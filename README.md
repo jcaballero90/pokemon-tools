@@ -37,7 +37,7 @@ The API is a modular monolith with pragmatic boundaries; the [architecture map](
 
 ## Run locally
 
-Prerequisites: Node.js 24, pnpm 11 (the workspace pins `pnpm@11.19.0`), and a local PostgreSQL database. The following commands run from the repository root.
+Prerequisites: Node.js 24, pnpm 11 (the workspace pins `pnpm@11.19.0`), and Docker Desktop for the local PostgreSQL container, or an existing local PostgreSQL 18 server. The following commands run from the repository root.
 
 1. Install dependencies and generate the Prisma client:
 
@@ -46,9 +46,26 @@ Prerequisites: Node.js 24, pnpm 11 (the workspace pins `pnpm@11.19.0`), and a lo
    pnpm db:generate
    ```
 
-2. Copy [`apps/api/.env.example`](apps/api/.env.example) to `apps/api/.env`. Set `DATABASE_URL` to your local PostgreSQL database and replace `BETTER_AUTH_SECRET` with a random value of at least 32 characters. Keep `.env` out of Git; the example values are placeholders. Set `PUBLIC_BASE_URL` and `TRUSTED_ORIGINS` to `http://127.0.0.1:5173` so they match Vite's default local address. SMTP settings are optional for local exploration; email verification and password reset require a working mail transport.
+2. Copy [`apps/api/.env.example`](apps/api/.env.example) to `apps/api/.env`. Replace `POSTGRES_PASSWORD` with a local URL-safe password and use the same password in `DATABASE_URL`. Replace `BETTER_AUTH_SECRET` with a random value of at least 32 characters. Keep `.env` out of Git; the example values are placeholders. Set `PUBLIC_BASE_URL` and `TRUSTED_ORIGINS` to `http://127.0.0.1:5173` so they match Vite's default local address. SMTP settings are optional for local exploration; email verification and password reset require a working mail transport.
 
-3. Apply the development migration and start both apps:
+3. Start the local database container:
+
+   ```sh
+   pnpm db:up
+   ```
+
+   Common database commands, run from the repository root:
+
+   ```sh
+   pnpm db:status  # check whether PostgreSQL is running
+   pnpm db:logs    # follow its logs; press Ctrl+C to stop viewing
+   pnpm db:stop    # stop PostgreSQL while keeping its data
+   pnpm db:down    # remove its container and network; keep the database volume
+   ```
+
+   Skip the container commands if you already run a local PostgreSQL server.
+
+4. Apply the development migration and start both apps:
 
    ```sh
    pnpm db:migrate

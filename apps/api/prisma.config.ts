@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { defineConfig } from "prisma/config";
 import { existsSync } from "node:fs";
 
