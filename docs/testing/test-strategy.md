@@ -1,0 +1,66 @@
+# Test strategy
+
+**Scope:** verification of the approved English-first Generation 9 release, its API, and its staging-to-production path. The [requirements](../requirements/requirements.md) define acceptance and track implementation progress; this document maps each requirement to credible checks and exposes gaps. The [security plan](../security/security-plan.md) covers risks, and the [operations guide](../operations.md) gives host procedures. A passing local test is not a public-release sign-off.
+
+## What the checks need to establish
+
+Use fast tests for deterministic battle rules, contracts, and UI behavior; database-backed tests for sessions, team ownership, and cache behavior; browser journeys for the guest and account workflows; and host checks for Docker, Caddy, Tailscale, HTTPS, backup, and promotion. The calculator is a pinned external library, so project tests should concentrate on the inputs, adaptation, and results the product promises rather than reimplementing all of its mechanics.
+
+Verification asks whether the implemented behavior meets the accepted criteria. Product validation also needs the owner to review whether the chart direction, statistics, comparison, calculator wording, and source credit help real users make sense of the data. A technically passing browser test cannot supply that judgment. No arbitrary global coverage percentage is selected; failures in ownership, validation, proxy trust, and release recovery deserve stronger checks than static types or simple constants.
+
+## Evidence available now
+
+On 2026-09-27, `pnpm test` passed: **8 API tests in 4 files and 1 web test in 1 file**. The contracts package has no test files and uses `--passWithNoTests`; that is not contract behavior coverage. `pnpm config:check` also passed, parsing eight YAML files and checking selected Compose network constraints. These commands did not start PostgreSQL, Docker, Caddy, Tailscale, or a browser journey.
+
+| Existing asset | What it currently exercises |
+| --- | --- |
+| [Catalog Vitest](../../apps/api/src/modules/catalog/catalog.test.ts) | Known type effectiveness values from pinned battle data. |
+| [Damage Vitest](../../apps/api/src/modules/damage/damage.test.ts) | Nonempty range, bounded one-hit KO probability, unknown species, and an explicit Tera condition. |
+| [API composition Vitest](../../apps/api/src/app.test.ts) | Health, catalog, default damage, anonymous team rejection, selected OpenAPI request bodies, and a synthetic non-edge peer rejection. It uses Fastify injection; it does not prove real database or proxy behavior. |
+| [CIDR Vitest](../../apps/api/src/ingress.test.ts) | In-subnet, out-of-subnet, malformed, and IPv4-mapped addresses. |
+| [Testing Library chart test](../../apps/web/src/type-chart.test.tsx) | Rendering 2× and 0.5× cells for a supplied row. |
+| [Playwright journeys](../../apps/web/e2e/journeys.spec.ts) | Two written flows: guest chart/build/damage and account signup/save. They have **not run in this documentation pass**; neither currently proves the full guest comparison or private-team lifecycle. |
+| [Static configuration check](../../scripts/check-config.mjs) | YAML parses, no API host port in app Compose files, expected API/database network membership, and loopback publication of Caddy's Tailscale listeners. |
+
+The [Checks workflow](../../.github/workflows/checks.yml) is written to build, type-check, lint, validate Prisma, run tests, migrate a CI PostgreSQL service, and run Playwright. [CodeQL](../../.github/workflows/codeql.yml), [staging smoke checks](../../.github/workflows/staging.yml), and [production promotion](../../.github/workflows/production.yml) are configured. Their execution cannot be claimed until the GitHub repository, branch rules, secrets, and host are in place. Earlier local browser observations are noted in the requirements but lack a durable run artifact.
+
+## Requirement-to-check map
+
+The “existing” column names a test or configuration currently present, not complete acceptance. The last column identifies the next proof needed, whether automated or explicitly recorded on the host.
+
+| Requirement | Existing check or artifact | Required additional proof |
+| --- | --- | --- |
+| [REQ-001](../requirements/requirements.md#req-001) English Gen 9 scope | Generation 9 catalog and UI exist; catalog and damage tests use Gen 9 data. | Review the built pages and API catalog against the first-release scope; confirm user-facing language and no unsupported-generation behavior in the deployed release. |
+| [REQ-002](../requirements/requirements.md#req-002) Type chart | Catalog Vitest checks Fire→Grass 2× and Electric→Ground 0×; Testing Library checks cells; written Playwright journey opens the chart. | Run the browser journey in CI and inspect offensive/defensive labels and known matchups in the release UI. The local chart behavior was previously inspected. |
+| [REQ-003](../requirements/requirements.md#req-003) Statistics | Catalog implementation exists; no dedicated stats journey test. | Select a known species in a browser, assert battle stats, then simulate PokéAPI unavailability and verify the stats remain while descriptive details report unavailable. |
+| [REQ-004](../requirements/requirements.md#req-004) Damage | Damage Vitest and API injection cover a default calculation; a written Playwright journey requests a result. | Add deterministic cases for HP/percentage bounds, conditional one-hit KO probability, unknown names, and supported field changes; run the browser journey and confirm accuracy is not folded into the displayed chance. |
+| [REQ-005](../requirements/requirements.md#req-005) Guest teams | The written Playwright journey adds one Pokémon; earlier local preview observed persistence. | In a browser, edit both teams, enforce six per side, reload to confirm both drafts, and assert that comparison changes with edits. Current Playwright assertions do not cover these outcomes. |
+| [REQ-006](../requirements/requirements.md#req-006) Accounts and private teams | API injection proves anonymous list returns 401; written Playwright signup/save flow exists. | Run database-backed signup/sign-in/sign-out and save/list/reopen/delete journeys. Use two users to prove reads and deletes cannot cross owners; check saved set fields after reopen. |
+| [REQ-007](../requirements/requirements.md#req-007) Set validation | Damage Vitest checks an unknown species; Zod and catalog validation code exist. | Check unknown species, moves, abilities, and items; level/EV/IV/boost boundaries and EV total; and acceptance of a known but tournament-illegal combination. Exercise both API and saved-team path where relevant. |
+| [REQ-008](../requirements/requirements.md#req-008) Pro teams | Curated records exist; staging smoke script is written to require at least two entries. | Human-review each record against its credited report/paste, including event and placement; check unknown spread fields stay unknown and source links work in the rendered UI. Run staging smoke. |
+| [REQ-009](../requirements/requirements.md#req-009) Data authority | Pinned calculator dependency and type chart test exist. | Adapter tests with controlled PokéAPI success, timeout/failure, fresh/stale cache, mapped form, and unmapped form; verify type, stats, and damage still use calculator values during an outage. |
+| [REQ-010](../requirements/requirements.md#req-010) API contracts | API injection checks two OpenAPI request bodies; frontend calls relative `/api`. | Audit request **and response** schemas for every published route, compare generated OpenAPI with responses, check same-origin calls through the deployed image, and confirm interactive docs are unavailable in production. |
+| [REQ-011](../requirements/requirements.md#req-011) App security | Helmet and rate-limit plugins are configured; anonymous 401 is tested. | Inspect HTTPS cookie flags and headers; verify invalid input and 429 behavior, account ownership, and the chosen CSRF defense for project-owned team mutations. The CSRF choice remains proposed in the security plan. |
+| [REQ-012](../requirements/requirements.md#req-012) Proxy trust | CIDR tests, one synthetic raw-peer rejection, and static Compose checks exist. | On the mini PC, test direct HTTPS, private Serve, and public Funnel with spoofed forwarding headers; observe Fastify's client IP/host/scheme, reject a reachable non-edge peer, inspect network membership and host ports, and check staging/production cookie isolation. |
+| [REQ-013](../requirements/requirements.md#req-013) Workspace/runtime | Package manifests and Dockerfile exist; previous local build evidence is in the requirements. | Run the frozen-lockfile build in CI, start the image through both Compose projects, and confirm the same image accepts separate runtime secrets, URLs, and databases without cross-environment access. |
+| [REQ-014](../requirements/requirements.md#req-014) Automated checks | Workflow and Dependabot files parse in `config:check`. | Observe required Checks, CodeQL, Playwright, and Dependabot activity on actual PRs/pushes; verify branch protection prevents bypass. A valid YAML file alone does not establish the gate. |
+| [REQ-015](../requirements/requirements.md#req-015) Promotion/rollback | Staging/production workflows and deploy script are written. | Record a successful staging commit/tree/digest and private smoke result; promote a matching main tree and confirm the **same** digest; exercise failed-stage abort and requested app-only rollback with a backward-compatible migration. |
+| [REQ-016](../requirements/requirements.md#req-016) Backup/gates | Backup, restore, and production gate scripts exist. | Prove a missing USB mount stops backup; create an encrypted snapshot, restore it into a disposable DB and query it; test public ingress from off-host/mobile data before setting its gate marker. |
+| [REQ-017](../requirements/requirements.md#req-017) Critical journeys | Vitest, Testing Library, Playwright files, and host procedures exist. | Run the database-backed adapter and browser journeys in CI, plus the explicit host ingress checks above. Preserve results or failure details; mark unexercised paths as gaps rather than treating written tests as passed. |
+
+## Environments, test data, and evidence
+
+- **Local and CI:** use pinned Node/pnpm dependencies and a disposable PostgreSQL database for auth and Prisma adapter checks. The existing CI workflow provisions PostgreSQL 18. Use test accounts and synthetic teams; never use real user credentials or production data. Reset or isolate database records between cases so order does not affect results.
+- **External data:** stub PokéAPI responses and failures in adapter tests. That makes outage, cache, and form behavior reproducible without relying on a live third-party service. Review pro-team publications manually because a green test cannot establish source accuracy by itself.
+- **Browser:** run Playwright against a started web/API/database stack. Assert outcomes after reload and across users, not only that a button was clicked or a page appeared. Retain failure traces or screenshots where CI supports them; do not treat an unreviewed visual baseline as proof of correct content.
+- **Staging and host:** record the staging digest and Git tree with smoke output. For ingress, capture expected and spoofed-header results, Docker network and port observations, and separate cookie jars without storing secrets. For recovery, keep the restore drill result and external public-ingress observation with the release record. Production promotion must refer to that tested digest.
+
+## Open questions and limits
+
+The requirement owner has not decided whether saved teams must contain exactly six Pokémon or whether public email verification is mandatory. Test cases for those choices remain provisional. The [security plan](../security/security-plan.md) also proposes an explicit Origin/CSRF control for the project-owned team mutations; test its accepted form once selected. Requirement priorities are undecided, so this strategy orders checks by technical risk without assigning product priority.
+
+No database-backed adapter integration test, CI Playwright result, Caddy/Tailscale header run, Docker image start, USB restore drill, or public ingress test is claimed here. The team should update the requirements' evidence after each check passes and keep failures visible. A new test framework, coverage target, or separate testing ADR is not needed merely to document this strategy.
+
+## Course influence and project ownership
+
+The validated **Ingeniería del software → Análisis de requisitos → Validación y verificación de requisitos** informs the distinction between acceptance checks and owner review. **Arquitectura del software → Aplicando Clean Architecture con TypeScript → Testing en Clean Architecture** informs which boundary each test protects. **Calidad → Testing → E2E asistido por IA** informs critical browser journeys and review of test evidence. **Calidad → Métricas, coverage y complejidad → Coverage honesto** cautions against using a high aggregate percentage as a substitute for risk coverage. These are course principles; the specific requirements, tools, checks, and release gates are owner-approved Pokémon Tools choices or proposed checks tied to them.

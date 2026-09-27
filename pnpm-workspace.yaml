@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  '@prisma/engines': true
+  better-sqlite3: false
+  esbuild: true
+  prisma: true
+minimumReleaseAgeExclude:
+  - '@fastify/static@10.1.5'
+  - '@types/node@26.6.3'

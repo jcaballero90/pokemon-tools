@@ -1,0 +1,47 @@
+name: pokemon-staging
+services:
+  api:
+    image: ${IMAGE_DIGEST:?set IMAGE_DIGEST}
+    container_name: pokemon-staging-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DEPLOY_ENV: staging
+      PORT: 4000
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET}
+      PUBLIC_BASE_URL: ${STAGING_BASE_URL:?set STAGING_BASE_URL}
+      TRUSTED_ORIGINS: ${STAGING_BASE_URL}
+      EDGE_CIDR: 172.31.11.0/24
+      STATIC_DIR: /app/apps/web/dist
+      SMTP_URL: ${SMTP_URL:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    networks: [edge, database]
+    depends_on:
+      db: { condition: service_healthy }
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+  db:
+    image: postgres:18
+    container_name: pokemon-staging-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pokemon
+      POSTGRES_USER: pokemon
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+    volumes: [staging_db:/var/lib/postgresql]
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U pokemon -d pokemon"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+networks:
+  edge:
+    external: true
+    name: pokemon_stage_edge
+  database:
+    internal: true
+volumes:
+  staging_db:

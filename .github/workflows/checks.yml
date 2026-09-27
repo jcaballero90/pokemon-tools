@@ -1,0 +1,44 @@
+name: Checks
+on:
+  pull_request:
+    branches: [staging, main]
+  push:
+    branches: [staging, main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: pokemon
+          POSTGRES_PASSWORD: test-password
+          POSTGRES_DB: pokemon
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U pokemon -d pokemon"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      DATABASE_URL: postgresql://pokemon:test-password@localhost:5432/pokemon
+      BETTER_AUTH_SECRET: ci-only-random-looking-secret-over-32-characters
+      PUBLIC_BASE_URL: http://127.0.0.1:5173
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11.19.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: "24", cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
+      - run: pnpm db:validate
+      - run: pnpm build
+      - run: pnpm check
+      - run: pnpm lint
+      - run: pnpm config:check
+      - run: pnpm test
+      - run: pnpm --filter @pokemon-tools/api db:deploy
+      - run: pnpm --filter @pokemon-tools/web exec playwright install --with-deps chromium
+      - run: pnpm test:e2e

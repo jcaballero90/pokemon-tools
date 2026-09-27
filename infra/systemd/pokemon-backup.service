@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up Pokémon production PostgreSQL to encrypted USB restic repository
+RequiresMountsFor=/mnt/pokemon-backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/pokemon-backup production daily

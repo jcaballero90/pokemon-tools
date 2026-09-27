@@ -1,0 +1,38 @@
+name: pokemon-edge
+services:
+  caddy:
+    image: caddy:2
+    container_name: pokemon-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:18081:8081"
+      - "127.0.0.1:18082:8082"
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?set PUBLIC_HOST}
+      STAGING_HOST: ${STAGING_HOST:?set STAGING_HOST}
+      FUNNEL_HOST: ${FUNNEL_HOST:?set FUNNEL_HOST}
+      TAILSCALE_PROXY_PEER: ${TAILSCALE_PROXY_PEER:?set TAILSCALE_PROXY_PEER}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+    volumes:
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [ingress, staging_edge, production_edge]
+networks:
+  ingress:
+    name: pokemon_ingress
+    ipam:
+      config:
+        - subnet: 172.31.10.0/24
+          gateway: 172.31.10.1
+  staging_edge:
+    external: true
+    name: pokemon_stage_edge
+  production_edge:
+    external: true
+    name: pokemon_prod_edge
+volumes:
+  caddy_data:
+  caddy_config:

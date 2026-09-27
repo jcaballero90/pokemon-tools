@@ -1,0 +1,47 @@
+name: pokemon-production
+services:
+  api:
+    image: ${IMAGE_DIGEST:?set IMAGE_DIGEST}
+    container_name: pokemon-prod-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DEPLOY_ENV: production
+      PORT: 4000
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?set PUBLIC_BASE_URL}
+      TRUSTED_ORIGINS: ${PUBLIC_BASE_URL},${FUNNEL_BASE_URL:?set FUNNEL_BASE_URL},https://${PUBLIC_HOST:?set PUBLIC_HOST}
+      EDGE_CIDR: 172.31.12.0/24
+      STATIC_DIR: /app/apps/web/dist
+      SMTP_URL: ${SMTP_URL:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    networks: [edge, database]
+    depends_on:
+      db: { condition: service_healthy }
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+  db:
+    image: postgres:18
+    container_name: pokemon-prod-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pokemon
+      POSTGRES_USER: pokemon
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+    volumes: [production_db:/var/lib/postgresql]
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U pokemon -d pokemon"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+networks:
+  edge:
+    external: true
+    name: pokemon_prod_edge
+  database:
+    internal: true
+volumes:
+  production_db:

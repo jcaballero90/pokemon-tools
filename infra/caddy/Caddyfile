@@ -1,0 +1,63 @@
+{
+  email {$ACME_EMAIL}
+  servers :8081 {
+    trusted_proxies static {$TAILSCALE_PROXY_PEER}/32
+    trusted_proxies_strict
+    client_ip_headers X-Forwarded-For
+  }
+  servers :8082 {
+    trusted_proxies static {$TAILSCALE_PROXY_PEER}/32
+    trusted_proxies_strict
+    client_ip_headers X-Forwarded-For
+  }
+}
+
+{$PUBLIC_HOST} {
+  log
+  reverse_proxy pokemon-prod-api:4000 {
+    header_up Host {$PUBLIC_HOST}
+    header_up X-Forwarded-Host {$PUBLIC_HOST}
+    header_up X-Forwarded-Proto https
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Real-IP {remote_host}
+    header_up -Tailscale-User-Login
+    header_up -Tailscale-User-Name
+    header_up -Tailscale-User-Profile-Pic
+  }
+}
+
+:8081 {
+  log
+  @tailscale remote_ip {$TAILSCALE_PROXY_PEER}
+  handle @tailscale {
+    reverse_proxy pokemon-staging-api:4000 {
+      header_up Host {$STAGING_HOST}
+      header_up X-Forwarded-Host {$STAGING_HOST}
+      header_up X-Forwarded-Proto https
+      header_up X-Forwarded-For {client_ip}
+      header_up X-Real-IP {client_ip}
+      header_up -Tailscale-User-Login
+      header_up -Tailscale-User-Name
+      header_up -Tailscale-User-Profile-Pic
+    }
+  }
+  handle { respond "Untrusted proxy peer" 403 }
+}
+
+:8082 {
+  log
+  @tailscale remote_ip {$TAILSCALE_PROXY_PEER}
+  handle @tailscale {
+    reverse_proxy pokemon-prod-api:4000 {
+      header_up Host {$FUNNEL_HOST}
+      header_up X-Forwarded-Host {$FUNNEL_HOST}
+      header_up X-Forwarded-Proto https
+      header_up X-Forwarded-For {client_ip}
+      header_up X-Real-IP {client_ip}
+      header_up -Tailscale-User-Login
+      header_up -Tailscale-User-Name
+      header_up -Tailscale-User-Profile-Pic
+    }
+  }
+  handle { respond "Untrusted proxy peer" 403 }
+}

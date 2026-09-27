@@ -1,0 +1,43 @@
+name: Promote production
+on:
+  workflow_run:
+    workflows: [Checks]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: pokemon-production-deploy
+  cancel-in-progress: false
+jobs:
+  promote:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ github.event.workflow_run.head_sha }}" }
+      - name: Verify this is still main head
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          HEAD=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          test "$HEAD" = "${{ github.event.workflow_run.head_sha }}"
+      - uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: "${{ secrets.TS_OAUTH_CLIENT_ID }}"
+          oauth-secret: "${{ secrets.TS_OAUTH_SECRET }}"
+          tags: tag:ci
+      - name: Verify tested Git tree and promote exact digest
+        env:
+          DEPLOY_KEY: "${{ secrets.DEPLOY_SSH_KEY }}"
+          KNOWN_HOSTS: "${{ secrets.DEPLOY_KNOWN_HOSTS }}"
+          DEPLOY_TARGET: "${{ vars.DEPLOY_TARGET }}"
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          read -r TESTED_COMMIT TESTED_TREE TESTED_DIGEST <<< "$(ssh -o BatchMode=yes "$DEPLOY_TARGET" release-info)"
+          TREE=$(git rev-parse 'HEAD^{tree}')
+          test "$TREE" = "$TESTED_TREE"
+          ssh -o BatchMode=yes "$DEPLOY_TARGET" "production $TESTED_DIGEST $TREE"

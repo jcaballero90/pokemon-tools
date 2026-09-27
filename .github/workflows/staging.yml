@@ -1,0 +1,78 @@
+name: Deploy staging
+on:
+  workflow_run:
+    workflows: [Checks]
+    types: [completed]
+    branches: [staging]
+permissions:
+  contents: read
+  packages: write
+concurrency:
+  group: pokemon-staging-deploy
+  cancel-in-progress: false
+jobs:
+  build-and-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ github.event.workflow_run.head_sha }}" }
+      - name: Verify this is still staging head
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          HEAD=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/staging" --jq .object.sha)
+          test "$HEAD" = "${{ github.event.workflow_run.head_sha }}"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Resolve image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@v6
+        id: build
+        with:
+          context: .
+          push: true
+          tags: "${{ steps.image.outputs.name }}:staging-${{ github.event.workflow_run.head_sha }}"
+      - uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: "${{ secrets.TS_OAUTH_CLIENT_ID }}"
+          oauth-secret: "${{ secrets.TS_OAUTH_SECRET }}"
+          tags: tag:ci
+      - name: Deploy immutable digest and verify private staging
+        env:
+          DEPLOY_KEY: "${{ secrets.DEPLOY_SSH_KEY }}"
+          KNOWN_HOSTS: "${{ secrets.DEPLOY_KNOWN_HOSTS }}"
+          DEPLOY_TARGET: "${{ vars.DEPLOY_TARGET }}"
+          STAGING_URL: "${{ vars.STAGING_URL }}"
+          IMAGE: "${{ steps.image.outputs.name }}@${{ steps.build.outputs.digest }}"
+          COMMIT: "${{ github.event.workflow_run.head_sha }}"
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          TREE=$(git rev-parse 'HEAD^{tree}')
+          staged=0
+          confirmed=0
+          abort_if_needed() {
+            status=$?
+            if [ "$status" -ne 0 ] && [ "$staged" -eq 1 ] && [ "$confirmed" -eq 0 ]; then
+              ssh -o BatchMode=yes "$DEPLOY_TARGET" "stage-abort $IMAGE $COMMIT $TREE" || true
+            fi
+          }
+          trap abort_if_needed EXIT
+          ssh -o BatchMode=yes "$DEPLOY_TARGET" "stage $IMAGE $COMMIT $TREE"
+          staged=1
+          curl --fail --silent --show-error --max-time 20 "$STAGING_URL/api/health"
+          curl --fail --silent --show-error --max-time 20 "$STAGING_URL/api/catalog" | jq -e '.species | length > 0'
+          curl --fail --silent --show-error --max-time 20 "$STAGING_URL/api/pro-teams" | jq -e 'length >= 2'
+          curl --fail --silent --show-error --max-time 20 "$STAGING_URL/docs/json" | jq -e '.paths["/api/damage"].post'
+          curl --fail --silent --show-error --max-time 20 -H 'content-type: application/json' --data '{"attacker":{"species":"Pikachu"},"defender":{"species":"Charizard"},"move":"Thunderbolt","field":{}}' "$STAGING_URL/api/damage" | jq -e '.max > 0'
+          ssh -o BatchMode=yes "$DEPLOY_TARGET" "stage-confirm $IMAGE $COMMIT $TREE"
+          confirmed=1
