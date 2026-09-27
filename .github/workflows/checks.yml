@@ -26,7 +26,7 @@ jobs:
       PUBLIC_BASE_URL: http://127.0.0.1:5173
       NODE_ENV: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
         with: { version: 11.19.0 }
       - uses: actions/setup-node@v7
