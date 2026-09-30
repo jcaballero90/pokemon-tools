@@ -223,7 +223,7 @@ Prefer updating an existing relevant document over creating a new one. Avoid doc
 
 The user approved the Generation 9 architecture and release plan in September 2026. The living system map and accepted ADRs are linked from `docs/architecture/architecture.md`. The accepted first-release choices include React/Vite, Fastify, Prisma 7, PostgreSQL 18, Better Auth, pinned Smogon calculator data, cached PokéAPI descriptions, a modular monolith, Docker Compose, shared Caddy, Tailscale Serve/Funnel, and GitHub Actions staging promotion by image digest. The repository contains an initial implementation of those choices.
 
-The deployment has not been activated or verified on the mini PC. `docs/operations.md` lists the remaining host, GitHub, network, email, and USB restore checks. Future options such as Kubernetes, a battle simulator, older generations, and Prisma 8 are not approved implementation choices for this release.
+The mini PC host foundation is partially deployed: Caddy, both PostgreSQL databases, encrypted USB restic backup, and the private staging Tailscale Serve route are configured. The application APIs are not deployed; current HTTP 502 responses are expected until CI supplies an image digest. Tailscale Funnel, restricted tailnet policy, full ingress verification, GitHub deployment gates, and the USB restore drill remain outstanding. `docs/operations.md` records observed state and the next host steps. Future options such as Kubernetes, a battle simulator, older generations, and Prisma 8 are not approved implementation choices for this release.
 
 ## 14. Instruction precedence
 

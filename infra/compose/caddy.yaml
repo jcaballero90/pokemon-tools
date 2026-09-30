@@ -2,6 +2,7 @@ name: pokemon-edge
 services:
   caddy:
     image: caddy:2
+    user: "${CADDY_UID:?set CADDY_UID}:${CADDY_GID:?set CADDY_GID}"
     container_name: pokemon-caddy
     restart: unless-stopped
     ports:
@@ -16,7 +17,12 @@ services:
       TAILSCALE_PROXY_PEER: ${TAILSCALE_PROXY_PEER:?set TAILSCALE_PROXY_PEER}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
     volumes:
-      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - type: bind
+        source: ../caddy/Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+        bind:
+          create_host_path: false
       - caddy_data:/data
       - caddy_config:/config
     networks: [ingress, staging_edge, production_edge]
