@@ -41,7 +41,9 @@
       header_up -Tailscale-User-Profile-Pic
     }
   }
-  handle { respond "Untrusted proxy peer" 403 }
+  handle {
+    respond "Untrusted proxy peer" 403
+  }
 }
 
 :8082 {
@@ -59,5 +61,7 @@
       header_up -Tailscale-User-Profile-Pic
     }
   }
-  handle { respond "Untrusted proxy peer" 403 }
+  handle {
+    respond "Untrusted proxy peer" 403
+  }
 }

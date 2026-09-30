@@ -9,6 +9,7 @@ test-results/
 !.env.example
 infra/secrets/*
 !infra/secrets/README.md
+!infra/secrets/*.env.example
 *.local
 **/src/generated/
 .DS_Store

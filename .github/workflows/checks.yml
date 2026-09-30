@@ -1,9 +1,9 @@
 name: Checks
 on:
   pull_request:
-    branches: [staging, main]
+    branches: [development, staging, main]
   push:
-    branches: [staging, main]
+    branches: [development, staging, main]
 permissions:
   contents: read
 jobs:

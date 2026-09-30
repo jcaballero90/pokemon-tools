@@ -84,7 +84,7 @@ case "$ACTION" in
     trap 'rollback_failed production' ERR
     export IMAGE_DIGEST="$DIGEST"
     docker pull "$DIGEST"
-    if docker container inspect pokemon-prod-db >/dev/null 2>&1; then "$ROOT/infra/scripts/backup.sh" production pre-migration; fi
+    if docker container inspect pokemon-prod-db >/dev/null 2>&1; then /usr/local/sbin/pokemon-backup production pre-migration; fi
     compose production up -d db
     compose production run --rm --no-deps api sh -c 'cd apps/api && ./node_modules/.bin/prisma migrate deploy'
     compose production up -d --no-deps api
