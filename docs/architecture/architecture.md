@@ -1,6 +1,6 @@
 # System architecture
 
-**Scope:** the approved English-first Generation 9 Scarlet/Violet release. **Status:** this is a living map of the local implementation and approved deployment design. The application builds and its local API/UI have been exercised; the mini PC deployment, public ingress, and recovery paths remain unverified. The [requirements](../requirements/requirements.md) distinguish accepted scope from implementation and verification progress.
+**Scope:** the approved English-first Generation 9 Scarlet/Violet release. **Status:** this is a living map of the local implementation and approved deployment design. The application builds and its local API/UI have been exercised. On the mini PC, Caddy and both databases are running; public HTTPS and private staging Serve reach Caddy, but the app containers are not deployed. The encrypted USB repository passes `restic check`; a restore drill and full ingress security checks remain. The [requirements](../requirements/requirements.md) distinguish accepted scope from implementation and verification progress.
 
 This document describes responsibilities and interactions. The accepted decisions and their trade-offs are recorded in the ADRs listed below.
 
@@ -78,7 +78,7 @@ GitHub checks precede a staging build. A successful staging workflow publishes o
 
 - Local build, type, lint, unit/API composition, Prisma schema, and static YAML checks have passed. The type chart and default damage calculation have also been inspected in the local browser preview.
 - Database-backed account journeys, adapter integration tests, CI Playwright runs, and the full OpenAPI response-schema audit are pending. The generated API description exists, but route response coverage is incomplete; see [REQ-010](../requirements/requirements.md#req-010) and [REQ-017](../requirements/requirements.md#req-017).
-- The image has not been started through Compose on the mini PC. Caddy parsing and peer/header behavior, Tailscale Serve/Funnel, DuckDNS resolution, external HTTPS ingress, email delivery, and the USB restore drill remain unverified. None of these paths is described as live production.
+- The application image has not been started through Compose on the mini PC. Caddy parsed and started; DuckDNS HTTPS and the private staging Tailscale Service both reached Caddy, where they returned 502 because the matching API containers are absent. Tailscale Funnel, proxy-header behavior, email delivery, a disposable USB restore drill, and application behavior on the host remain unverified. No application environment is described as live production.
 
 ## Decision records
 
