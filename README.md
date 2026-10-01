@@ -2,7 +2,7 @@
 
 An English-first Generation 9 Scarlet/Violet web app for exploring battle data, planning teams, and estimating damage. Guests can draft and compare two teams in their browser. An account adds private saved teams. The first release also includes a small collection of tournament teams with links to their publications and team pastes.
 
-This repository is the working TFM project. The application and deployment configuration exist, while public hosting and several end-to-end checks still need to be completed. The [requirements](docs/requirements/requirements.md) track accepted scope and verification state.
+This repository is the working TFM project. The application is deployed to staging and production on the owner's mini PC, with production reachable at `https://jcrserver.duckdns.org`. Several end-to-end product and security checks remain open; see the [requirements](docs/requirements/requirements.md) and [test strategy](docs/testing/test-strategy.md).
 
 ## Features
 
@@ -88,13 +88,13 @@ pnpm config:check
 
 ## Deployment status and documentation
 
-The intended release path is a protected `staging` branch, one image build and private smoke test, then approval and promotion of that **same digest** to `main` production. The production service runs behind shared Caddy; private staging uses Tailscale Serve, and public production can use direct HTTPS or a Tailscale Funnel fallback. The [infrastructure plan](docs/infrastructure/infrastructure-plan.md) records those choices. The [mini PC operations guide](docs/operations.md) gives the staged setup, ingress checks, backup drill, and rollback procedure. These repository files have **not** been provisioned or verified on the mini PC. GitHub Actions has not yet run in the owner's repository.
+The release path uses successful Checks on `staging` to build one image, deploy it by immutable digest, and run private smoke checks through Tailscale Serve. A successful Checks run on `main` starts production promotion, which compares the main Git tree with the tree recorded by staging and deploys that same digest. Production runs behind shared Caddy at `https://jcrserver.duckdns.org`; private staging uses Tailscale Serve. The optional public Tailscale Funnel fallback is not required for the working DuckDNS route. The [infrastructure plan](docs/infrastructure/infrastructure-plan.md) records the topology; the [mini PC operations guide](docs/operations.md) records setup, CI/CD settings, release evidence, and recovery steps. The [latest TFM workflow record](docs/tfm/ai-methodology/workflows/006-staging-production-rollout.md) captures the rollout and remaining verification limits.
 
 | TFM handoff item | Current state |
 | --- | --- |
-| GitHub repository URL | Pending owner initialization and first commit. |
-| Public application URL | Pending off-host ingress and production release gates. |
+| GitHub repository URL | [github.com/jcaballero90/pokemon-tools](https://github.com/jcaballero90/pokemon-tools) |
+| Public application URL | `https://jcrserver.duckdns.org` (production deployment and page reported working by the owner). |
 | Slides and explanatory video | Pending; links will be added when created. |
 | Reviewer login | `<user>` / `<password>` are placeholders only. The owner will arrange usable test access for final delivery without committing real credentials. |
 
-Further project records: [security plan](docs/security/security-plan.md), [AI methodology and workflow evidence](docs/tfm/ai-methodology/README.md), and [documentation-pass workflow](docs/tfm/ai-methodology/workflows/005-project-documentation-pass.md). The README will need a final review against the actual GitHub URL, live app, delivery materials, and reviewer access before TFM submission.
+Further project records: [security plan](docs/security/security-plan.md), [AI methodology and workflow evidence](docs/tfm/ai-methodology/README.md), [documentation-pass workflow](docs/tfm/ai-methodology/workflows/005-project-documentation-pass.md), and [staging-to-production rollout workflow](docs/tfm/ai-methodology/workflows/006-staging-production-rollout.md). The README will need a final review against the actual GitHub URL, live app, delivery materials, and reviewer access before TFM submission.

@@ -25,7 +25,7 @@ Back up PostgreSQL daily and before production migrations into an encrypted rest
 - The promoted artifact is traceable to the staging tree and checks, and an app rollback is quick to invoke.
 - Backward-compatible migrations constrain schema changes. A data or migration failure may still require a separate recovery procedure.
 - The USB repository provides local recovery from some host failures, but it is exposed to loss of the mini PC's location until an off-host copy exists.
-- The workflow, Tailscale SSH path, restore drill, and public ingress are configured but not yet proven on the mini PC or GitHub.
+- **Implementation status (2026-09-30):** the owner reports successful staging and production workflow runs, a completed staging restore drill, and a live public production page. Retain Actions run links for exact commit/digest evidence. Reviewer settings, failed-stage recovery, and app-only rollback remain to be verified.
 
 ## Evidence and sources
 

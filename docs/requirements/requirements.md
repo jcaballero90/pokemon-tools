@@ -32,7 +32,7 @@ The first release shall present English-language utilities for Generation 9 Scar
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** The released UI and battle catalog use this scope. Spanish, older generations, and a player battle simulator are not first-release commitments.
-- **Current evidence:** The web app and API are implemented around the Generation 9 catalog; a public release has not been verified.
+- **Current evidence:** The web app and API are implemented around the Generation 9 catalog. The owner reports the production page is live at `https://jcrserver.duckdns.org`; feature acceptance still needs product review.
 
 ### REQ-002
 
@@ -120,7 +120,7 @@ Shared Caddy shall be the application-facing reverse proxy for private staging a
 
 - **Origin:** Project owner's approved architecture and release plan and explicit proxy-trust decision.
 - **Acceptance:** Test direct DuckDNS HTTPS where available, private Tailscale Serve staging, and public Funnel fallback. Spoofed forwarding headers cannot alter the trusted client address, host, or scheme; a non-edge peer receives a rejection; Fastify has no host-published port; staging and production cookies remain isolated by hostname.
-- **Current evidence:** Compose, Caddy, and raw-peer guard configuration exist. Live Caddy, Tailscale, Docker-network, and public-path checks await the mini PC.
+- **Current evidence:** The owner reports staging Serve and the public DuckDNS production page working through Caddy. This verifies basic reachability, not spoofed-header handling, non-edge rejection, deployed security headers, or cookie isolation; those host checks remain open.
 
 ### REQ-013
 
@@ -136,7 +136,7 @@ Feature PRs and pushes to the release branches shall run automated quality check
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** GitHub executes the configured build, type, lint, test, schema, browser, and code-scanning checks on the intended events; dependency updates are proposed through Dependabot.
-- **Current evidence:** Workflow and Dependabot files exist. The GitHub repository and checks have not yet been activated.
+- **Current evidence:** The owner reports successful Checks and staging/production deployment workflow runs. The workflows encode checks and deployment for `staging` and `main`; retain the Actions run links as evidence. Repository branch protection, CodeQL coverage, and production environment reviewer/branch settings still require direct confirmation in GitHub settings.
 
 ### REQ-015
 
@@ -144,7 +144,7 @@ A staging push shall build one image, deploy and smoke-test it by immutable dige
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** A tested staging tree is required for promotion; production performs no rebuild; rollback restores the previous app digest without reversing the database. Shipped migrations remain compatible with the immediately previous image.
-- **Current evidence:** Workflows and deployment scripts implement the flow, including a staging abort after failed private smoke checks. No host deployment or rollback drill has run.
+- **Current evidence:** The owner reports that staging and production deployment workflows completed and the production page is live. The staging workflow builds one digest and smoke-tests selected endpoints; production checks the Git tree and promotes that recorded digest without rebuilding. Failed-stage recovery and app-only rollback have not been exercised.
 
 ### REQ-016
 
@@ -152,7 +152,7 @@ PostgreSQL shall receive encrypted daily and pre-production-migration backups on
 
 - **Origin:** Project owner's approved architecture and release plan, including the USB destination chosen in place of a NAS.
 - **Acceptance:** Backups stop if the USB mount is absent; a restored snapshot can be queried in a disposable database; public ingress works from outside the home network before production is enabled.
-- **Current evidence:** Backup, restore, and gate scripts exist. The USB and public-ingress checks have not run on the mini PC.
+- **Current evidence:** The owner reports a successful backup/check and ran the disposable staging restore drill. The owner also reports successful production deployment and public page reachability, implying the host's production gates passed. These facts do not establish missing-mount behavior or an off-host recovery copy; the current USB is local to the mini PC.
 
 ### REQ-017
 
