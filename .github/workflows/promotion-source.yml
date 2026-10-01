@@ -1,0 +1,30 @@
+name: Promotion source
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+# Read PR metadata using the trusted workflow on the default branch.
+# Do not check out or execute code from the pull request in this workflow.
+permissions: {}
+
+jobs:
+  promotion-source:
+    # Keep this name stable: select it as a required status check for main.
+    name: Promotion source
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require staging from this repository
+        shell: bash
+        env:
+          PR_SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_SOURCE_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          TARGET_REPOSITORY: ${{ github.repository }}
+        run: |
+          if [[ "$PR_SOURCE_BRANCH" != "staging" || "$PR_SOURCE_REPOSITORY" != "$TARGET_REPOSITORY" ]]; then
+            echo "::error::Only staging from this repository may be merged into main. Promote changes through development -> staging -> main."
+            exit 1
+          fi
+          echo "Promotion source accepted: staging -> main."

@@ -6,9 +6,12 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    target-branch: development
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
+    target-branch: development
   - package-ecosystem: docker
     directory: /
     schedule: { interval: weekly }
+    target-branch: development
