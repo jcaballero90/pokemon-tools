@@ -22,7 +22,7 @@ On 2026-09-27, `pnpm test` passed: **8 API tests in 4 files and 1 web test in 1 
 | [Playwright journeys](../../apps/web/e2e/journeys.spec.ts) | Two written flows: guest chart/build/damage and account signup/save. They have **not run in this documentation pass**; neither currently proves the full guest comparison or private-team lifecycle. |
 | [Static configuration check](../../scripts/check-config.mjs) | YAML parses, no API host port in app Compose files, expected API/database network membership, and loopback publication of Caddy's Tailscale listeners. |
 
-The [Checks workflow](../../.github/workflows/checks.yml) is written to build, type-check, lint, validate Prisma, run tests, migrate a CI PostgreSQL service, and run Playwright. [CodeQL](../../.github/workflows/codeql.yml), [staging smoke checks](../../.github/workflows/staging.yml), and [production promotion](../../.github/workflows/production.yml) are configured. Their execution cannot be claimed until the GitHub repository, branch rules, secrets, and host are in place. Earlier local browser observations are noted in the requirements but lack a durable run artifact.
+The [Checks workflow](../../.github/workflows/checks.yml) builds, type-checks, lints, validates Prisma, runs tests, migrates a CI PostgreSQL service, and runs Playwright. [CodeQL](../../.github/workflows/codeql.yml), [staging smoke checks](../../.github/workflows/staging.yml), and [production promotion](../../.github/workflows/production.yml) are configured. The owner reports successful staging and production deployment runs; retain their GitHub Actions links/run IDs as durable evidence. These green runs establish the checks and smoke requests defined by those workflows, not every product/security requirement. Verify environment settings and branch protections in GitHub; full host proxy/security checks, account journeys, and rollback remain open.
 
 ## Requirement-to-check map
 
@@ -59,7 +59,7 @@ The “existing” column names a test or configuration currently present, not c
 
 The requirement owner has not decided whether saved teams must contain exactly six Pokémon or whether public email verification is mandatory. Test cases for those choices remain provisional. The [security plan](../security/security-plan.md) also proposes an explicit Origin/CSRF control for the project-owned team mutations; test its accepted form once selected. Requirement priorities are undecided, so this strategy orders checks by technical risk without assigning product priority.
 
-No database-backed adapter integration test, CI Playwright result, Caddy/Tailscale header run, Docker image start, USB restore drill, or public ingress test is claimed here. The team should update the requirements' evidence after each check passes and keep failures visible. A new test framework, coverage target, or separate testing ADR is not needed merely to document this strategy.
+No database-backed adapter integration test, complete Caddy/Tailscale header exercise, or rollback drill is claimed here. The owner reports a staging restore drill, live public production page, and successful staging/production deployment workflows. The Actions workflow includes selected private staging API smoke checks, but this is not a substitute for full Playwright/account journeys or independent proxy/security verification. Update the requirements' evidence as further checks pass and keep failures visible.
 
 ## Course influence and project ownership
 
