@@ -15,6 +15,7 @@
     "config:check": "node scripts/check-config.mjs",
     "test": "pnpm --filter @pokemon-tools/contracts build && pnpm -r test",
     "test:e2e": "pnpm --filter @pokemon-tools/web test:e2e",
+    "pre-pr": "pnpm lint && pnpm check && pnpm test && pnpm test:e2e && docker build -t pokemon-tools:local .",
     "db:up": "docker compose --env-file apps/api/.env -f infra/compose/local-db.yaml up -d",
     "db:stop": "docker compose --env-file apps/api/.env -f infra/compose/local-db.yaml stop",
     "db:down": "docker compose --env-file apps/api/.env -f infra/compose/local-db.yaml down --remove-orphans",
