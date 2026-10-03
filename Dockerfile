@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS build
+FROM node:24.21.0-bookworm-slim
 WORKDIR /work
 RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
@@ -12,7 +12,7 @@ COPY apps/api apps/api
 COPY apps/web apps/web
 RUN pnpm --filter @pokemon-tools/api db:generate && pnpm build
 
-FROM node:24-bookworm-slim
+FROM node:24.21.0-bookworm-slim
 ENV NODE_ENV=production PORT=4000 STATIC_DIR=/app/web
 WORKDIR /app
 RUN corepack enable && groupadd -r pokemon && useradd -r -g pokemon pokemon
