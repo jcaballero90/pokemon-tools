@@ -1,0 +1,246 @@
+export const en = {
+  app: {
+    title: "Pokémon Tools",
+    brandSubtitle: "Generation 9 / Scarlet & Violet",
+    mainNavigation: "Main navigation",
+    competitiveWorkspace: "COMPETITIVE WORKSPACE",
+    guestMode: "Guest mode",
+    dismissNotice: "Dismiss",
+    footer: "Battle data and mechanics: {calc} · Descriptive data: {pokedex} · Pokémon is owned by Nintendo, Game Freak and The Pokémon Company."
+  },
+  tabs: {
+    overview: "Overview",
+    typeChart: "Type chart",
+    pokedex: "Pokédex",
+    teamBuilder: "Team builder",
+    damage: "Damage",
+    proTeams: "Pro teams",
+    account: "Account"
+  },
+  descriptions: {
+    overview: "A clear place to plan, compare, and learn.",
+    typeChart: "Read offensive matchups across Generation 9 types.",
+    pokedex: "Battle stats from Smogon, descriptive details from PokéAPI.",
+    teamBuilder: "Draft two teams side by side; save your own when signed in.",
+    damage: "Estimate damage for one move against one target.",
+    proTeams: "Curated tournament lineups with credited publications.",
+    account: "Keep your competitive sets private."
+  },
+  notices: {
+    catalogUnavailable: "Pokémon data is temporarily unavailable.",
+    typeChartUnavailable: "The type chart is temporarily unavailable.",
+    proTeamsUnavailable: "Published teams are temporarily unavailable.",
+    teamStorageUnavailable: "Browser storage is unavailable. This team will not survive a refresh.",
+    comparisonStorageUnavailable: "Browser storage is unavailable. This comparison will not survive a refresh.",
+    teamSaved: "Team saved privately."
+  },
+  api: {
+    requestFailed: "Request failed ({status})"
+  },
+  overview: {
+    eyebrow: "YOUR GEN 9 WORKBENCH",
+    headline: "Prepare a team.",
+    headlineEmphasis: "Understand the matchup.",
+    introduction: "Explore reliable battle data, estimate damage, and keep your sets together. Guest drafts stay in this browser; an account lets you save private teams.",
+    buildTeam: "Build a team →",
+    openCalculator: "Open calculator",
+    explore: "Explore ↗",
+    cards: {
+      typeCoverage: { title: "Type coverage", body: "Inspect every Generation 9 matchup." },
+      battleNumbers: { title: "Battle numbers", body: "Compare damage ranges and KO odds." },
+      realTeams: { title: "Real teams", body: "Explore credited tournament teams." }
+    }
+  },
+  chart: {
+    loading: "Loading Generation 9 type data…",
+    superEffective: "2× or more",
+    neutral: "1×",
+    resisted: "½×",
+    immune: "0×",
+    axes: "Attacking ↓ / Defending →"
+  },
+  pokedex: {
+    findPokemon: "Find a Pokémon",
+    searchPlaceholder: "Search species or form",
+    generationData: "GENERATION 9 DATA",
+    nationalNumber: "National Pokédex #{id}",
+    descriptiveUnavailable: "Descriptive data is temporarily unavailable. Battle stats remain available.",
+    cachedDataStale: "Showing cached descriptive data; the refresh failed.",
+    loadingDetails: "Loading descriptive details…",
+    baseStats: "Base stats",
+    selectPokemon: "Select a Pokémon to see its battle stats."
+  },
+  team: {
+    yourTeam: "Your team",
+    comparisonTeam: "Comparison team",
+    defaultName: "New team",
+    sideA: "SIDE A",
+    sideB: "SIDE B",
+    name: "Team name",
+    species: "Species",
+    nickname: "Nickname",
+    ability: "Ability",
+    item: "Item",
+    nature: "Nature",
+    level: "Level",
+    teraType: "Tera type",
+    noTeraType: "None",
+    status: "Status",
+    moves: "Moves",
+    movePlaceholder: "Move {number}",
+    evs: "EVs",
+    ivs: "IVs",
+    boosts: "Boosts",
+    stats: { hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "SpD", spe: "Spe" },
+    statuses: {
+      Healthy: "Healthy",
+      Burned: "Burned",
+      Poisoned: "Poisoned",
+      "Badly Poisoned": "Badly Poisoned",
+      Paralyzed: "Paralyzed",
+      Asleep: "Asleep",
+      Frozen: "Frozen"
+    },
+    choosePokemon: "Choose a Pokémon",
+    noItem: "No item",
+    removePokemon: "Remove Pokémon",
+    addPokemon: "+ Add Pokémon",
+    privateLibrary: "Private library",
+    saveDescription: "Save this full set after signing in.",
+    saveButton: "Save your team",
+    signInOrCreate: "Sign in or create an account →",
+    deleteTeam: "Delete {name}"
+  },
+  comparison: {
+    eyebrow: "AT A GLANCE",
+    title: "Team comparison",
+    memberCount: "{count} Pokémon",
+    noTypes: "No types yet",
+    description: "Type lists summarize coverage; they do not predict a battle outcome."
+  },
+  damage: {
+    formEyebrow: "ONE MOVE / ONE TARGET",
+    attacker: "Attacker",
+    defender: "Defender",
+    attackerItem: "Attacker item",
+    defenderItem: "Defender item",
+    attackerAbility: "Attacker ability",
+    defenderAbility: "Defender ability",
+    move: "Move",
+    battleType: "Battle type",
+    weatherLabel: "Weather",
+    terrainLabel: "Terrain",
+    gameTypes: { Singles: "Singles", Doubles: "Doubles" },
+    weather: { none: "None", Sun: "Sun", Rain: "Rain", Sand: "Sand", Snow: "Snow" },
+    terrain: { none: "None", Electric: "Electric", Grassy: "Grassy", Misty: "Misty", Psychic: "Psychic" },
+    fieldLabels: {
+      reflect: "Reflect",
+      lightScreen: "Light Screen",
+      auroraVeil: "Aurora Veil",
+      helpingHand: "Helping Hand",
+      critical: "Critical hit",
+      attackerTerastallized: "Attacker Terastallized",
+      defenderTerastallized: "Defender Terastallized",
+      friendGuard: "Friend Guard",
+      stealthRock: "Stealth Rock"
+    },
+    spikesLayers: "Spikes layers",
+    calculate: "Calculate damage →",
+    calculating: "Calculating…",
+    resultEyebrow: "DAMAGE ESTIMATE",
+    hpRange: "{min}–{max} {hpUnit} out of {hp}",
+    koChance: "{chance}% one-hit KO chance",
+    conditionalAccuracy: "Conditional on the move hitting. Accuracy is not included.",
+    damageMatchupPending: "Calculating this matchup…",
+    inputsChanged: "Inputs changed. Calculate again to see an estimate.",
+    mechanics: "Mechanics and battle data: {calc}{generation}",
+    generation: " · Generation {generation}",
+    matchup: "{attacker} uses {move} against {defender}.",
+    noEffect: "{move} has no effect on {defender}.",
+    calculationDetails: "Calculation details"
+  },
+  proTeams: {
+    teraType: "Tera {type}",
+    evs: "EVs:",
+    publishedIvs: "Published IVs:",
+    none: "None",
+    unknownIvs: "Unlisted IVs are unknown.",
+    moves: "Moves:",
+    originalPaste: "Original team paste ↗"
+  },
+  account: {
+    privateTeams: "PRIVATE TEAMS",
+    welcome: "Welcome, {name}",
+    welcomeBack: "Welcome back",
+    createAccountTitle: "Create your account",
+    signedInAs: "Signed in as {email}. Your saved teams are only visible in your account.",
+    signOut: "Sign out",
+    signIn: "Sign in",
+    createAccount: "Create account",
+    name: "Name",
+    email: "Email",
+    password: "Password",
+    whatAccountAdds: "What an account adds",
+    guestDraftsExplanation: "Guest drafts remain in this browser. Sign in to save full competitive sets in your private library and open them later.",
+    created: "Account created.",
+    signedIn: "Signed in.",
+    sessionUnavailable: "The account session could not be loaded."
+  },
+  errors: {
+    network: "The server could not be reached. Please try again.",
+    invalidResponse: "The server returned an unexpected response. Please try again.",
+    codes: {
+      "sign-in-required": "Sign in required",
+      "untrusted-origin": "This request came from an untrusted origin.",
+      "team-not-found": "Team not found",
+      "internal-error": "Internal server error",
+      "request-failed": "Request failed",
+      "not-found": "Not found",
+      "body-too-large": "Request body too large",
+      "unsupported-media-type": "Unsupported media type",
+      "rate-limited": "Too many requests. Please try again later.",
+      "validation-failed": "Check the input values and try again.",
+      "unknown-species": "Unknown species: {value}",
+      "unknown-move": "Unknown move: {value}",
+      "unknown-ability": "Unknown ability: {value}",
+      "unknown-item": "Unknown item: {value}",
+      "unknown-nature": "Unknown nature: {value}",
+      "unknown-type": "Unknown Tera type: {value}",
+      "missing-attacker-tera-type": "Attacker Tera type required when Terastallized",
+      "missing-defender-tera-type": "Defender Tera type required when Terastallized",
+      "untrusted-ingress": "This request did not arrive through a trusted ingress.",
+      "ingress-not-configured": "The server ingress is not configured."
+    },
+    auth: {
+      invalidCredentials: "The email or password is incorrect.",
+      emailInUse: "An account already uses this email address.",
+      invalidEmail: "Enter a valid email address.",
+      passwordTooShort: "The password is too short.",
+      passwordTooLong: "The password is too long.",
+      emailNotVerified: "Verify your email address before signing in."
+    },
+    validation: {
+      required: "{field} is required.",
+      type: "{field} has an invalid value.",
+      minimum: "{field} must be at least {minimum}.",
+      maximum: "{field} must be at most {maximum}.",
+      lengthMinimum: "{field} must contain at least {minimum} characters or entries.",
+      lengthMaximum: "{field} must contain at most {maximum} characters or entries.",
+      invalidValue: "{field} has an invalid value.",
+      allowedValues: "{field} must be one of: {values}.",
+      evTotal: "EV total cannot exceed 510.",
+      fieldFallback: "Input",
+      pathEntry: "{field} {number}"
+    },
+    fields: {
+      attacker: "Attacker", defender: "Defender", pokemon: "Pokémon", moves: "Move", move: "Move",
+      name: "Team name", nickname: "Nickname", notes: "Notes", format: "Format", species: "Species",
+      item: "Item", ability: "Ability", nature: "Nature", level: "Level", teraType: "Tera type", status: "Status",
+      evs: "EVs", ivs: "IVs", boosts: "Boosts", field: "Field", gameType: "Battle type",
+      weather: "Weather", terrain: "Terrain", spikes: "Spikes layers"
+    }
+  }
+} as const;
+
+type MessageShape<T> = { readonly [Key in keyof T]: T[Key] extends string ? string : MessageShape<T[Key]> };
+export type LocaleMessages = MessageShape<typeof en>;

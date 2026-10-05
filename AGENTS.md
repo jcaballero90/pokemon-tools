@@ -135,6 +135,64 @@ Avoid unnecessary overengineering, premature optimization, speculative infrastru
 
 Future extensibility may influence architecture, but functionality explicitly outside the TFM scope should not be implemented unless necessary to support the current design. When making important technical decisions, explain meaningful alternatives and trade-offs.
 
+## Code readability and component structure
+
+Prioritize readability and maintainability over compactness.
+
+- Do not compress JSX, callbacks, conditions, or expressions to reduce line count.
+- Page-level components should primarily orchestrate state, data fetching, events, and child components. Their JSX should read as a high-level description of the screen.
+- Avoid large monolithic JSX trees containing data transformations, nested conditions, API logic, and event logic inline.
+- Extract meaningful UI sections into named components when this makes the parent easier to understand.
+- Do not extract trivial elements only to reduce line count. Components should represent a clear UI concept or responsibility.
+- Prefer named event handlers over multi-statement inline callbacks.
+- Prefer named variables or helper functions over complex expressions inside JSX.
+- Prefer early returns over deeply nested conditional rendering.
+- Avoid nested ternary expressions in JSX.
+- Keep `map`, `filter`, `find`, `Object.entries`, and similar transformations simple inside JSX. Move non-trivial transformations outside the returned JSX.
+- Extract reusable or stateful behavior into custom hooks when doing so creates a clear responsibility boundary.
+- Keep related small components colocated when appropriate; do not create unnecessary file fragmentation.
+- Split components into separate files when they become independently meaningful, reusable, testable, or large enough that colocating them hurts readability.
+- Use descriptive names that explain intent rather than implementation details.
+- Format JSX vertically when an element has multiple props, children, conditions, or event logic.
+- Do not rely on Prettier to make structurally complex code readable. Refactor the structure first, then format it.
+
+For React screens, prefer code shaped approximately like:
+
+```tsx
+export function Pokedex({ catalog }: PokedexProps) {
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const filteredSpecies = useFilteredSpecies(catalog, query);
+  const pokemonDetail = usePokemonDetail(selected);
+
+  function handlePokemonSelect(name: string) {
+    setSelected(name);
+  }
+
+  return (
+    <PokedexLayout>
+      <PokemonList
+        query={query}
+        species={filteredSpecies}
+        onQueryChange={setQuery}
+        onSelect={handlePokemonSelect}
+      />
+
+      <PokemonDetail
+        selected={selected}
+        detail={pokemonDetail}
+        catalog={catalog}
+      />
+    </PokedexLayout>
+  );
+}
+```
+
+The exact abstractions may differ. The goal is that the main component can be understood quickly without reading implementation details.
+
+When generating or modifying code, review the result for readability before finishing. If a component has become difficult to scan, refactor it instead of merely reformatting it.
+
 ## 8. Repository security
 
 Never commit secrets, credentials, API keys, access tokens, private keys, passwords, connection strings containing credentials, or other sensitive configuration to the public repository.

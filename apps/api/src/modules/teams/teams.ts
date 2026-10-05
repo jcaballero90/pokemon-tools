@@ -1,5 +1,6 @@
 import type { TeamInput } from "@pokemon-tools/contracts";
-import { validateSet } from "../damage/damage.js";
+import { validateSet, validateSetIssues } from "../damage/damage.js";
+import { errorText } from "../../resources/errors.js";
 
 export interface TeamStore {
   list(ownerId: string): Promise<unknown[]>;
@@ -8,7 +9,11 @@ export interface TeamStore {
 }
 
 export function validateTeam(team: TeamInput) {
-  return team.pokemon.flatMap((set, index) => validateSet(set).map((error) => `Pokemon ${index + 1}: ${error}`));
+  return team.pokemon.flatMap((set, index) => validateSet(set).map((error) => errorText.pokemonIssue(index + 1, error)));
+}
+
+export function validateTeamIssues(team: TeamInput) {
+  return team.pokemon.flatMap((set, index) => validateSetIssues(set, ["pokemon", index]));
 }
 
 export function listTeams(store: TeamStore, ownerId: string) { return store.list(ownerId); }

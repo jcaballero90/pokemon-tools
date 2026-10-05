@@ -1,19 +1,25 @@
 import { calculate, Field, Generations, Move, Pokemon } from "@smogon/calc";
-import type { DamageRequest, DamageResponse, PokemonSet } from "@pokemon-tools/contracts";
+import type { ApiValidationIssue, DamageRequest, DamageResponse, PokemonSet } from "@pokemon-tools/contracts";
 import { knownAbility, knownItem, knownMove, knownNature, knownSpecies, knownType } from "../catalog/catalog.js";
+import { InputValidationError } from "../../http-errors.js";
+import { errorText, validationIssueMessage } from "../../resources/errors.js";
 
 const gen = Generations.get(9);
 const status = { Healthy: "", Burned: "brn", Poisoned: "psn", "Badly Poisoned": "tox", Paralyzed: "par", Asleep: "slp", Frozen: "frz" } as const;
 
+export function validateKnownSetIssues(set: PokemonSet, path: ApiValidationIssue["path"] = []): ApiValidationIssue[] {
+  const issues: ApiValidationIssue[] = [];
+  if (!knownSpecies(set.species)) issues.push({ code: "unknown-species", path: [...path, "species"], value: set.species });
+  if (!knownAbility(set.ability)) issues.push({ code: "unknown-ability", path: [...path, "ability"], value: set.ability });
+  if (!knownItem(set.item)) issues.push({ code: "unknown-item", path: [...path, "item"], value: set.item });
+  if (!knownNature(set.nature)) issues.push({ code: "unknown-nature", path: [...path, "nature"], value: set.nature });
+  if (set.teraType && !knownType(set.teraType)) issues.push({ code: "unknown-type", path: [...path, "teraType"], value: set.teraType });
+  for (const [index, move] of set.moves.entries()) if (!knownMove(move)) issues.push({ code: "unknown-move", path: [...path, "moves", index], value: move });
+  return issues;
+}
+
 export function validateKnownSet(set: PokemonSet): string[] {
-  const errors: string[] = [];
-  if (!knownSpecies(set.species)) errors.push(`Unknown species: ${set.species}`);
-  if (!knownAbility(set.ability)) errors.push(`Unknown ability: ${set.ability}`);
-  if (!knownItem(set.item)) errors.push(`Unknown item: ${set.item}`);
-  if (!knownNature(set.nature)) errors.push(`Unknown nature: ${set.nature}`);
-  if (set.teraType && !knownType(set.teraType)) errors.push(`Unknown Tera type: ${set.teraType}`);
-  for (const move of set.moves) if (!knownMove(move)) errors.push(`Unknown move: ${move}`);
-  return errors;
+  return validateKnownSetIssues(set).map(validationIssueMessage);
 }
 
 function pokemon(set: PokemonSet, terastallized: boolean) {
@@ -26,14 +32,15 @@ function pokemon(set: PokemonSet, terastallized: boolean) {
 }
 
 export function computeSmogonDamage(input: DamageRequest): DamageResponse {
-  const errors = [...validateKnownSet(input.attacker), ...validateKnownSet(input.defender)];
-  if (!knownMove(input.move)) errors.push(`Unknown move: ${input.move}`);
-  if (input.field.attackerTerastallized && !input.attacker.teraType) errors.push("Attacker Tera type required when Terastallized");
-  if (input.field.defenderTerastallized && !input.defender.teraType) errors.push("Defender Tera type required when Terastallized");
-  if (errors.length) throw new Error(errors.join("; "));
+  const issues = [...validateKnownSetIssues(input.attacker, ["attacker"]), ...validateKnownSetIssues(input.defender, ["defender"])];
+  if (!knownMove(input.move)) issues.push({ code: "unknown-move", path: ["move"], value: input.move });
+  if (input.field.attackerTerastallized && !input.attacker.teraType) issues.push({ code: "missing-attacker-tera-type", path: ["attacker", "teraType"] });
+  if (input.field.defenderTerastallized && !input.defender.teraType) issues.push({ code: "missing-defender-tera-type", path: ["defender", "teraType"] });
+  if (issues.length) throw new InputValidationError(issues.map(validationIssueMessage).join("; "), issues);
   const attacker = pokemon(input.attacker, input.field.attackerTerastallized);
   const defender = pokemon(input.defender, input.field.defenderTerastallized);
   const move = new Move(gen, input.move, { isCrit: input.field.critical });
+  const matchup = { attacker: attacker.species.name, defender: defender.species.name, move: move.name };
   const field = new Field({
     gameType: input.field.gameType,
     weather: input.field.weather ? input.field.weather as Field["weather"] : undefined,
@@ -53,6 +60,7 @@ export function computeSmogonDamage(input: DamageRequest): DamageResponse {
     generation: 9, min, max, minPercent: Math.round(min / hp * 1000) / 10,
     maxPercent: Math.round(max / hp * 1000) / 10,
     koChanceOnHit: ko.n === 1 ? ko.chance ?? 0 : 0,
-    defenderHp: hp, description: max === 0 ? `${input.move} has no effect on ${input.defender.species}` : result.desc()
+    defenderHp: hp, description: max === 0 ? errorText.noEffect(input.move, input.defender.species) : result.desc(),
+    matchup, hasEffect: max > 0
   };
 }
