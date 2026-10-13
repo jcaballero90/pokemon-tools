@@ -64,7 +64,7 @@ Guests shall be able to draft and compare two temporary teams of up to six Poké
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** Each side accepts no more than six sets, both drafts remain after a reload in the same browser, and the comparison reflects team edits.
-- **Current evidence:** The builder and browser storage are implemented; a local preview confirmed adding a set and persistence after reload. The full browser journey has not run in CI.
+- **Current evidence:** Versioned browser drafts preserve incomplete edits across reload and storage failures leave editing available; the local audit tested migration and fixed move slots. A saved team opened from the private library becomes the Team A browser draft and intentionally remains after logout. The local Playwright journey verified draft reload and move slots; it used a separate disposable PostgreSQL database for account actions.
 
 ### REQ-006
 
@@ -72,7 +72,7 @@ Users shall be able to create an email/password account, sign in and out, and sa
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** Unauthenticated team requests fail, and an authenticated account cannot read or delete another account's teams. Saved set fields remain available when reopened.
-- **Current evidence:** Better Auth, the team routes, and owner-scoped Prisma operations exist. Database-backed account and cross-account journeys have not run locally.
+- **Current evidence:** Better Auth, team routes, owner-scoped Prisma operations, and immediate in-memory library clearing on logout are implemented. Testing Library covers a loaded library disappearing at logout and a delayed prior-session list being ignored. A disposable PostgreSQL Playwright journey verified signup, save/list/reopen/delete, logout, and a second account receiving an empty list and 404 when attempting to delete the first account's team.
 
 ### REQ-007
 
@@ -96,7 +96,7 @@ Pinned `@smogon/calc` data shall supply battle facts and mechanics; cached Poké
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** PokéAPI failures do not replace calculator values or disable type, statistics, or damage utilities. Supported forms map explicitly; unmapped forms report unavailable descriptive data rather than substituting another form.
-- **Current evidence:** The catalog and PokéAPI adapter implement this separation. An outage exercise has not been run.
+- **Current evidence:** Adapter tests cover stale-cache fallback, unavailable descriptive data, cache read/write failures, and sprite host validation. Battle data remains sourced from pinned `@smogon/calc`. Live upstream behavior and database integration remain unverified.
 
 ### REQ-010
 
@@ -104,7 +104,7 @@ The browser shall call same-origin `/api` endpoints using browser-safe Zod contr
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** Published routes have accurate request and response descriptions; production does not expose the interactive docs UI.
-- **Current evidence:** Contracts and Swagger generation exist. The OpenAPI audit still needs to check response descriptions across all routes.
+- **Current evidence:** Shared Zod response schemas now describe app-owned feature routes and the browser validates their results at runtime. Fastify injection checks representative statuses/security metadata. Better Auth wildcard operations are delegated; exhaustive generated-document and database-backed response checks, plus production docs exposure checks, remain.
 
 ### REQ-011
 
@@ -112,7 +112,7 @@ Authentication and API routes shall use proportionate application security contr
 
 - **Origin:** Project owner's approved architecture and release plan, including the requirement for `@fastify/rate-limit` 11.2.0 or newer.
 - **Acceptance:** Inspect deployed cookie attributes and response headers; verify invalid inputs and excessive requests are rejected as configured. Private team access remains owner-scoped.
-- **Current evidence:** The relevant packages and configuration exist. Their behavior over deployed HTTPS paths is unverified.
+- **Current evidence:** Team create/delete now reject absent, malformed, `null`, and untrusted Origins with 403 before session/database work; utility and Fastify injection tests cover the decision. A disposable-PostgreSQL browser journey verified owner isolation between two accounts. Unexpected client errors and token-bearing request URLs are sanitized, and local CSP checks cover the PokéAPI sprite source. Deployed HTTPS cookies/headers and Origin behavior through each ingress remain unverified.
 
 ### REQ-012
 
@@ -160,7 +160,7 @@ Critical guest, account, data-adapter, and ingress behavior shall have automated
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** Run Vitest, adapter integration tests, Testing Library, and Playwright for the relevant journeys; run spoofed-header and network-boundary checks on each ingress path. Record any gap that cannot be exercised locally.
-- **Current evidence:** Local unit/API-composition and UI tests pass, and Playwright journeys are written. Database-backed adapter integration, Playwright in CI, and host ingress checks remain pending.
+- **Current evidence:** On 2026-10-03, 24 API tests, 15 web tests, and all four Playwright journeys passed with lint, type, production build, and static configuration checks. Desktop/mobile visual preview used stubbed API responses. The database-backed account journey used an isolated disposable database; Docker image/Compose and host ingress checks remain pending.
 
 ## Open questions and deferred scope
 

@@ -33,7 +33,7 @@ Battle facts and mechanics come from pinned `@smogon/calc` data. PokéAPI suppli
 | [`.github/workflows`](.github/workflows/) | Checks, code scanning, staging build/deploy, and production promotion. |
 | [`docs`](docs/) | Requirements, decisions, guides, test evidence, and TFM methodology records. |
 
-The API is a modular monolith with pragmatic boundaries; the [architecture map](docs/architecture/architecture.md) and its [ADRs](docs/architecture/architecture.md#decision-records) explain the design. The browser calls same-origin `/api`; the [API contract guide](docs/api-contracts.md) lists current routes and OpenAPI gaps.
+The API is a modular monolith with pragmatic boundaries; the [architecture map](docs/architecture/architecture.md) and its [ADRs](docs/architecture/architecture.md#decision-records) explain the design. The browser calls same-origin `/api`; the [API contract guide](docs/api-contracts.md) lists current routes and OpenAPI coverage. For a feature-by-feature map from each view to its UI, endpoint, backend adapter, data source, and storage, see the [website guide](docs/website-guide.md). The [2026-10-03 code audit](docs/code-audit-2026-10-03.md) records findings, fixes, and verification limits.
 
 ## Run locally
 
@@ -84,7 +84,9 @@ pnpm test
 pnpm config:check
 ```
 
-`pnpm test:e2e` runs the written Playwright browser journeys and needs the local PostgreSQL setup; Playwright can start the web/API development servers. The [test strategy](docs/testing/test-strategy.md) distinguishes checks that have run from tests and host drills that remain pending. On 2026-09-27, the local Vitest suite passed 8 API tests and 1 web test, and the static configuration check passed; this did not exercise a deployed Caddy/Tailscale path or USB restore.
+`pnpm test:e2e` runs the Playwright browser journeys and needs local PostgreSQL; the Playwright configuration starts the API and web servers and waits for both. The [test strategy](docs/testing/test-strategy.md) distinguishes checks that have run from host drills that remain pending. On 2026-10-03, lint, type checks, production builds, configuration checks, 24 API tests, 15 web tests, and all four expanded Playwright journeys passed. The account journey used a disposable PostgreSQL database and tested two-account isolation; desktop/mobile visual checks used stubbed APIs. Docker image/Compose and deployed ingress checks remain unverified locally. The earlier 2026-09-27 result remains historical evidence.
+
+The 2026-10-04 localization follow-up passed lint, type checks, production builds, configuration checks, 29 API tests, 37 web tests, and three guest Playwright journeys. The account/database journey was not repeated. Interface strings and optional catalog-label dictionaries are registered through [`apps/web/src/i18n.ts`](apps/web/src/i18n.ts); browser language falls back to English, currently the only locale. Recognized translated selections retain canonical API values. No language selector has been added; the [website guide](docs/website-guide.md#translation-resources-and-canonical-values) explains where future translations belong.
 
 ## Deployment status and documentation
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { TypeChart } from "./main";
+import { TypeChart } from "./features/type-chart/TypeChart";
 
 describe("type chart", () => {
   it("renders effectiveness for each defending type", () => {
