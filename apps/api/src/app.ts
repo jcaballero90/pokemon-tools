@@ -8,7 +8,7 @@ import { z } from "zod";
 import { resolve } from "node:path";
 import {
   apiErrorResponseSchema, catalogResponseSchema, damageRequestSchema, damageResponseSchema,
-  pokedexResponseSchema, proTeamsResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
+  pokedexResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
   teamInputSchema, typeChartResponseSchema
 } from "@pokemon-tools/contracts";
 import { createAuth } from "./modules/auth/auth.js";
@@ -17,7 +17,6 @@ import { pokedex } from "./modules/catalog/pokeapi-adapter.js";
 import { computeDamage } from "./modules/damage/damage.js";
 import { deleteTeam, listTeams, saveTeam, validateTeam, validateTeamIssues } from "./modules/teams/teams.js";
 import { PrismaTeamStore } from "./modules/teams/prisma-adapter.js";
-import { proTeams } from "./modules/pro-teams/pro-teams.js";
 import { inCidr } from "./ingress.js";
 import { apiError, fastifyValidationIssues, InputValidationError, zodValidationIssues } from "./http-errors.js";
 import { errorText } from "./resources/errors.js";
@@ -111,7 +110,6 @@ export async function buildApp(config: Config, db: Database) {
     if (!parsed.success) return reply.code(400).send(apiError("validation-failed", parsed.error.flatten(), zodValidationIssues(parsed.error.issues)));
     return computeDamage(parsed.data);
   });
-  app.get("/api/pro-teams", { schema: { tags: ["pro-teams"], summary: "Credited curated pro teams", response: { 200: json(proTeamsResponseSchema) } } }, async () => proTeams);
   app.get("/api/me/teams", { schema: { tags: ["teams"], security: [{ cookieAuth: [] }], response: { 200: json(savedTeamsResponseSchema), 401: errors, 500: errors } } }, async (request, reply) => {
     const owner = await userId(request);
     if (!owner) return reply.code(401).send(apiError("sign-in-required"));

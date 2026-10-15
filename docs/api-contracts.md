@@ -15,7 +15,6 @@ The browser does not need an API key for public utilities. Private team routes r
 | `GET /api/type-chart` | Public | None | `200` array of `{ attack, against }` rows; `against` maps defending type names to multipliers. |
 | `GET /api/pokedex/:species` | Public | Species name in path | `200` descriptive PokéAPI fields, cached fields, or an `unavailable` object; `400` for a species outside the known Generation 9 catalog. A missing form mapping or upstream failure is represented as unavailable rather than replacing battle values. |
 | `POST /api/damage` | Public | [Damage request](../packages/contracts/src/index.ts) JSON | `200` damage range, conditional one-hit KO chance, and structured canonical matchup/no-effect fields; `400` for invalid shape or unknown catalog names. |
-| `GET /api/pro-teams` | Public | None | `200` array of credited curated teams. This collection is manually maintained; see the [data source policy](data-sources.md). |
 | `GET /api/me/teams` | Session | None | `200` saved teams for this owner, newest updated first; `401` without a session. |
 | `POST /api/me/teams` | Session + trusted Origin | [Team input](../packages/contracts/src/index.ts) JSON | `201` created owner-scoped team; `400` for invalid shape or unknown set names; `401` without a session; `403` for missing/untrusted Origin. |
 | `DELETE /api/me/teams/:id` | Session + trusted Origin | Team ID in path | `204` with no body when deleted; `401` without a session; `403` for missing/untrusted Origin; `404` if no team with that ID belongs to the caller. |

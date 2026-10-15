@@ -96,17 +96,6 @@ export const pokedexResponseSchema = z.object({
   stale: z.boolean().optional()
 });
 
-const proSetSchema = z.object({
-  species: z.string(), item: z.string(), ability: z.string(), teraType: z.string(), nature: z.string(),
-  evs: z.record(z.string(), z.number()), ivs: z.record(z.string(), z.number()), moves: z.array(z.string())
-});
-
-export const proTeamsResponseSchema = z.array(z.object({
-  id: z.string(), player: z.string(), event: z.string(), eventDate: z.string(), placement: z.string(),
-  format: z.string(), sets: z.array(proSetSchema),
-  source: z.object({ title: z.string(), url: z.url(), pasteUrl: z.url() })
-}));
-
 export const savedTeamResponseSchema = teamInputSchema.extend({
   id: z.string(), ownerId: z.string(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime()
 });
@@ -169,6 +158,5 @@ export type DamageResponse = z.infer<typeof damageResponseSchema>;
 export type CatalogResponse = z.infer<typeof catalogResponseSchema>;
 export type TypeChartResponse = z.infer<typeof typeChartResponseSchema>;
 export type PokedexResponse = z.infer<typeof pokedexResponseSchema>;
-export type ProTeamsResponse = z.infer<typeof proTeamsResponseSchema>;
 export type SavedTeamResponse = z.infer<typeof savedTeamResponseSchema>;
 export type TeamDraft = z.infer<typeof teamDraftSchema>;
