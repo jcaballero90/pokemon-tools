@@ -6,7 +6,7 @@ This repository is the working TFM project. The application is deployed to stagi
 
 ## Features
 
-- Read an offensive type chart and browse Generation 9 Pokémon statistics.
+- Explore defensive Generation 9 type matchups by type or Pokémon and browse Pokémon statistics.
 - Draft and compare two teams of up to six Pokémon each; guest drafts stay in that browser's local storage.
 - Estimate a move's damage range and one-hit KO chance **conditional on the move hitting**.
 - Create an email/password account and save, reopen, list, or delete private teams.
