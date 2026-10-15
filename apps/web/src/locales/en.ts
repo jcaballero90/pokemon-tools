@@ -19,7 +19,7 @@ export const en = {
   },
   descriptions: {
     overview: "A clear place to plan, compare, and learn.",
-    typeChart: "Read offensive matchups across Generation 9 types.",
+    typeChart: "Choose a Pokémon or two types to see what can hit it hardest.",
     pokedex: "Battle stats from Smogon, descriptive details from PokéAPI.",
     teamBuilder: "Draft two teams side by side; save your own when signed in.",
     damage: "Estimate damage for one move against one target.",
@@ -46,18 +46,34 @@ export const en = {
     openCalculator: "Open calculator",
     explore: "Explore ↗",
     cards: {
-      typeCoverage: { title: "Type coverage", body: "Inspect every Generation 9 matchup." },
+      typeCoverage: { title: "Type matchups", body: "See what hits a Pokémon hardest." },
       battleNumbers: { title: "Battle numbers", body: "Compare damage ranges and KO odds." },
       realTeams: { title: "Real teams", body: "Explore credited tournament teams." }
     }
   },
   chart: {
     loading: "Loading Generation 9 type data…",
-    superEffective: "2× or more",
-    neutral: "1×",
-    resisted: "½×",
-    immune: "0×",
-    axes: "Attacking ↓ / Defending →"
+    unavailable: "Type effectiveness data is unavailable. Please try again later.",
+    defendAgainst: "DEFENDING POKÉMON",
+    chooseDefender: "Who are you attacking?",
+    selectionCount: "{count} of 2 types selected",
+    findPokemon: "Or find a Pokémon",
+    pokemonPlaceholder: "Search Pokémon by name or form…",
+    pokemonLoadingPlaceholder: "Loading Pokémon…",
+    pokemonHelp: "Choose an exact match to fill in its types.",
+    pokemonLoading: "Pokémon finder is loading.",
+    pokemonUnavailable: "Pokémon finder is unavailable; you can still select types below.",
+    pokemonSelected: "You can change these types below.",
+    pokemonImageLoading: "Loading sprite…",
+    pokemonImageUnavailable: "Sprite unavailable",
+    selectedPokemon: "Selected Pokémon",
+    selectTypes: "Or choose one or two types",
+    maxTypesReached: "Deselect a type to choose another.",
+    clearSelection: "Clear selection",
+    selectDefender: "Choose one or two defending types to see their matchups.",
+    matchupSummary: "GENERATION 9 MATCHUPS",
+    attackingTypes: "Attacking types",
+    noResults: "No attacking types match these selections."
   },
   pokedex: {
     findPokemon: "Find a Pokémon",
@@ -242,5 +258,27 @@ export const en = {
   }
 } as const;
 
+export const typeCatalog: Readonly<Record<string, { label: string; spriteId: number }>> = {
+  bug: { label: "Bug", spriteId: 7 },
+  dark: { label: "Dark", spriteId: 17 },
+  dragon: { label: "Dragon", spriteId: 16 },
+  electric: { label: "Electric", spriteId: 13 },
+  fairy: { label: "Fairy", spriteId: 18 },
+  fighting: { label: "Fighting", spriteId: 2 },
+  fire: { label: "Fire", spriteId: 10 },
+  flying: { label: "Flying", spriteId: 3 },
+  ghost: { label: "Ghost", spriteId: 8 },
+  grass: { label: "Grass", spriteId: 12 },
+  ground: { label: "Ground", spriteId: 5 },
+  ice: { label: "Ice", spriteId: 15 },
+  normal: { label: "Normal", spriteId: 1 },
+  poison: { label: "Poison", spriteId: 4 },
+  psychic: { label: "Psychic", spriteId: 14 },
+  rock: { label: "Rock", spriteId: 6 },
+  steel: { label: "Steel", spriteId: 9 },
+  water: { label: "Water", spriteId: 11 }
+};
+
 type MessageShape<T> = { readonly [Key in keyof T]: T[Key] extends string ? string : MessageShape<T[Key]> };
 export type LocaleMessages = MessageShape<typeof en>;
+

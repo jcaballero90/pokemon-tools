@@ -36,11 +36,11 @@ The first release shall present English-language utilities for Generation 9 Scar
 
 ### REQ-002
 
-Users shall be able to read offensive type effectiveness against defending types.
+Users shall be able to inspect the defensive effectiveness of a Generation 9 Pokémon with one or two types, selected directly or through a Pokémon finder.
 
-- **Origin:** Project owner's approved architecture and release plan.
-- **Acceptance:** The chart labels attacking and defending directions and gives known matchups, including Fire against Grass at 2× and Electric against Ground at 0×.
-- **Current evidence:** [Catalog tests](../../apps/api/src/modules/catalog/catalog.test.ts), [UI test](../../apps/web/src/type-chart.test.tsx), and local browser inspection passed. This verifies the specified local behavior; public ingress remains a separate gate.
+- **Origin:** Project owner's approved Generation 9 release plan, expanded by the owner's explicit defensive-chart request on 2026-10-13.
+- **Acceptance:** The view groups all attacking types by their combined multiplier for the selected defender types. Grass/Ground takes 4× damage from Ice, 2× from Bug, Fire, and Flying, 0.5× from Ground and Rock, and 0× from Electric. A species selection fills its types automatically; manual type selection remains limited to two.
+- **Current evidence:** [Catalog tests](../../apps/api/src/modules/catalog/catalog.test.ts), [UI test](../../apps/web/src/type-chart.test.tsx), and [guest browser journey](../../apps/web/e2e/journeys.spec.ts). The UI groups results from the pinned Generation 9 type chart. Public ingress is a separate gate.
 
 ### REQ-003
 

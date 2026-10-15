@@ -1,10 +1,16 @@
-import { en, type LocaleMessages } from "./locales/en";
+import { en, typeCatalog, type LocaleMessages } from "./locales/en";
 import type { CatalogTranslations } from "./lib/catalog-labels";
 
 // Add a locale resource here when its complete translation is ready. The
 // LocaleMessages type keeps every catalog aligned with the English keys.
 export type LocaleResources = { messages: LocaleMessages; catalog: CatalogTranslations };
-const catalogs: Record<string, LocaleResources> = { en: { messages: en, catalog: {} } };
+const englishTypeLabels: NonNullable<CatalogTranslations["types"]> = Object.fromEntries(
+  Object.entries(typeCatalog).map(([typeId, type]) => [typeId, type.label])
+);
+
+const catalogs: Record<string, LocaleResources> = {
+  en: { messages: en, catalog: { types: englishTypeLabels } }
+};
 
 export function resolveLocale(locale?: string | null): string {
   const browserLocale = locale ?? (typeof navigator === "undefined" ? "en" : navigator.language);

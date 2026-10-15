@@ -3,7 +3,18 @@ import { expect, test } from "@playwright/test";
 test("guest can inspect chart, build a team, and calculate damage", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Type chart" }).click();
-  await expect(page.getByRole("table")).toBeVisible();
+  await expect(page.getByRole("group", { name: "Or choose one or two types" }).getByRole("button")).toHaveCount(18);
+  await page.getByRole("button", { name: "Grass" }).click();
+  await page.getByRole("button", { name: "Ground" }).click();
+  const quadrupleDamage = page.getByRole("region", { name: "4×" });
+  await expect(quadrupleDamage.getByText("Ice")).toBeVisible();
+  await expect(page.getByRole("region", { name: "2×" }).getByText("Bug")).toBeVisible();
+  await expect(page.getByRole("region", { name: "2×" }).getByText("Fire")).toBeVisible();
+  await expect(page.getByRole("region", { name: "2×" }).getByText("Flying")).toBeVisible();
+  await expect(page.getByRole("region", { name: "0×" }).getByText("Electric")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Ice" })).toBeDisabled();
+  await page.getByRole("combobox", { name: "Or find a Pokémon" }).fill("Charizard");
+  await expect(page.getByText("Charizard", { exact: true }).first()).toBeVisible();
   await page.getByRole("button", { name: "Team builder" }).click();
   await page.getByRole("button", { name: "+ Add Pokémon" }).first().click();
   await expect(page.getByText("1/6").first()).toBeVisible();
@@ -26,10 +37,17 @@ test("guest drafts retain incomplete edits and move slots after a page reload", 
   await expect(page.getByPlaceholder("Move 3").first()).toHaveValue("Protect");
 });
 
-test("the overview stays readable on a narrow phone-sized viewport", async ({ page }) => {
+test("the defensive chart stays readable on a narrow phone-sized viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
+  await page.getByRole("button", { name: "Type chart" }).click();
+  const grass = page.getByRole("button", { name: "Grass" });
+  await grass.focus();
+  await page.keyboard.press("Space");
+  await expect(grass).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Ground" }).click();
+  await expect(page.getByRole("region", { name: "4×" }).getByText("Ice")).toBeVisible();
+  await expect(page.getByRole("region", { name: "0×" }).getByText("Electric")).toBeVisible();
   const width = await page.evaluate(() => document.documentElement.scrollWidth);
   expect(width).toBeLessThanOrEqual(390);
 });

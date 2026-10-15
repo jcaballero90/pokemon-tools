@@ -5,6 +5,7 @@ import { teamInputSchema, type CatalogResponse, type DamageResponse, type TeamDr
 import { Damage } from "./features/damage/Damage";
 import { Pokedex } from "./features/pokedex/Pokedex";
 import { TeamEditor } from "./features/teams/TeamEditor";
+import { TypeChart } from "./features/type-chart/TypeChart";
 
 const { apiMock } = vi.hoisted(() => ({ apiMock: vi.fn() }));
 vi.mock("./lib/api", () => ({ api: apiMock }));
@@ -88,5 +89,34 @@ describe("localized website values", () => {
     expect(apiMock.mock.calls[0]?.[0]).toBe("/pokedex/Charizard");
     expect(await screen.findByAltText("Translated Charizard")).toBeTruthy();
     expect(screen.getByRole("button", { name: /Translated Charizard/ }).textContent).toContain("Translated Fire");
+  });
+
+  it("uses translated Pokémon suggestions to select canonical defensive types", async () => {
+    apiMock.mockResolvedValue({
+      source: "PokéAPI",
+      pokedexId: 6,
+      sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png"
+    });
+    const chart = [
+      { attack: "Electric", against: { Fire: 1, Flying: 2 } },
+      { attack: "Fire", against: { Fire: 0.5, Flying: 1 } },
+      { attack: "Rock", against: { Fire: 2, Flying: 2 } },
+      { attack: "Flying", against: { Fire: 1, Flying: 1 } }
+    ];
+    render(
+      <TypeChart chart={chart} catalog={catalog} chartStatus="ready" catalogStatus="ready" />
+    );
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Or find a Pokémon" }), {
+      target: { value: "Translated Charizard" }
+    });
+
+    expect(screen.getByRole("button", { name: "Translated Fire" }).getAttribute("aria-pressed")).toBe("true");
+    expect(
+      screen.getByRole("button", { name: "Translated Fire" }).querySelector("img")?.getAttribute("src")
+    ).toContain("/10.png");
+    expect(screen.getByRole("button", { name: "Flying" }).getAttribute("aria-pressed")).toBe("true");
+    expect(await screen.findByAltText("Translated Charizard")).toBeTruthy();
+    expect(apiMock.mock.calls[0]?.[0]).toBe("/pokedex/Charizard");
   });
 });
