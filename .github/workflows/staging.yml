@@ -71,7 +71,6 @@ jobs:
           staged=1
           curl --fail --silent --show-error --max-time 20 "$STAGING_URL/api/health"
           curl --fail --silent --show-error --max-time 20 "$STAGING_URL/api/catalog" | jq -e '.species | length > 0'
-          curl --fail --silent --show-error --max-time 20 "$STAGING_URL/api/pro-teams" | jq -e 'length >= 2'
           curl --fail --silent --show-error --max-time 20 "$STAGING_URL/docs/json" | jq -e '.paths["/api/damage"].post'
           curl --fail --silent --show-error --max-time 20 -H 'content-type: application/json' --data '{"attacker":{"species":"Pikachu"},"defender":{"species":"Charizard"},"move":"Thunderbolt","field":{}}' "$STAGING_URL/api/damage" | jq -e '.max > 0'
           ssh -o BatchMode=yes "$DEPLOY_TARGET" "stage-confirm $IMAGE $COMMIT $TREE"

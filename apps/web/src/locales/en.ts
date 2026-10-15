@@ -14,7 +14,6 @@ export const en = {
     pokedex: "Pokédex",
     teamBuilder: "Team builder",
     damage: "Damage",
-    proTeams: "Pro teams",
     account: "Account"
   },
   descriptions: {
@@ -23,13 +22,11 @@ export const en = {
     pokedex: "Battle stats from Smogon, descriptive details from PokéAPI.",
     teamBuilder: "Draft two teams side by side; save your own when signed in.",
     damage: "Estimate damage for one move against one target.",
-    proTeams: "Curated tournament lineups with credited publications.",
     account: "Keep your competitive sets private."
   },
   notices: {
     catalogUnavailable: "Pokémon data is temporarily unavailable.",
     typeChartUnavailable: "The type chart is temporarily unavailable.",
-    proTeamsUnavailable: "Published teams are temporarily unavailable.",
     teamStorageUnavailable: "Browser storage is unavailable. This team will not survive a refresh.",
     comparisonStorageUnavailable: "Browser storage is unavailable. This comparison will not survive a refresh.",
     teamSaved: "Team saved privately."
@@ -48,7 +45,6 @@ export const en = {
     cards: {
       typeCoverage: { title: "Type matchups", body: "See what hits a Pokémon hardest." },
       battleNumbers: { title: "Battle numbers", body: "Compare damage ranges and KO odds." },
-      realTeams: { title: "Real teams", body: "Explore credited tournament teams." }
     }
   },
   chart: {
@@ -174,15 +170,6 @@ export const en = {
     matchup: "{attacker} uses {move} against {defender}.",
     noEffect: "{move} has no effect on {defender}.",
     calculationDetails: "Calculation details"
-  },
-  proTeams: {
-    teraType: "Tera {type}",
-    evs: "EVs:",
-    publishedIvs: "Published IVs:",
-    none: "None",
-    unknownIvs: "Unlisted IVs are unknown.",
-    moves: "Moves:",
-    originalPaste: "Original team paste ↗"
   },
   account: {
     privateTeams: "PRIVATE TEAMS",

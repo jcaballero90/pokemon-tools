@@ -2,12 +2,10 @@ import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   catalogResponseSchema,
-  proTeamsResponseSchema,
   savedTeamResponseSchema,
   savedTeamsResponseSchema,
   teamInputSchema,
   type CatalogResponse,
-  type ProTeamsResponse,
   type SavedTeamResponse,
   type TeamDraft,
   type TeamInput,
@@ -21,7 +19,6 @@ import { TeamEditor } from "./features/teams/TeamEditor";
 import { Damage } from "./features/damage/Damage";
 import { Overview } from "./features/overview/Overview";
 import { Pokedex } from "./features/pokedex/Pokedex";
-import { ProTeams } from "./features/pro-teams/ProTeams";
 import { TypeChart } from "./features/type-chart/TypeChart";
 import { formatMessage, t, locale } from "./i18n/presentation";
 import { formatUiError } from "./lib/errors";
@@ -32,9 +29,9 @@ import { CatalogDatalists } from "./components/catalog-datalists";
 import "./style.css";
 
 type SavedTeam = SavedTeamResponse;
-type Tab = "overview" | "typeChart" | "pokedex" | "teamBuilder" | "damage" | "proTeams" | "account";
+type Tab = "overview" | "typeChart" | "pokedex" | "teamBuilder" | "damage" | "account";
 
-const tabs: Tab[] = ["overview", "typeChart", "pokedex", "teamBuilder", "damage", "proTeams", "account"];
+const tabs: Tab[] = ["overview", "typeChart", "pokedex", "teamBuilder", "damage", "account"];
 const emptyTeam = (): TeamInput => teamInputSchema.parse({ name: t.team.defaultName, pokemon: [] });
 const tabLabels: Record<Tab, string> = t.tabs;
 const descriptions: Record<Tab, string> = t.descriptions;
@@ -45,7 +42,6 @@ export function App() {
   const [chart, setChart] = useState<TypeChartResponse | null>(null);
   const [chartStatus, setChartStatus] = useState<"loading" | "ready" | "unavailable">("loading");
   const [catalogStatus, setCatalogStatus] = useState<"loading" | "ready" | "unavailable">("loading");
-  const [proTeams, setProTeams] = useState<ProTeamsResponse>([]);
   const [user, setUser] = useState<AccountUser | null>(null);
   const [saved, setSaved] = useState<SavedTeam[]>([]);
   const [notice, setNotice] = useState("");
@@ -102,9 +98,6 @@ export function App() {
         setChartStatus("unavailable");
         setNotice(t.notices.typeChartUnavailable);
       });
-    void api<ProTeamsResponse>("/pro-teams", undefined, proTeamsResponseSchema)
-      .then(setProTeams)
-      .catch(() => setNotice(t.notices.proTeamsUnavailable));
     void refreshSession();
   }, [refreshSession]);
 
@@ -247,7 +240,6 @@ export function App() {
             initialDefender={comparison.pokemon[0]}
           />
         )}
-        {tab === "proTeams" && <ProTeams teams={proTeams} />}
         {tab === "account" && (
           <Account
             user={user}
