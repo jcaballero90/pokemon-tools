@@ -42,7 +42,9 @@ const descriptions: Record<Tab, string> = t.descriptions;
 export function App() {
   const [tab, setTab] = useState<Tab>("overview");
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
-  const [chart, setChart] = useState<TypeChartResponse>([]);
+  const [chart, setChart] = useState<TypeChartResponse | null>(null);
+  const [chartStatus, setChartStatus] = useState<"loading" | "ready" | "unavailable">("loading");
+  const [catalogStatus, setCatalogStatus] = useState<"loading" | "ready" | "unavailable">("loading");
   const [proTeams, setProTeams] = useState<ProTeamsResponse>([]);
   const [user, setUser] = useState<AccountUser | null>(null);
   const [saved, setSaved] = useState<SavedTeam[]>([]);
@@ -82,11 +84,24 @@ export function App() {
 
   useEffect(() => {
     void api<CatalogResponse>("/catalog", undefined, catalogResponseSchema)
-      .then(setCatalog)
-      .catch(() => setNotice(t.notices.catalogUnavailable));
+      .then((result) => {
+        setCatalog(result);
+        setCatalogStatus(result.species.length > 0 ? "ready" : "unavailable");
+      })
+      .catch(() => {
+        setCatalogStatus("unavailable");
+        setNotice(t.notices.catalogUnavailable);
+      });
     void api<TypeChartResponse>("/type-chart", undefined, typeChartResponseSchema)
-      .then(setChart)
-      .catch(() => setNotice(t.notices.typeChartUnavailable));
+      .then((result) => {
+        setChart(result);
+        setChartStatus(result.length > 0 ? "ready" : "unavailable");
+        if (result.length === 0) setNotice(t.notices.typeChartUnavailable);
+      })
+      .catch(() => {
+        setChartStatus("unavailable");
+        setNotice(t.notices.typeChartUnavailable);
+      });
     void api<ProTeamsResponse>("/pro-teams", undefined, proTeamsResponseSchema)
       .then(setProTeams)
       .catch(() => setNotice(t.notices.proTeamsUnavailable));
@@ -185,7 +200,14 @@ export function App() {
         )}
 
         {tab === "overview" && <Overview goTo={setTab} />}
-        {tab === "typeChart" && <TypeChart chart={chart} types={catalog?.types ?? []} />}
+        {tab === "typeChart" && (
+          <TypeChart
+            chart={chart}
+            catalog={catalog}
+            chartStatus={chartStatus}
+            catalogStatus={catalogStatus}
+          />
+        )}
         {tab === "pokedex" && <Pokedex catalog={catalog} />}
 
         {tab === "teamBuilder" && (

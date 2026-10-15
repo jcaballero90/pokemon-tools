@@ -8,7 +8,8 @@ describe("locale resources", () => {
     expect(resolveLocale(" EN_us ")).toBe("en");
     expect(resolveLocale("es-ES")).toBe("en");
     expect(getMessages("en-US")).toBe(en);
-    expect(getCatalogTranslations("unsupported")).toEqual({});
+    expect(getCatalogTranslations("unsupported").types?.fire).toBe("Fire");
+    expect(getCatalogTranslations("en").types?.grass).toBe("Grass");
   });
 
   it("allows translated message values while preserving the complete key structure", () => {
