@@ -9,7 +9,7 @@ This document describes responsibilities and interactions. The accepted decision
 | Location | Responsibility |
 | --- | --- |
 | [`apps/web`](../../apps/web/) | React/Vite frontend, feature views, guest drafts, and same-origin API calls. |
-| [`apps/api`](../../apps/api/) | One Fastify process with HTTP routes and the `catalog`, `damage`, `teams`, `pro-teams`, and `auth` modules. |
+| [`apps/api`](../../apps/api/) | One Fastify process with HTTP routes and the `catalog`, `damage`, `teams`, and `auth` modules. |
 | [`packages/contracts`](../../packages/contracts/) | Browser-safe Zod request and data schemas shared by the frontend and API. |
 | [`infra`](../../infra/) | Separate Compose projects, shared Caddy configuration, deployment, backup, and restore scripts. |
 | [`docs`](../) | Requirements, system map, decision history, and operating guidance. |
@@ -26,7 +26,6 @@ flowchart LR
   Routes --> Catalog[Catalog and Pokédex]
   Routes --> Damage[Damage]
   Routes --> Teams[Teams]
-  Routes --> Pro[Curated pro teams]
   Routes --> Auth[Better Auth]
   Catalog --> Calc[Pinned Smogon data]
   Damage --> DPort[DamageCalculator interface]
@@ -47,7 +46,6 @@ The diagram shows application dependencies, not separate deployable services. [`
 | `catalog` | Supplies Generation 9 species, moves, abilities, items, natures, and type effectiveness from pinned `@smogon/calc` data. Its [PokéAPI adapter](../../apps/api/src/modules/catalog/pokeapi-adapter.ts) requests descriptive Pokémon details, caches them in PostgreSQL, and reports unavailable details when needed. Battle facts remain independent of that request. |
 | `damage` | Validates known catalog names and passes a selected set, move, and field to the [Smogon adapter](../../apps/api/src/modules/damage/smogon-adapter.ts). Its `DamageCalculator` interface allows application-level substitution in tests. The response includes damage ranges and a one-hit KO chance conditional on a hit. |
 | `teams` | Exposes save, list, and delete operations for the authenticated owner. The [TeamStore interface](../../apps/api/src/modules/teams/teams.ts) is implemented by a [Prisma adapter](../../apps/api/src/modules/teams/prisma-adapter.ts); owner filtering is applied in persistence operations. |
-| `pro-teams` | Serves a small manually curated collection with publication, event, player, and spread provenance. Unlisted IVs are represented as unknown rather than inferred. |
 | `auth` | Uses Better Auth with Prisma-backed users, sessions, accounts, and verification records. The API checks the session before private team operations. |
 
 The boundaries are pragmatic rather than a full Clean Architecture directory layout. In particular, team validation calls `damage.validateSet`, whose default implementation wires the Smogon adapter. Simple catalog reads also use `@smogon/calc` directly. These observed dependencies should not be described as a strict dependency inversion boundary. They are candidates for refactoring if they impede tests or feature changes; no refactor is implied by this document alone.
@@ -56,7 +54,7 @@ The boundaries are pragmatic rather than a full Clean Architecture directory lay
 
 Guest team and comparison drafts are kept in browser `localStorage` under versioned keys, with migration from earlier keys; storage errors leave the in-memory editor usable. Each draft can contain up to six sets. Opening a private saved team copies its set into the browser draft, which then remains after logout. Saved teams are private database records tied to an authenticated user. The [Prisma schema](../../apps/api/prisma/schema.prisma) has `User`, `Session`, `Account`, and `Verification` records for auth, `Team` for saved sets, and `PokedexCache` for descriptive metadata. All tables are currently in one database per environment; module ownership is a code-level convention, not separate database schemas.
 
-Battle facts and damage mechanics come from pinned `@smogon/calc`. PokéAPI contributes sprites and other descriptive fields only, using explicit form mappings where supported. A PokéAPI outage can leave those fields unavailable or stale without replacing battle values. Pro teams come from manually credited publications and linked team pastes. The [data sources and publication policy](../data-sources.md) records the source rules, current coverage limits, and audit findings. These flows support [REQ-003](../requirements/requirements.md#req-003), [REQ-004](../requirements/requirements.md#req-004), [REQ-006](../requirements/requirements.md#req-006), [REQ-008](../requirements/requirements.md#req-008), and [REQ-009](../requirements/requirements.md#req-009).
+Battle facts and damage mechanics come from pinned `@smogon/calc`. PokéAPI contributes sprites and other descriptive fields only, using explicit form mappings where supported. A PokéAPI outage can leave those fields unavailable or stale without replacing battle values. These flows support [REQ-003](../requirements/requirements.md#req-003), [REQ-004](../requirements/requirements.md#req-004), [REQ-006](../requirements/requirements.md#req-006), and [REQ-009](../requirements/requirements.md#req-009).
 
 ## Environment topology
 

@@ -13,7 +13,7 @@ The project owner has approved first-release scope without assigning relative pr
 | [REQ-005](#req-005) | Guest team drafting and comparison | Functional | Undecided | Implemented |
 | [REQ-006](#req-006) | Accounts and private teams | Functional | Undecided | Implemented |
 | [REQ-007](#req-007) | Competitive set validation | Functional | Undecided | Implemented |
-| [REQ-008](#req-008) | Credited pro teams | Functional | Undecided | Implemented |
+| [REQ-008](#req-008) | Credited pro teams | Functional | Undecided | Descoped |
 | [REQ-009](#req-009) | Battle and descriptive data authority | Constraint | Undecided | Implemented |
 | [REQ-010](#req-010) | API contracts and documentation | Constraint | Undecided | In progress |
 | [REQ-011](#req-011) | Application security controls | Nonfunctional | Undecided | Implemented |
@@ -84,11 +84,7 @@ The application shall accept combinations of known Generation 9 species, moves, 
 
 ### REQ-008
 
-Users shall be able to inspect a small collection of manually curated pro teams with publication credit.
-
-- **Origin:** Project owner's approved architecture and release plan.
-- **Acceptance:** Every published entry identifies its player, event, placement, format, and source. EVs and IVs absent from the cited publication remain unknown rather than inferred.
-- **Current evidence:** The [curated entries](../../apps/api/src/modules/pro-teams/pro-teams.ts) and UI exist. A [source comparison](../data-sources.md#audit-of-the-two-current-records) found a 2024 public-sheet/report discrepancy and inconsistent event-date semantics. Final publication review and release presentation remain subject to human verification.
+**Descoped from the current release:** The Pro teams tab, API endpoint, response contract, and curated records have been removed. The original approved requirement remains recorded here for traceability; it is not current release scope.
 
 ### REQ-009
 

@@ -1,14 +1,13 @@
 import { Button } from "../../components/ui/button";
 import { t } from "../../i18n/presentation";
 
-type OverviewDestination = "typeChart" | "damage" | "proTeams" | "teamBuilder";
+type OverviewDestination = "typeChart" | "damage" | "teamBuilder";
 type OverviewProps = { goTo: (tab: OverviewDestination) => void };
 type OverviewCardData = { number: string; title: string; body: string; tab: OverviewDestination };
 
 const overviewCards: OverviewCardData[] = [
   { number: "01", tab: "typeChart", ...t.overview.cards.typeCoverage },
   { number: "02", tab: "damage", ...t.overview.cards.battleNumbers },
-  { number: "03", tab: "proTeams", ...t.overview.cards.realTeams }
 ];
 
 export function Overview({ goTo }: OverviewProps) {

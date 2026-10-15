@@ -15,7 +15,7 @@ The first release combines a small set of related Generation 9 utilities, accoun
 
 ## Decision and rationale
 
-Use one Fastify process organized around `catalog`, `damage`, `teams`, `pro-teams`, and `auth`. Routes translate HTTP requests into application operations. Introduce ports where an external dependency merits substitution: `TeamStore` for persistence and `DamageCalculator` for the battle calculation. Keep simple catalog reads direct. The frontend and API share browser-safe contracts and communicate through same-origin `/api`.
+Use one Fastify process organized around `catalog`, `damage`, `teams`, and `auth`. Routes translate HTTP requests into application operations. Introduce ports where an external dependency merits substitution: `TeamStore` for persistence and `DamageCalculator` for the battle calculation. Keep simple catalog reads direct. The frontend and API share browser-safe contracts and communicate through same-origin `/api`.
 
 This is a **pragmatic** boundary choice, not a claim that the current code follows every Clean Architecture dependency rule. Team validation currently calls `damage.validateSet`, whose default path wires the Smogon adapter, and catalog reads use that library directly. Refactor those paths if they impede change or testing; the ADR does not require speculative layers.
 
