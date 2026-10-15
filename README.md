@@ -1,6 +1,6 @@
 # Pokémon Tools
 
-An English-first Generation 9 Scarlet/Violet web app for exploring battle data, planning teams, and estimating damage. Guests can draft and compare two teams in their browser. An account adds private saved teams. The first release also includes a small collection of tournament teams with links to their publications and team pastes.
+An English-first Generation 9 Scarlet/Violet web app for exploring battle data, planning teams, and estimating damage. Guests can draft and compare two teams in their browser. An account adds private saved teams.
 
 This repository is the working TFM project. The application is deployed to staging and production on the owner's mini PC, with production reachable at `https://jcrserver.duckdns.org`. Several end-to-end product and security checks remain open; see the [requirements](docs/requirements/requirements.md) and [test strategy](docs/testing/test-strategy.md).
 
@@ -10,7 +10,6 @@ This repository is the working TFM project. The application is deployed to stagi
 - Draft and compare two teams of up to six Pokémon each; guest drafts stay in that browser's local storage.
 - Estimate a move's damage range and one-hit KO chance **conditional on the move hitting**.
 - Create an email/password account and save, reopen, list, or delete private teams.
-- Explore credited pro teams with published sets and source links. Unpublished spread values are left unknown.
 
 Battle facts and mechanics come from pinned `@smogon/calc` data. PokéAPI supplies server-cached descriptive details where available; an outage or unmapped form does not replace battle values. The [data source policy](docs/data-sources.md) explains authority, provenance, and current limitations. The API accepts known species, moves, abilities, and items without tournament-legality checks. Spanish localization, older generations, Google sign-in, and a player battle simulator are later possibilities, not first-release features.
 
@@ -27,7 +26,7 @@ Battle facts and mechanics come from pinned `@smogon/calc` data. PokéAPI suppli
 | Path | Purpose |
 | --- | --- |
 | [`apps/web`](apps/web/) | Browser UI, guest drafts, and Playwright journeys. |
-| [`apps/api`](apps/api/) | Fastify routes and the catalog, damage, teams, pro-teams, and auth modules. |
+| [`apps/api`](apps/api/) | Fastify routes and the catalog, damage, teams, and auth modules. |
 | [`packages/contracts`](packages/contracts/) | Browser-safe Zod request schemas and types. |
 | [`infra`](infra/) | Compose files, Caddy configuration, deployment, backup, and restore scripts. |
 | [`.github/workflows`](.github/workflows/) | Checks, code scanning, staging build/deploy, and production promotion. |

@@ -46,7 +46,6 @@ describe("API composition", () => {
       expect(spec.paths?.["/api/type-chart"]?.get?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/pokedex/{species}"]?.get?.responses?.["400"]).toBeDefined();
       expect(spec.paths?.["/api/damage"]?.post?.responses?.["200"]).toBeDefined();
-      expect(spec.paths?.["/api/pro-teams"]?.get?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/me/teams"]?.get?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/me/teams"]?.post?.responses?.["201"]).toBeDefined();
       expect(spec.paths?.["/api/me/teams/{id}"]?.delete?.responses?.["204"]).toBeDefined();

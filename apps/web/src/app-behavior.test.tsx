@@ -47,7 +47,7 @@ describe("website interaction regressions", () => {
     let signedOut = false;
     apiMock.mockImplementation((path: string) => {
       if (path === "/catalog") return Promise.resolve(catalog);
-      if (path === "/type-chart" || path === "/pro-teams") return Promise.resolve([]);
+      if (path === "/type-chart") return Promise.resolve([]);
       if (path === "/auth/get-session") return Promise.resolve(signedOut ? {} : { user: { id: "owner-1", name: "Trainer", email: "trainer@example.test" } });
       if (path === "/me/teams") return Promise.resolve([savedTeam]);
       if (path === "/auth/sign-out") { signedOut = true; return Promise.resolve(undefined); }
@@ -71,7 +71,7 @@ describe("website interaction regressions", () => {
     let sessions = 0;
     apiMock.mockImplementation((path: string) => {
       if (path === "/catalog") return Promise.resolve(catalog);
-      if (path === "/type-chart" || path === "/pro-teams") return Promise.resolve([]);
+      if (path === "/type-chart") return Promise.resolve([]);
       if (path === "/auth/get-session") return Promise.resolve(++sessions === 1 ? { user: { id: "owner-1", name: "Trainer", email: "trainer@example.test" } } : {});
       if (path === "/me/teams") return oldList.promise;
       return Promise.resolve(undefined);
@@ -226,7 +226,7 @@ describe("website interaction regressions", () => {
     let damageRequests = 0;
     apiMock.mockImplementation((path: string) => {
       if (path === "/catalog") return Promise.resolve(catalog);
-      if (path === "/type-chart" || path === "/pro-teams") return Promise.resolve([]);
+      if (path === "/type-chart") return Promise.resolve([]);
       if (path === "/auth/get-session") return Promise.resolve({});
       if (path === "/damage") {
         damageRequests++;
