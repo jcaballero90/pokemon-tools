@@ -11,6 +11,6 @@
     "check": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run --passWithNoTests"
   },
-  "dependencies": { "zod": "4.6.5" },
-  "devDependencies": { "typescript": "7.0.2", "vitest": "5.0.2" }
+  "dependencies": { "zod": "4.6.7" },
+  "devDependencies": { "typescript": "7.0.2", "vitest": "5.0.4" }
 }
