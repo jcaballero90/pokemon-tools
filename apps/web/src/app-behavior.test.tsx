@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { teamInputSchema, type CatalogResponse, type DamageResponse, type SavedTeamResponse, type TeamDraft } from "@pokemon-tools/contracts";
+import { teamInputSchema, type CatalogResponse, type DamageResponse, type EvolutionResponse, type PokedexResponse, type SavedTeamResponse, type TeamDraft } from "@pokemon-tools/contracts";
 import { App } from "./main.js";
 import { Account } from "./features/account/Account.js";
 import { Damage } from "./features/damage/Damage.js";
@@ -43,6 +43,28 @@ afterEach(() => {
 });
 
 describe("website interaction regressions", () => {
+  it("lists a Pokémon's abilities and reveals their description by focus or tap", async () => {
+    const family: EvolutionResponse = { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
+    apiMock.mockImplementation((path: string) => path.endsWith("/evolution")
+      ? Promise.resolve(family)
+      : Promise.resolve({ source: "PokéAPI", pokedexId: 25, familyKey: "pikachu", abilities: [
+        { name: "Static", isHidden: false, description: "May paralyze a Pokémon that makes contact." },
+        { name: "Lightning Rod", isHidden: true, description: "Draws in Electric-type moves." }
+      ] }));
+
+    render(<Pokedex catalog={catalog} />);
+    fireEvent.click(screen.getByRole("button", { name: /Pikachu/ }));
+
+    const staticAbility = await screen.findByRole("button", { name: "Static" });
+    expect(screen.getByRole("heading", { name: "Abilities" })).toBeTruthy();
+    const tooltipId = staticAbility.getAttribute("aria-describedby");
+    expect(tooltipId).toBeTruthy();
+    expect(document.getElementById(tooltipId ?? "")?.textContent).toBe("May paralyze a Pokémon that makes contact.");
+    fireEvent.click(staticAbility);
+    expect(staticAbility.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Hidden ability")).toBeTruthy();
+  });
+
   it("removes a previously rendered private library as soon as the user signs out", async () => {
     let signedOut = false;
     apiMock.mockImplementation((path: string) => {
@@ -89,9 +111,10 @@ describe("website interaction regressions", () => {
   });
 
   it("shows only the newest selected Pokémon when older descriptive responses finish late", async () => {
-    const first = deferred<{ source: "PokéAPI"; pokedexId: number; sprite: string }>();
-    const second = deferred<{ source: "PokéAPI"; pokedexId: number; sprite: string }>();
-    apiMock.mockImplementation((path: string) => path.endsWith("Pikachu") ? first.promise : second.promise);
+    const first = deferred<PokedexResponse>();
+    const second = deferred<PokedexResponse>();
+    const family: EvolutionResponse = { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
+    apiMock.mockImplementation((path: string) => path.endsWith("/evolution") ? Promise.resolve(family) : path.endsWith("Pikachu") ? first.promise : second.promise);
 
     render(<Pokedex catalog={catalog} />);
     fireEvent.click(screen.getByRole("button", { name: /Pikachu/ }));
@@ -101,6 +124,79 @@ describe("website interaction regressions", () => {
     await act(async () => first.resolve({ source: "PokéAPI", pokedexId: 25, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" }));
     expect(screen.queryByAltText("Pikachu")).toBeNull();
     expect(screen.getByText("National Pokédex #6")).toBeTruthy();
+  });
+
+  it("shows Corvisquire's level requirements and opens clickable relatives without changing search text", async () => {
+    const familyCatalog: CatalogResponse = {
+      ...catalog,
+      species: [
+        { name: "Rookidee", types: ["Flying"], baseStats: { hp: 38, atk: 47, def: 35, spa: 33, spd: 35, spe: 57 } },
+        { name: "Corvisquire", types: ["Flying"], baseStats: { hp: 68, atk: 67, def: 55, spa: 77, spd: 55, spe: 77 } },
+        { name: "Corviknight", types: ["Flying", "Steel"], baseStats: { hp: 98, atk: 87, def: 105, spa: 53, spd: 85, spe: 67 } }
+      ]
+    };
+    const relatives: EvolutionResponse = {
+      source: "PokéAPI",
+      nodes: [
+        { key: "rookidee", name: "Rookidee", pokedexId: 821, iconCandidates: [] },
+        { key: "corvisquire", name: "Corvisquire", pokedexId: 822, iconCandidates: [] },
+        { key: "corviknight", name: "Corviknight", pokedexId: 823, iconCandidates: [] }
+      ],
+      edges: [
+        { from: "rookidee", to: "corvisquire", alternatives: [["Level 18"]] },
+        { from: "corvisquire", to: "corviknight", alternatives: [["Level 38"]] }
+      ], megaForms: []
+    };
+    apiMock.mockImplementation((path: string) => {
+      if (path.endsWith("/evolution")) return Promise.resolve(relatives);
+      if (path === "/pokedex/Corvisquire") return Promise.resolve({ source: "PokéAPI", pokedexId: 822, familyKey: "corvisquire", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/822.webp", artwork: {
+        normal: ["https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/822.webp", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/legends-za/822.webp"],
+        shiny: ["https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/shiny/822.webp"],
+        genderVariants: {
+          male: {
+            normal: ["https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/822.webp", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/legends-za/822.webp"],
+            shiny: ["https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/shiny/822.webp"]
+          },
+          female: {
+            normal: ["https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/female/822.webp"],
+            shiny: ["https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/shiny/female/822.webp"]
+          }
+        }
+      } });
+      return Promise.resolve({ source: "PokéAPI", pokedexId: 823, familyKey: "corviknight", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/823.webp", artwork: { normal: [], shiny: [] } });
+    });
+
+    render(<Pokedex catalog={familyCatalog} />);
+    fireEvent.change(screen.getByLabelText("Find a Pokémon"), { target: { value: "Corvisquire" } });
+    fireEvent.click(screen.getByRole("button", { name: /Corvisquire/ }));
+
+    expect(await screen.findByAltText("Corvisquire")).toBeTruthy();
+    const artwork = screen.getByAltText("Corvisquire") as HTMLImageElement;
+    expect(artwork.src).toContain("scarlet-violet/822.webp");
+    fireEvent.error(artwork);
+    expect((screen.getByAltText("Corvisquire") as HTMLImageElement).src).toContain("legends-za/822.webp");
+    expect(screen.getByText("Level 18")).toBeTruthy();
+    expect(screen.getByText("Level 38")).toBeTruthy();
+    const totalMeter = screen.getByRole("meter", { name: "Total" });
+    expect(totalMeter.getAttribute("aria-valuenow")).toBe("399");
+    expect(totalMeter.getAttribute("aria-valuemax")).toBe("495");
+    expect(totalMeter.querySelector(".stat-fill")?.className).toContain("stat-fill--modest");
+    const femaleToggle = screen.getByRole("button", { name: "Female artwork" });
+    fireEvent.click(femaleToggle);
+    expect(femaleToggle.getAttribute("aria-pressed")).toBe("true");
+    expect((screen.getByAltText("Corvisquire") as HTMLImageElement).src).toContain("female/822.webp");
+    fireEvent.click(screen.getByRole("button", { name: "Male artwork" }));
+    expect(screen.getByRole("button", { name: "Male artwork" }).getAttribute("aria-pressed")).toBe("true");
+    const shinyToggle = screen.getByRole("button", { name: "Shiny artwork" });
+    fireEvent.click(shinyToggle);
+    expect(shinyToggle.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(femaleToggle);
+    expect((screen.getByAltText("Corvisquire") as HTMLImageElement).src).toContain("shiny/female/822.webp");
+
+    fireEvent.click(screen.getByRole("button", { name: "View Corviknight details" }));
+    expect(await screen.findByAltText("Corviknight")).toBeTruthy();
+    expect((screen.getByLabelText("Find a Pokémon") as HTMLInputElement).value).toBe("Corvisquire");
+    expect(screen.getByRole("button", { name: "Shiny artwork" }).getAttribute("aria-pressed")).toBe("false");
   });
 
   it("preserves empty move positions rather than shifting the next move", () => {

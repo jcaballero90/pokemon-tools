@@ -1,8 +1,9 @@
 import { Generations, toID } from "@smogon/calc";
+import { pokedexIdentity } from "./pokedex-identities.js";
 
 const gen = Generations.get(9);
 export const catalog = {
-  species: [...gen.species].map((p) => ({ name: p.name, types: p.types, baseStats: p.baseStats })).sort((a, b) => a.name.localeCompare(b.name)),
+  species: [...gen.species].map((p) => ({ name: p.name, types: p.types, baseStats: p.baseStats, pokedexEligible: pokedexIdentity(p.name)?.eligible ?? false })).sort((a, b) => a.name.localeCompare(b.name)),
   moves: [...gen.moves].map((m) => m.name).sort(),
   abilities: [...gen.abilities].map((a) => a.name).sort(),
   items: [...gen.items].map((i) => i.name).sort(),

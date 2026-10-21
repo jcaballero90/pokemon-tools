@@ -76,7 +76,10 @@ export const damageResponseSchema = z.object({
 });
 
 export const catalogResponseSchema = z.object({
-  species: z.array(z.object({ name: z.string(), types: z.array(z.string()), baseStats: z.record(z.string(), z.number()) })),
+  species: z.array(z.object({
+    name: z.string(), types: z.array(z.string()), baseStats: z.record(z.string(), z.number()),
+    pokedexEligible: z.boolean().optional()
+  })),
   moves: z.array(z.string()), abilities: z.array(z.string()), items: z.array(z.string()),
   types: z.array(z.string()), natures: z.array(z.string())
 });
@@ -85,14 +88,49 @@ export const typeChartResponseSchema = z.array(z.object({
   attack: z.string(), against: z.record(z.string(), z.number())
 }));
 
+const pokedexArtworkVariantSchema = z.object({ normal: z.array(z.url()), shiny: z.array(z.url()) });
 export const pokedexResponseSchema = z.object({
   source: z.literal("PokéAPI"),
   pokedexId: z.number().int().positive().optional(),
+  familyKey: z.string().optional(),
   sprite: z.url().nullable().optional(),
+  artwork: z.object({
+    normal: z.array(z.url()),
+    shiny: z.array(z.url()),
+    genderVariants: z.object({
+      male: pokedexArtworkVariantSchema,
+      female: pokedexArtworkVariantSchema
+    }).optional()
+  }).optional(),
+  abilities: z.array(z.object({
+    name: z.string().trim().min(1).max(80),
+    isHidden: z.boolean(),
+    description: z.string().trim().max(2000).optional()
+  })).optional(),
   heightDecimeters: z.number().int().nonnegative().optional(),
   weightHectograms: z.number().int().nonnegative().optional(),
   unavailable: z.boolean().optional(),
   reason: z.string().optional(),
+  stale: z.boolean().optional()
+});
+
+export const evolutionNodeSchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  pokedexId: z.number().int().positive(),
+  iconCandidates: z.array(z.url())
+});
+export const evolutionEdgeSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+  alternatives: z.array(z.array(z.string()))
+});
+export const evolutionResponseSchema = z.object({
+  source: z.literal("PokéAPI"),
+  nodes: z.array(evolutionNodeSchema),
+  edges: z.array(evolutionEdgeSchema),
+  megaForms: z.array(evolutionNodeSchema),
+  unavailable: z.boolean().optional(),
   stale: z.boolean().optional()
 });
 
@@ -158,5 +196,8 @@ export type DamageResponse = z.infer<typeof damageResponseSchema>;
 export type CatalogResponse = z.infer<typeof catalogResponseSchema>;
 export type TypeChartResponse = z.infer<typeof typeChartResponseSchema>;
 export type PokedexResponse = z.infer<typeof pokedexResponseSchema>;
+export type EvolutionNode = z.infer<typeof evolutionNodeSchema>;
+export type EvolutionEdge = z.infer<typeof evolutionEdgeSchema>;
+export type EvolutionResponse = z.infer<typeof evolutionResponseSchema>;
 export type SavedTeamResponse = z.infer<typeof savedTeamResponseSchema>;
 export type TeamDraft = z.infer<typeof teamDraftSchema>;
