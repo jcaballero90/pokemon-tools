@@ -1,3 +1,4 @@
+import { Moon, Sun } from "lucide-react";
 import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -26,7 +27,9 @@ import { api } from "./lib/api";
 import { loadTeamDraft, saveTeamDraft } from "./lib/team-drafts";
 import { submittedTeam } from "./features/teams/team-model";
 import { CatalogDatalists } from "./components/catalog-datalists";
+import { useTheme } from "./lib/use-theme";
 import "./style.css";
+import "./theme.css";
 
 type SavedTeam = SavedTeamResponse;
 type Tab = "overview" | "typeChart" | "pokedex" | "teamBuilder" | "damage" | "account";
@@ -37,6 +40,7 @@ const tabLabels: Record<Tab, string> = t.tabs;
 const descriptions: Record<Tab, string> = t.descriptions;
 
 export function App() {
+  const { theme, toggleTheme } = useTheme();
   const [tab, setTab] = useState<Tab>("overview");
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
   const [chart, setChart] = useState<TypeChartResponse | null>(null);
@@ -175,6 +179,8 @@ export function App() {
       <SiteHeader
         tab={tab}
         user={user}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         onNavigate={handleNavigation}
       />
 
@@ -261,10 +267,12 @@ export function App() {
 type SiteHeaderProps = {
   tab: Tab;
   user: AccountUser | null;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
   onNavigate: (destination: Tab) => void;
 };
 
-function SiteHeader({ tab, user, onNavigate }: SiteHeaderProps) {
+function SiteHeader({ tab, user, theme, onToggleTheme, onNavigate }: SiteHeaderProps) {
   return (
     <header className="site-header">
       <div className="brand">
@@ -285,7 +293,23 @@ function SiteHeader({ tab, user, onNavigate }: SiteHeaderProps) {
           </button>
         ))}
       </nav>
-      <div className="header-user">{user ? user.name : t.app.guestMode}</div>
+      <div className="header-actions">
+        <div className="header-user" title={user?.name}>{user ? user.name : t.app.guestMode}</div>
+        <button
+          className="theme-toggle"
+          type="button"
+          role="switch"
+          aria-label={t.app.darkTheme}
+          aria-checked={theme === "dark"}
+          onClick={onToggleTheme}
+        >
+          <span className="theme-toggle-thumb" aria-hidden="true">
+            {theme === "dark"
+              ? <Moon size={14} aria-hidden="true" />
+              : <Sun size={14} aria-hidden="true" />}
+          </span>
+        </button>
+      </div>
     </header>
   );
 }
