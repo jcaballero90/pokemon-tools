@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { teamInputSchema, type CatalogResponse, type DamageResponse, type TeamDraft } from "@pokemon-tools/contracts";
+import { teamInputSchema, type CatalogResponse, type DamageResponse, type EvolutionResponse, type TeamDraft } from "@pokemon-tools/contracts";
 import { Damage } from "./features/damage/Damage";
 import { Pokedex } from "./features/pokedex/Pokedex";
 import { TeamEditor } from "./features/teams/TeamEditor";
@@ -80,7 +80,8 @@ describe("localized website values", () => {
   });
 
   it("finds localized Pokémon labels and requests descriptions using the canonical species", async () => {
-    apiMock.mockResolvedValue({ source: "PokéAPI", pokedexId: 6, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" });
+    const evolution: EvolutionResponse = { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
+    apiMock.mockImplementation((path: string | undefined) => path?.endsWith("/evolution") ? Promise.resolve(evolution) : Promise.resolve({ source: "PokéAPI", pokedexId: 6, familyKey: "charizard", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" }));
     render(<Pokedex catalog={catalog} />);
     fireEvent.change(screen.getByLabelText("Find a Pokémon"), { target: { value: "Translated Char" } });
     expect(screen.queryByRole("button", { name: /Translated Pikachu/ })).toBeNull();

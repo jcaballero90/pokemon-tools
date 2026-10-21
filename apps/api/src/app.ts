@@ -8,12 +8,12 @@ import { z } from "zod";
 import { resolve } from "node:path";
 import {
   apiErrorResponseSchema, catalogResponseSchema, damageRequestSchema, damageResponseSchema,
-  pokedexResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
+  evolutionResponseSchema, pokedexResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
   teamInputSchema, typeChartResponseSchema
 } from "@pokemon-tools/contracts";
 import { createAuth } from "./modules/auth/auth.js";
 import { catalog, typeChart } from "./modules/catalog/catalog.js";
-import { pokedex } from "./modules/catalog/pokeapi-adapter.js";
+import { pokedex, pokedexEvolution } from "./modules/catalog/pokeapi-adapter.js";
 import { computeDamage } from "./modules/damage/damage.js";
 import { deleteTeam, listTeams, saveTeam, validateTeam, validateTeamIssues } from "./modules/teams/teams.js";
 import { PrismaTeamStore } from "./modules/teams/prisma-adapter.js";
@@ -105,6 +105,7 @@ export async function buildApp(config: Config, db: Database) {
   app.get("/api/catalog", { schema: { tags: ["catalog"], summary: "Pinned Generation 9 battle catalog", response: { 200: json(catalogResponseSchema) } } }, async () => catalog);
   app.get("/api/type-chart", { schema: { tags: ["catalog"], summary: "Generation 9 type effectiveness", response: { 200: json(typeChartResponseSchema) } } }, async () => typeChart());
   app.get<{ Params: { species: string } }>("/api/pokedex/:species", { schema: { tags: ["catalog"], params: { type: "object", required: ["species"], properties: { species: { type: "string" } } }, response: { 200: json(pokedexResponseSchema), 400: errors, 500: errors } } }, async (request) => pokedex(db, request.params.species));
+  app.get<{ Params: { species: string } }>("/api/pokedex/:species/evolution", { schema: { tags: ["catalog"], summary: "Official evolution family and Mega forms", params: { type: "object", required: ["species"], properties: { species: { type: "string" } } }, response: { 200: json(evolutionResponseSchema), 400: errors, 500: errors } } }, async (request) => pokedexEvolution(db, request.params.species));
   app.post("/api/damage", { schema: { tags: ["damage"], body: z.toJSONSchema(damageRequestSchema, { target: "draft-7", io: "input" }), response: { 200: json(damageResponseSchema), 400: errors, 500: errors }, summary: "Damage range and one-hit KO chance conditional on a hit" } }, async (request, reply) => {
     const parsed = damageRequestSchema.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send(apiError("validation-failed", parsed.error.flatten(), zodValidationIssues(parsed.error.issues)));

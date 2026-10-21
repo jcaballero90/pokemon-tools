@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "check": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
+    "pokedex:manifest": "node scripts/generate-pokedex-identities.mjs",
     "start": "node dist/main.js",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
