@@ -1,0 +1,356 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #e6edf5;
+  background: #101827;
+  --theme-page: #101827;
+  --theme-surface: #192437;
+  --theme-raised: #233247;
+  --theme-inset: #141f30;
+  --theme-text: #e6edf5;
+  --theme-muted: #a8b5c5;
+  --theme-subtle: #91a0b2;
+  --theme-border: #344357;
+  --theme-accent: #75d6bd;
+  --theme-accent-soft: #203b3c;
+  --theme-focus: #80e2ca;
+  --theme-shadow: 0 8px 28px #050b1480;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .site-shell {
+  background: var(--theme-page);
+  color: var(--theme-text);
+}
+
+:root[data-theme="dark"] p { color: #bdc9d8; }
+:root[data-theme="dark"] a,
+:root[data-theme="dark"] .text-link,
+:root[data-theme="dark"] .saved-row button { color: var(--theme-accent); }
+:root[data-theme="dark"] :focus-visible { outline-color: var(--theme-focus); }
+
+:root[data-theme="dark"] .site-header {
+  background: var(--theme-surface);
+  border-color: var(--theme-border);
+}
+:root[data-theme="dark"] .brand-mark {
+  background: #24443f;
+  color: var(--theme-accent);
+}
+:root[data-theme="dark"] .brand small,
+:root[data-theme="dark"] .header-user { color: var(--theme-muted); }
+:root[data-theme="dark"] .site-header nav button { color: var(--theme-muted); }
+:root[data-theme="dark"] .site-header nav .nav-active {
+  background: var(--theme-accent-soft);
+  color: var(--theme-accent);
+}
+:root[data-theme="dark"] .site-shell footer {
+  border-color: var(--theme-border);
+  color: var(--theme-subtle);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  margin-inline-start: auto;
+}
+.header-user {
+  overflow: hidden;
+  max-width: min(26vw, 230px);
+  text-overflow: ellipsis;
+}
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  width: 48px;
+  height: 30px;
+  flex: none;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid #cbd6dc;
+  border-radius: 999px;
+  background: #e9eff2;
+  color: #526478;
+  transition: background .16s ease, border-color .16s ease;
+}
+.theme-toggle:focus-visible {
+  outline: 3px solid #258d7a;
+  outline-offset: 3px;
+}
+.theme-toggle-thumb {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  place-items: center;
+  transform: translateX(0);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px #18253535;
+  color: #946a15;
+  transition: transform .16s ease, background .16s ease, color .16s ease;
+}
+.theme-toggle[aria-checked="true"] {
+  border-color: #3c7771;
+  background: #244c4b;
+  color: #d0e6df;
+}
+.theme-toggle[aria-checked="true"] .theme-toggle-thumb {
+  transform: translateX(18px);
+  background: #182b36;
+  color: #9be4d2;
+}
+:root[data-theme="dark"] .theme-toggle { border-color: #496071; }
+
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .effectiveness-group,
+:root[data-theme="dark"] .type-chart th,
+:root[data-theme="dark"] .species-list button,
+:root[data-theme="dark"] .compare-columns > div,
+:root[data-theme="dark"] .account-layout .panel {
+  background: var(--theme-surface);
+  border-color: var(--theme-border);
+  color: var(--theme-text);
+}
+:root[data-theme="dark"] .panel { box-shadow: var(--theme-shadow); }
+:root[data-theme="dark"] .hero {
+  background:
+    radial-gradient(circle at 83% 28%, #245349 0, #1c393b 21%, transparent 48%),
+    linear-gradient(135deg, #1d2a3b, #182b32);
+}
+:root[data-theme="dark"] .hero em,
+:root[data-theme="dark"] .hero .eyebrow,
+:root[data-theme="dark"] .eyebrow,
+:root[data-theme="dark"] .feature > span,
+:root[data-theme="dark"] .feature b { color: var(--theme-accent); }
+:root[data-theme="dark"] .notice {
+  border-color: #315b4c;
+  background: #1b352f;
+  color: #c0eed8;
+}
+:root[data-theme="dark"] .notice p { color: inherit; }
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select {
+  border-color: #43546a;
+  background: var(--theme-inset);
+  color: var(--theme-text);
+}
+:root[data-theme="dark"] input::placeholder { color: #8292a6; }
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 3px #75d6bd35;
+}
+:root[data-theme="dark"] option { background: var(--theme-inset); color: var(--theme-text); }
+:root[data-theme="dark"] label,
+:root[data-theme="dark"] .wide > b { color: #c4cfdd; }
+:root[data-theme="dark"] .section-heading > span,
+:root[data-theme="dark"] .muted,
+:root[data-theme="dark"] .compare-columns small { color: var(--theme-muted); }
+:root[data-theme="dark"] .set-card,
+:root[data-theme="dark"] .set-fields,
+:root[data-theme="dark"] .saved-row,
+:root[data-theme="dark"] .stats-list .stat-row.stat-total,
+:root[data-theme="dark"] .mega-forms { border-color: var(--theme-border); }
+:root[data-theme="dark"] .set-card summary small { color: var(--theme-subtle); }
+:root[data-theme="dark"] .set-number {
+  background: #24443f;
+  color: var(--theme-accent);
+}
+:root[data-theme="dark"] .compare-columns > div { background: var(--theme-inset); }
+:root[data-theme="dark"] .mode-switch { background: var(--theme-inset); }
+:root[data-theme="dark"] .mode-switch .selected {
+  background: var(--theme-raised);
+  color: var(--theme-accent);
+}
+:root[data-theme="dark"] .account-aside { background: #1b352f; }
+:root[data-theme="dark"] .danger,
+:root[data-theme="dark"] .error { color: #ff9b96; }
+:root[data-theme="dark"] .result-card h2 { color: var(--theme-accent); }
+:root[data-theme="dark"] .damage-meter { background: #344357; }
+
+:root[data-theme="dark"] .button-outline {
+  border-color: #45605f;
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+}
+:root[data-theme="dark"] .button-ghost { color: var(--theme-accent); }
+:root[data-theme="dark"] .button-primary { background: #167865; }
+:root[data-theme="dark"] .button-primary:hover { background: #1b8a73; }
+
+:root[data-theme="dark"] .legend { color: var(--theme-muted); }
+:root[data-theme="dark"] .type-chart th { background: #192437; }
+:root[data-theme="dark"] .type-chart td.super,
+:root[data-theme="dark"] .legend i.super { background: #244b3d; color: #b8f0d0; }
+:root[data-theme="dark"] .type-chart td.resist,
+:root[data-theme="dark"] .legend i.resist { background: #4b3a26; color: #f6d5a1; }
+:root[data-theme="dark"] .type-chart td.immune,
+:root[data-theme="dark"] .legend i.immune { background: #354252; color: #d0d8e2; }
+:root[data-theme="dark"] .type-chart td.neutral,
+:root[data-theme="dark"] .legend i.neutral { background: #202d3e; color: #b5c2d1; }
+
+:root[data-theme="dark"] .selection-count {
+  border-color: var(--theme-border);
+  background: var(--theme-raised);
+  color: #d2e8dc;
+}
+:root[data-theme="dark"] .species-finder-label,
+:root[data-theme="dark"] .type-selection-heading h3,
+:root[data-theme="dark"] .results-heading h2 { color: #dce7e3; }
+:root[data-theme="dark"] .finder-help,
+:root[data-theme="dark"] .sprite-status,
+:root[data-theme="dark"] .pokedex-status,
+:root[data-theme="dark"] .species-list span { color: var(--theme-muted); }
+:root[data-theme="dark"] .type-selection-heading p { color: #f1d58f; }
+:root[data-theme="dark"] .type-button:hover:not(:disabled) { box-shadow: 0 4px 12px #050b1455; }
+:root[data-theme="dark"] .type-button:focus-visible,
+:root[data-theme="dark"] .clear-defender-button:focus-visible { outline-color: var(--theme-focus); }
+:root[data-theme="dark"] .selected-species {
+  border-color: var(--theme-border);
+  background: var(--theme-inset);
+}
+:root[data-theme="dark"] .selected-species > img,
+:root[data-theme="dark"] .species-sprite-placeholder {
+  background: var(--theme-raised);
+  color: var(--theme-muted);
+}
+:root[data-theme="dark"] .selected-species-copy > strong { color: #dcebe4; }
+:root[data-theme="dark"] .defensive-results-empty {
+  border-color: #43546a;
+  background: linear-gradient(145deg, #1d2b3d, #192437);
+  color: #c2d0dc;
+}
+:root[data-theme="dark"] .effectiveness-results { border-color: var(--theme-border); }
+:root[data-theme="dark"] .effectiveness-group h3 { color: #dce7e3; }
+:root[data-theme="dark"] .multiplier-4 { border-left-color: #ed806a; background: linear-gradient(145deg, #3f292f, #253042); }
+:root[data-theme="dark"] .multiplier-2 { border-left-color: #e7b458; background: linear-gradient(145deg, #3d3528, #253042); }
+:root[data-theme="dark"] .multiplier-1 { border-left-color: #83c497; background: linear-gradient(145deg, #263d36, #253042); }
+:root[data-theme="dark"] .multiplier-0-5 { border-left-color: #7fb9d0; background: linear-gradient(145deg, #243a46, #253042); }
+:root[data-theme="dark"] .multiplier-0-25 { border-left-color: #91a8ed; background: linear-gradient(145deg, #2b3150, #253042); }
+:root[data-theme="dark"] .multiplier-0 { border-left-color: #aab5c5; background: linear-gradient(145deg, #303746, #253042); }
+:root[data-theme="dark"] .chart-message { color: #c1cede; }
+
+:root[data-theme="dark"] .type-bug { --defend-bg:#363d29; --defend-border:#6c7847; --defend-ink:#d7e7a7; }
+:root[data-theme="dark"] .type-dark { --defend-bg:#36313e; --defend-border:#746985; --defend-ink:#ddd1ef; }
+:root[data-theme="dark"] .type-dragon { --defend-bg:#382f46; --defend-border:#806397; --defend-ink:#e5cffb; }
+:root[data-theme="dark"] .type-electric { --defend-bg:#40391f; --defend-border:#88752d; --defend-ink:#f5df91; }
+:root[data-theme="dark"] .type-fairy { --defend-bg:#402e39; --defend-border:#875b71; --defend-ink:#f5c9df; }
+:root[data-theme="dark"] .type-fighting { --defend-bg:#432f28; --defend-border:#8b5b44; --defend-ink:#f3c5ae; }
+:root[data-theme="dark"] .type-fire { --defend-bg:#462e27; --defend-border:#935b43; --defend-ink:#ffc6ad; }
+:root[data-theme="dark"] .type-flying { --defend-bg:#2f3650; --defend-border:#6876a5; --defend-ink:#d3dcff; }
+:root[data-theme="dark"] .type-ghost { --defend-bg:#34334e; --defend-border:#7170a3; --defend-ink:#d8d7ff; }
+:root[data-theme="dark"] .type-grass { --defend-bg:#2b3d2c; --defend-border:#5f8754; --defend-ink:#c9edb8; }
+:root[data-theme="dark"] .type-ground { --defend-bg:#403629; --defend-border:#8c6e48; --defend-ink:#f0d1a7; }
+:root[data-theme="dark"] .type-ice { --defend-bg:#293e3e; --defend-border:#568c87; --defend-ink:#bfece6; }
+:root[data-theme="dark"] .type-normal { --defend-bg:#363a35; --defend-border:#777d6e; --defend-ink:#d8ddce; }
+:root[data-theme="dark"] .type-poison { --defend-bg:#3c3040; --defend-border:#805f86; --defend-ink:#eccbf0; }
+:root[data-theme="dark"] .type-psychic { --defend-bg:#422d34; --defend-border:#905664; --defend-ink:#fac7d0; }
+:root[data-theme="dark"] .type-rock { --defend-bg:#3e3b2f; --defend-border:#80794f; --defend-ink:#e8e1b2; }
+:root[data-theme="dark"] .type-steel { --defend-bg:#303a40; --defend-border:#667c85; --defend-ink:#cbdde3; }
+:root[data-theme="dark"] .type-water { --defend-bg:#2b394c; --defend-border:#5d7fa9; --defend-ink:#c8e0fb; }
+
+:root[data-theme="dark"] .pokedex-layout .species-list { border-color: var(--theme-border); }
+:root[data-theme="dark"] .pokedex-layout .species-list button {
+  border-color: var(--theme-border);
+  background: transparent;
+  color: var(--theme-text);
+}
+:root[data-theme="dark"] .pokedex-layout .species-list button:hover { background: #24354a; }
+:root[data-theme="dark"] .pokedex-layout .species-list button[aria-pressed="true"] {
+  background: #203b3c;
+  color: #b4f0dc;
+  box-shadow: inset 3px 0 #75d6bd;
+}
+:root[data-theme="dark"] .pokemon-detail h2,
+:root[data-theme="dark"] .pokedex-stats h3,
+:root[data-theme="dark"] .pokedex-abilities h3,
+:root[data-theme="dark"] .evolution-heading h2 { color: #e1e9f0; }
+:root[data-theme="dark"] .national-number,
+:root[data-theme="dark"] .stat-label,
+:root[data-theme="dark"] .stat-value { color: #c2cddd; }
+:root[data-theme="dark"] .stat-track { background: #344357; }
+:root[data-theme="dark"] .pokedex-ability-chip {
+  border-color: #426257;
+  background: #203a35;
+  color: #d1eee2;
+}
+:root[data-theme="dark"] .pokedex-ability-chip small { background: #334b46; color: #c1d8cd; }
+:root[data-theme="dark"] .pokedex-ability-tooltip {
+  border-color: #53647a;
+  background: #26364b;
+  box-shadow: 0 8px 24px #050b1480;
+  color: #edf3f8;
+}
+:root[data-theme="dark"] .pokedex-ability-help,
+:root[data-theme="dark"] .shiny-note { color: var(--theme-muted); }
+:root[data-theme="dark"] .pokemon-artwork-frame {
+  border-color: var(--theme-border);
+  background: radial-gradient(circle at 50% 54%, #29384a 0, #202d3f 63%, #192437 100%);
+  box-shadow: var(--theme-shadow);
+}
+:root[data-theme="dark"] .artwork-placeholder { color: var(--theme-muted); }
+:root[data-theme="dark"] .artwork-placeholder > span:first-child { border-color: #53647a; color: #9eacba; }
+:root[data-theme="dark"] .gender-toggle,
+:root[data-theme="dark"] .shiny-toggle {
+  border-color: #43566a;
+  background: var(--theme-raised);
+  color: #d2dfdf;
+}
+:root[data-theme="dark"] .gender-toggle[aria-pressed="true"] {
+  border-color: #568c79;
+  background: #203e39;
+  color: #c1f0de;
+  box-shadow: inset 0 0 0 1px #385e53;
+}
+:root[data-theme="dark"] .shiny-toggle[aria-pressed="true"] {
+  border-color: #9d8645;
+  background: #3d3827;
+  color: #f0dfa5;
+}
+:root[data-theme="dark"] .evolution-heading > span,
+:root[data-theme="dark"] .evolution-requirement { color: var(--theme-muted); }
+:root[data-theme="dark"] .evolution-path {
+  border-color: var(--theme-border);
+  background: var(--theme-inset);
+}
+:root[data-theme="dark"] .evolution-species { color: #d5e0ec; }
+:root[data-theme="dark"] .evolution-species:hover { border-color: #49645a; background: #24372f; }
+:root[data-theme="dark"] .evolution-species[aria-current="true"] {
+  border-color: #568c79;
+  background: #203e39;
+  color: #c1f0de;
+  box-shadow: inset 0 0 0 1px #385e53;
+}
+:root[data-theme="dark"] .evolution-transition { color: #b6c7bb; }
+:root[data-theme="dark"] .evolution-arrow { color: #83c9aa; }
+:root[data-theme="dark"] .mega-forms h3 { color: #c3d2c8; }
+:root[data-theme="dark"] .mega-form-link {
+  border-color: #405266;
+  background: var(--theme-raised);
+  color: #d5e1e8;
+}
+:root[data-theme="dark"] .mega-form-link:hover { background: #2c4056; }
+:root[data-theme="dark"] .mega-form-link[aria-current="true"] {
+  border-color: #568c79;
+  background: #203e39;
+  color: #c1f0de;
+}
+
+@media (max-width: 1100px) {
+  .header-actions { order: 2; }
+}
+
+@media (max-width: 650px) {
+  .site-header { column-gap: 8px; padding-inline: 16px; }
+  .brand { min-width: 0; flex: 1 1 auto; }
+  .brand > div { min-width: 0; overflow: hidden; }
+  .brand strong,
+  .brand small { overflow: hidden; text-overflow: ellipsis; }
+  .header-actions { gap: 8px; flex: none; }
+  .header-user { max-width: min(26vw, 120px); }
+  .theme-toggle { width: 46px; }
+  .theme-toggle[aria-checked="true"] .theme-toggle-thumb { transform: translateX(16px); }
+}
