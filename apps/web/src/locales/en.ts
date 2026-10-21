@@ -5,6 +5,7 @@ export const en = {
     mainNavigation: "Main navigation",
     competitiveWorkspace: "COMPETITIVE WORKSPACE",
     guestMode: "Guest mode",
+    darkTheme: "Dark theme",
     dismissNotice: "Dismiss",
     footer: "Battle data and mechanics: {calc} · Descriptive data: {pokedex} · Pokémon is owned by Nintendo, Game Freak and The Pokémon Company."
   },
