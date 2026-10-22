@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](005-project-documentation-pass.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](005-project-documentation-pass.es.md)
+
 # Project documentation pass after initial construction
 
 > Status: Recorded from repository artifacts and this documentation sequence; owner content review remains open.

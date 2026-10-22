@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](operations.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](operations.es.md)
+
 # Mini PC operations and release gates
 
 This is a setup guide for the mini PC. The files in this repository do not themselves create GitHub, DuckDNS, Tailscale, router, USB, or SSH resources. Keep all secrets in root-owned files on the server and GitHub encrypted secrets; never commit them.

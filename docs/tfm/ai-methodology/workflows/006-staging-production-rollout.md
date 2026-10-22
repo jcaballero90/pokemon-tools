@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](006-staging-production-rollout.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](006-staging-production-rollout.es.md)
+
 # Staging and production rollout
 
 > Status: Recorded from the repository configuration and the owner's reports on 2026-09-30. Workflow execution details are not reconstructed beyond evidence supplied in the conversation; retain the GitHub Actions runs as the authoritative logs.

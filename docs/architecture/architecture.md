@@ -1,6 +1,8 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](architecture.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](architecture.es.md)
+
 # System architecture
 
-**Scope:** the approved English-first Generation 9 Scarlet/Violet release. **Status (2026-10-03):** this is a living map of the local implementation and deployment design. The owner reports successful staging and production deployments and that the production page is live at `https://jcrserver.duckdns.org`. A staging backup and disposable restore drill were also completed. Local audit fixes, lint/type/build/config checks, unit tests, and four Playwright journeys passed; host ingress checks remain open. See the [website guide](../website-guide.md) for a feature-to-file map and the [dated code audit](../code-audit-2026-10-03.md) for evidence and remaining limits. The [requirements](../requirements/requirements.md) distinguish accepted scope from implementation and verification progress.
+**Scope:** the approved bilingual English and Spain-Spanish Generation 9 Scarlet/Violet release. **Status (2026-10-22):** this is a living map of the local implementation and deployment design. The owner reports successful staging and production deployments and that the production page is live at `https://jcrserver.duckdns.org`. A staging backup and disposable restore drill were also completed. Part 6 added route-based navigation and basic SEO; the latest [workflow record](../tfm/ai-methodology/workflows/007-post-rollout-product-evolution.md) records its verification and limits. Host ingress and browser visual review remain open. See the [website guide](../website-guide.md) for a feature-to-file map and the [dated code audit](../code-audit-2026-10-03.md) for historical evidence. The [requirements](../requirements/requirements.md) distinguish accepted scope from implementation and verification progress.
 
 This document describes responsibilities and interactions. The accepted decisions and their trade-offs are recorded in the ADRs listed below.
 
@@ -8,13 +10,15 @@ This document describes responsibilities and interactions. The accepted decision
 
 | Location | Responsibility |
 | --- | --- |
-| [`apps/web`](../../apps/web/) | React/Vite frontend, feature views, guest drafts, and same-origin API calls. |
+| [`apps/web`](../../apps/web/) | React/Vite frontend, React Router routes, English and Spain-Spanish locales, feature views, guest drafts, and same-origin API calls. |
 | [`apps/api`](../../apps/api/) | One Fastify process with HTTP routes and the `catalog`, `damage`, `teams`, and `auth` modules. |
 | [`packages/contracts`](../../packages/contracts/) | Browser-safe Zod request and data schemas shared by the frontend and API. |
 | [`infra`](../../infra/) | Separate Compose projects, shared Caddy configuration, deployment, backup, and restore scripts. |
 | [`docs`](../) | Requirements, system map, decision history, and operating guidance. |
 
-Local development uses Vite at `127.0.0.1:5173` and its `/api` proxy to a Fastify process at `127.0.0.1:4000`. The deployment image contains the built frontend and API; Fastify serves the static frontend and `/api` on its internal port. The browser therefore calls `/api` on its own origin. Staging and production use the same image digest with separate runtime configuration and PostgreSQL databases; no database or auth secret is bundled into the image.
+Local development uses Vite at `127.0.0.1:5173` and its `/api` proxy to a Fastify process at `127.0.0.1:4000`. The deployment image contains the built frontend and API; Fastify serves the static frontend, `/api`, `robots.txt`, and `sitemap.xml` on its internal port. The browser therefore calls `/api` on its own origin. Staging and production use the same image digest with separate runtime configuration and PostgreSQL databases; no database or auth secret is bundled into the image.
+
+The browser routes are `/`, `/type-chart`, `/pokedex`, `/pokedex/:slug`, `/team-builder`, `/damage`, and `/account`. The eligible Pokédex entry slugs come from the checked-in identity manifest. `PUBLIC_BASE_URL`, exposed through `/api/site-config`, determines the canonical origin. The Fastify fallback serves the app shell for known page paths and species entries and returns HTTP 404 for an unknown Pokédex slug. Page titles and descriptions are client-rendered and localized; server rendering and separate language URLs remain deferred.
 
 ## Application interactions
 
@@ -43,7 +47,7 @@ The diagram shows application dependencies, not separate deployable services. [`
 
 | Module | Current responsibility and boundary |
 | --- | --- |
-| `catalog` | Supplies Generation 9 species, moves, abilities, items, natures, and type effectiveness from pinned `@smogon/calc` data. Its [PokéAPI adapter](../../apps/api/src/modules/catalog/pokeapi-adapter.ts) requests descriptive Pokémon details, caches them in PostgreSQL, and reports unavailable details when needed. Battle facts remain independent of that request. |
+| `catalog` | Supplies Generation 9 species, moves, abilities, items, natures, and type effectiveness from pinned `@smogon/calc` data. Generated, committed PokéAPI snapshots provide official English/Spain-Spanish labels, National Dex numbers, stable slugs, and Scarlet/Violet learnsets. Its [PokéAPI adapter](../../apps/api/src/modules/catalog/pokeapi-adapter.ts) requests descriptive Pokémon details, caches them in PostgreSQL, and reports unavailable details when needed. Battle facts remain independent of those requests. |
 | `damage` | Validates known catalog names and passes a selected set, move, and field to the [Smogon adapter](../../apps/api/src/modules/damage/smogon-adapter.ts). Its `DamageCalculator` interface allows application-level substitution in tests. The response includes damage ranges and a one-hit KO chance conditional on a hit. |
 | `teams` | Exposes save, list, and delete operations for the authenticated owner. The [TeamStore interface](../../apps/api/src/modules/teams/teams.ts) is implemented by a [Prisma adapter](../../apps/api/src/modules/teams/prisma-adapter.ts); owner filtering is applied in persistence operations. |
 | `auth` | Uses Better Auth with Prisma-backed users, sessions, accounts, and verification records. The API checks the session before private team operations. |
@@ -54,7 +58,7 @@ The boundaries are pragmatic rather than a full Clean Architecture directory lay
 
 Guest team and comparison drafts are kept in browser `localStorage` under versioned keys, with migration from earlier keys; storage errors leave the in-memory editor usable. Each draft can contain up to six sets. Opening a private saved team copies its set into the browser draft, which then remains after logout. Saved teams are private database records tied to an authenticated user. The [Prisma schema](../../apps/api/prisma/schema.prisma) has `User`, `Session`, `Account`, and `Verification` records for auth, `Team` for saved sets, and `PokedexCache` for descriptive metadata. All tables are currently in one database per environment; module ownership is a code-level convention, not separate database schemas.
 
-Battle facts and damage mechanics come from pinned `@smogon/calc`. PokéAPI contributes sprites and other descriptive fields only, using explicit form mappings where supported. A PokéAPI outage can leave those fields unavailable or stale without replacing battle values. These flows support [REQ-003](../requirements/requirements.md#req-003), [REQ-004](../requirements/requirements.md#req-004), [REQ-006](../requirements/requirements.md#req-006), and [REQ-009](../requirements/requirements.md#req-009).
+Battle facts and damage mechanics come from pinned `@smogon/calc`. PokéAPI contributes sprites and other descriptive fields, official localized labels, evolution data, and the recorded Scarlet/Violet learnsets through generated snapshots and explicit form mappings. A live PokéAPI outage can leave fetched detail fields unavailable or stale without replacing battle values. The locale switch changes presentation while preserving canonical values in drafts and requests. These flows support [REQ-003](../requirements/requirements.md#req-003), [REQ-004](../requirements/requirements.md#req-004), [REQ-006](../requirements/requirements.md#req-006), [REQ-009](../requirements/requirements.md#req-009), and the newly recorded locale/Pokédex requirements.
 
 ## Environment topology
 
@@ -77,6 +81,7 @@ GitHub checks precede a staging build. A successful staging workflow publishes o
 - Local lint, type checks, web/API production builds, 24 API tests, 15 web tests, static configuration checks, and four Playwright journeys passed on 2026-10-03. The account journey used disposable PostgreSQL data to create two accounts and verify list/delete isolation. API injection tests cover origins, safe errors, logging, response schemas, and proxy headers; adapter tests cover PokéAPI fallback and owner-scoped team operations. Separate desktop/mobile visual checks used stubbed API responses.
 - CI execution, production image startup, and deployed Caddy/Tailscale checks remain pending. App-owned route responses now declare schemas and status/security metadata; Better Auth's wildcard endpoints remain delegated and are not exhaustively described. See [REQ-010](../requirements/requirements.md#req-010) and [REQ-017](../requirements/requirements.md#req-017).
 - Docker engine access was denied in this sandbox, but a local PostgreSQL service was reachable. The audit created and then dropped a dedicated database for the browser account journeys. The owner previously reported staging/production deployment, basic route reachability, and a staging restore drill; this local audit does not independently verify those host claims. Tailscale Funnel, proxy-header behavior, deployed CSP/cookies, email delivery, and rollback remain unverified.
+- On 2026-10-22, repository ESLint, web/API TypeScript checks, contracts build, Vite production build, UI-literal audit, 49 API tests, and 82 web tests passed for the bilingual locale, Pokédex, moves, and direct-route work. The direct-route Playwright spec could not launch because the configured Chromium executable is absent. Human visual review, deployed indexing behavior, and search-engine indexing remain unverified.
 
 ## Decision records
 

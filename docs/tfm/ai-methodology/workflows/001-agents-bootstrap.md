@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](001-agents-bootstrap.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](001-agents-bootstrap.es.md)
+
 # AI Workflow: Global AGENTS.md bootstrap
 
 ## Purpose

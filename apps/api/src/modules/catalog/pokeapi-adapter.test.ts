@@ -42,37 +42,39 @@ describe("PokéAPI descriptive cache", () => {
     await expect(pokedex(db, "Pikachu")).resolves.toMatchObject({ stale: true, sprite: null, pokedexId: 25 });
   });
 
-  it("returns ability names and caches English descriptions independently", async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => ({
+  it("returns official bilingual ability descriptions from the generated snapshot", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => ({
         id: 25, height: 4, weight: 60,
         abilities: [
           { ability: { name: "static", url: "https://pokeapi.co/api/v2/ability/9/" }, is_hidden: false },
           { ability: { name: "lightning-rod", url: "https://pokeapi.co/api/v2/ability/31/" }, is_hidden: true }
         ],
         sprites: { front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" }
-      }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ effect_entries: [
-        { short_effect: "May paralyze a Pokémon that makes contact.", language: { name: "en" } },
-        { short_effect: "別の言語の説明", language: { name: "ja" } }
-      ] }) })
-      .mockResolvedValueOnce({ ok: false, status: 503, json: async () => ({}) });
+      }) });
     vi.stubGlobal("fetch", fetchMock);
-    const findUnique = vi.fn(async () => null);
-    const upsert = vi.fn(async () => ({}));
-
-    const result = await pokedex(cache(findUnique, upsert), "Pikachu");
+    const result = await pokedex(cache(async () => null), "Pikachu");
 
     expect(result.abilities).toEqual([
-      { name: "Static", isHidden: false, description: "May paralyze a Pokémon that makes contact." },
-      { name: "Lightning Rod", isHidden: true }
+      {
+        name: "Static", isHidden: false,
+        description: "The Pokémon is charged with static electricity and may paralyze attackers that make direct contact with it.",
+        descriptions: {
+          en: "The Pokémon is charged with static electricity and may paralyze attackers that make direct contact with it.",
+          esES: "La electricidad estática que lo envuelve puede paralizar al mínimo contacto.",
+          sources: { en: "scarlet-violet", esES: "sword-shield" }
+        }
+      },
+      {
+        name: "Lightning Rod", isHidden: true,
+        description: "The Pokémon draws in all Electric-type moves. Instead of taking damage from them, its Sp. Atk stat is boosted.",
+        descriptions: {
+          en: "The Pokémon draws in all Electric-type moves. Instead of taking damage from them, its Sp. Atk stat is boosted.",
+          esES: "Atrae y neutraliza los movimientos de tipo Eléctrico, que además le suben el Ataque Especial.",
+          sources: { en: "scarlet-violet", esES: "sword-shield" }
+        }
+      }
     ]);
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "https://pokeapi.co/api/v2/ability/9", expect.any(Object));
-    expect(findUnique).toHaveBeenCalledWith({ where: { key: "ability:v1:9" } });
-    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({
-      where: { key: "ability:v1:9" },
-      create: { key: "ability:v1:9", payload: { description: "May paralyze a Pokémon that makes contact." } }
-    }));
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 
   it("reports invalid species as a safe input error", async () => {
@@ -210,9 +212,13 @@ describe("PokéAPI descriptive cache", () => {
     expect(result.nodes.map((node) => node.name)).toEqual(["Rookidee", "Corvisquire", "Corviknight"]);
     expect(result.nodes.map((node) => node.pokedexId)).toEqual([821, 822, 823]);
     expect(result.edges.map((edge) => edge.alternatives)).toEqual([[ ["Level 18"] ], [ ["Level 38"] ]]);
+    expect(result.edges.map((edge) => edge.conditionAlternatives)).toEqual([
+      [[{ field: "trigger", value: "level-up" }, { field: "min_level", value: 18 }]],
+      [[{ field: "trigger", value: "level-up" }, { field: "min_level", value: 38 }]]
+    ]);
     expect(result.nodes[0]?.iconCandidates[0]).toContain("generation-ix/scarlet-violet/icons/821.png");
     expect(result.nodes[0]?.iconCandidates[1]).toContain("other/official-artwork/821.png");
-    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({ where: { key: "evolution:v1:434" }, create: { key: "evolution:v1:434", payload: { chain } } }));
+    expect(upsert).toHaveBeenCalledWith(expect.objectContaining({ where: { key: "evolution:v2:434" }, create: { key: "evolution:v2:434", payload: { chain } } }));
 
     await pokedexEvolution(db, "Rookidee");
     expect(fetch).toHaveBeenCalledOnce();
@@ -235,6 +241,7 @@ describe("PokéAPI descriptive cache", () => {
     const eevee = await pokedexEvolution(cache(async () => null), "Eevee");
     expect(eevee.edges.map((edge) => edge.to)).toEqual(["vaporeon", "jolteon"]);
     expect(eevee.edges[0]?.alternatives).toEqual([["Use Water Stone"]]);
+    expect(eevee.edges[0]?.conditionAlternatives).toEqual([[{ field: "trigger", value: "use-item" }, { field: "item", value: "water-stone" }]]);
     expect(eevee.edges[1]?.alternatives).toEqual([["Use Thunder Stone"]]);
 
     const meowthChain = {

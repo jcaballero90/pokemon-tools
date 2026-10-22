@@ -1,10 +1,13 @@
-import type { DamageResponse } from "@pokemon-tools/contracts";
-import { formatMessage, label, locale, t } from "../../i18n/presentation";
+import type { DamageResponse, FieldInput, PokemonSet } from "@pokemon-tools/contracts";
+import { formatMessage, label, t } from "../../i18n/presentation";
 
 type DamageResultProps = {
   result: DamageResponse | null;
   attackerName: string;
   defenderName: string;
+  attacker: PokemonSet;
+  defender: PokemonSet;
+  field: FieldInput;
   moveName: string;
   isCalculating: boolean;
   hasCatalog: boolean;
@@ -16,6 +19,9 @@ export function DamageResult({
   result,
   attackerName,
   defenderName,
+  attacker,
+  defender,
+  field,
   moveName,
   isCalculating,
   hasCatalog
@@ -33,7 +39,7 @@ export function DamageResult({
     <div className="panel result-card">
       <span className="eyebrow">{t.damage.resultEyebrow}</span>
       {result ? (
-        <DamageEstimate result={result} matchupLabels={matchupLabels} />
+        <DamageEstimate result={result} matchupLabels={matchupLabels} attacker={attacker} defender={defender} field={field} />
       ) : (
         <p role="status">
           {isCalculating ? t.damage.damageMatchupPending : t.damage.inputsChanged}
@@ -63,9 +69,12 @@ function getMatchupLabels(
   };
 }
 
-function DamageEstimate({ result, matchupLabels }: {
+function DamageEstimate({ result, matchupLabels, attacker, defender, field }: {
   result: DamageResponse;
   matchupLabels: MatchupLabels;
+  attacker: PokemonSet;
+  defender: PokemonSet;
+  field: FieldInput;
 }) {
   const damageRange = formatMessage(t.damage.hpRange, {
     min: result.min,
@@ -91,12 +100,45 @@ function DamageEstimate({ result, matchupLabels }: {
       <h3>{koChance}</h3>
       <p className="muted">{t.damage.conditionalAccuracy}</p>
       <p>{matchupDescription}</p>
-      {locale === "en" && (
-        <details>
-          <summary>{t.damage.calculationDetails}</summary>
-          <p>{result.description}</p>
-        </details>
-      )}
+      <details>
+        <summary>{t.damage.calculationDetails}</summary>
+        <h4>{t.damage.calculationInputs}</h4>
+        <ul>
+          <li>{t.damage.attackerSummary}: {matchupLabels.attacker} · {formatMessage(t.damage.levelSummary, { level: attacker.level })}</li>
+          {attacker.item && <li>{formatMessage(t.damage.itemSummary, { side: t.damage.attackerSummary, value: label("items", attacker.item) })}</li>}
+          {attacker.ability && <li>{formatMessage(t.damage.abilitySummary, { side: t.damage.attackerSummary, value: label("abilities", attacker.ability) })}</li>}
+          <li>{formatMessage(t.damage.natureSummary, { side: t.damage.attackerSummary, value: label("natures", attacker.nature) })}</li>
+          <li>{formatMessage(t.damage.teraSummary, { side: t.damage.attackerSummary, value: field.attackerTerastallized ? t.damage.teraYes : t.damage.teraNo })}</li>
+          {attacker.teraType && <li>{formatMessage(t.damage.teraTypeSummary, { side: t.damage.attackerSummary, value: label("types", attacker.teraType) })}</li>}
+          <li>{t.damage.defenderSummary}: {matchupLabels.defender} · {formatMessage(t.damage.levelSummary, { level: defender.level })}</li>
+          {defender.item && <li>{formatMessage(t.damage.itemSummary, { side: t.damage.defenderSummary, value: label("items", defender.item) })}</li>}
+          {defender.ability && <li>{formatMessage(t.damage.abilitySummary, { side: t.damage.defenderSummary, value: label("abilities", defender.ability) })}</li>}
+          <li>{formatMessage(t.damage.natureSummary, { side: t.damage.defenderSummary, value: label("natures", defender.nature) })}</li>
+          <li>{formatMessage(t.damage.teraSummary, { side: t.damage.defenderSummary, value: field.defenderTerastallized ? t.damage.teraYes : t.damage.teraNo })}</li>
+          {defender.teraType && <li>{formatMessage(t.damage.teraTypeSummary, { side: t.damage.defenderSummary, value: label("types", defender.teraType) })}</li>}
+          <li>{t.damage.gameTypeSummary}: {t.damage.gameTypes[field.gameType]}</li>
+        </ul>
+        <h4>{t.damage.calculationModifiers}</h4>
+        <ul>
+          {field.weather && <li>{formatMessage(t.damage.activeWeather, { value: t.damage.weather[field.weather] })}</li>}
+          {field.terrain && <li>{formatMessage(t.damage.activeTerrain, { value: t.damage.terrain[field.terrain] })}</li>}
+          {activeFieldLabels(field).map((modifier) => <li key={modifier}>{modifier}</li>)}
+          {field.spikes > 0 && <li>{formatMessage(t.damage.spikesActive, { count: field.spikes })}</li>}
+          {!field.weather && !field.terrain && activeFieldLabels(field).length === 0 && field.spikes === 0 && <li>{t.damage.noActiveModifiers}</li>}
+        </ul>
+        <h4>{t.damage.calculationDamage}</h4>
+        <p>{formatMessage(t.damage.damageSummary, {
+          min: result.min, max: result.max, minPercent: result.minPercent, maxPercent: result.maxPercent
+        })}</p>
+        <p>{formatMessage(t.damage.koSummary, { chance: Math.round(result.koChanceOnHit * 100) })}</p>
+      </details>
     </>
   );
+}
+
+function activeFieldLabels(field: FieldInput): string[] {
+  const labels = t.damage.fieldLabels;
+  return (Object.keys(labels) as (keyof typeof labels)[])
+    .filter((key) => field[key])
+    .map((key) => labels[key]);
 }

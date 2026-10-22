@@ -3,6 +3,7 @@ import {
   evolutionResponseSchema,
   pokedexResponseSchema,
   type EvolutionEdge,
+  type EvolutionCondition,
   type EvolutionNode,
   type EvolutionResponse,
   type PokedexResponse
@@ -12,11 +13,14 @@ import { InputValidationError } from "../../http-errors.js";
 import { errorText } from "../../resources/errors.js";
 import { knownSpecies } from "./catalog.js";
 import { pokedexIdentities, pokedexIdentity, type PokedexIdentity } from "./pokedex-identities.js";
+import abilityDescriptionData from "./ability-descriptions.generated.json" with { type: "json" };
 
 const DAY = 86_400_000;
 const SPRITE_ROOT = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 const generation9 = "generation-ix";
 const unavailable = (reason?: string) => ({ source: "PokéAPI" as const, unavailable: true, ...(reason ? { reason } : {}) });
+type AbilityDescription = { en: string; esES: string; sources?: { en: string; esES: string } };
+const abilityDescriptions = (abilityDescriptionData as { descriptions: Record<string, AbilityDescription> }).descriptions;
 
 type JsonRecord = Record<string, unknown>;
 const record = (value: unknown): JsonRecord => value && typeof value === "object" ? value as JsonRecord : {};
@@ -30,6 +34,7 @@ function safeCachedDetails(value: unknown): PokedexResponse | undefined {
   const data = result.data;
   return {
     ...data,
+    ...(data.abilities ? { abilities: data.abilities.map((ability) => localizedAbility(ability.name, ability.isHidden)) } : {}),
     sprite: data.sprite && isAllowedSprite(data.sprite) ? data.sprite : null,
     ...(data.artwork ? {
       artwork: {
@@ -117,70 +122,24 @@ function genderArtworkCandidates(sprites: unknown, identity: PokedexIdentity, re
   };
 }
 
-function abilityResourceId(url?: string): number | undefined {
-  const match = url?.match(/\/ability\/(\d+)\/?$/);
-  return match ? Number(match[1]) : undefined;
+function localizedAbility(name: string, isHidden: boolean) {
+  const canonical = gen.abilities.get(toID(name))?.name ?? name;
+  const descriptions = abilityDescriptions[toID(canonical)];
+  return {
+    name: canonical,
+    isHidden,
+    ...(descriptions ? { description: descriptions.en, descriptions } : {})
+  };
 }
 
-function cachedAbilityText(value: unknown): string | undefined {
-  const description = record(value).description;
-  return typeof description === "string" && description.trim() ? description : undefined;
-}
-
-function abilityText(value: unknown): string | undefined {
-  const data = record(value);
-  const entries = Array.isArray(data.effect_entries) ? data.effect_entries.map(record) : [];
-  const english = entries.find((entry) => nested(entry, "language", "name") === "en");
-  const raw = typeof english?.short_effect === "string" && english.short_effect.trim()
-    ? english.short_effect
-    : english?.effect;
-  if (typeof raw !== "string" || !raw.trim()) return undefined;
-  return raw
-    .replace(/\$effect_chance/g, String(data.effect_chance ?? ""))
-    .replace(/\[([^\]]+)\]\{[^}]*\}/g, "$1")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-async function cachedAbilityDescription(db: Database, id: number): Promise<string | undefined> {
-  const key = `ability:v1:${id}`;
-  let previous: { payload: unknown; fetchedAt: Date } | null = null;
-  try { previous = await db.pokedexCache.findUnique({ where: { key } }); } catch { /* cache is best effort */ }
-  const cached = cachedAbilityText(previous?.payload);
-  if (cached && previous && Date.now() - previous.fetchedAt.getTime() < DAY) return cached;
-
-  try {
-    const response = await fetch(`https://pokeapi.co/api/v2/ability/${id}`, { signal: AbortSignal.timeout(3000) });
-    if (!response.ok) throw new Error(`PokéAPI ${response.status}`);
-    const description = abilityText(await response.json());
-    if (!description) throw new Error("PokéAPI ability description missing");
-    try {
-      await db.pokedexCache.upsert({
-        where: { key },
-        update: { payload: { description }, fetchedAt: new Date() },
-        create: { key, payload: { description } }
-      });
-    } catch { /* the description is still useful without caching */ }
-    return description;
-  } catch {
-    return cached;
-  }
-}
-
-async function pokedexAbilities(db: Database, value: unknown) {
+function pokedexAbilities(value: unknown) {
   const entries = Array.isArray(value) ? value.map(record) : [];
-  return Promise.all(entries.flatMap((entry) => {
+  return entries.flatMap((entry) => {
     const resource = record(entry.ability);
     const rawName = typeof resource.name === "string" ? resource.name : "";
     if (!rawName) return [];
-    const canonical = gen.abilities.get(toID(rawName))?.name ?? rawName.split("-").map((part) => part[0]?.toUpperCase() + part.slice(1)).join(" ");
-    const id = abilityResourceId(typeof resource.url === "string" ? resource.url : undefined);
-    return [Promise.resolve(id ? cachedAbilityDescription(db, id) : undefined).then((description) => ({
-      name: canonical,
-      isHidden: entry.is_hidden === true,
-      ...(description ? { description } : {})
-    }))];
-  }));
+    return [localizedAbility(rawName, entry.is_hidden === true)];
+  });
 }
 
 export async function pokedex(db: Database, species: string): Promise<PokedexResponse> {
@@ -211,7 +170,7 @@ export async function pokedex(db: Database, species: string): Promise<PokedexRes
     const defaultGender = fixedArtworkGender(identity, species) ?? "male";
     const normal = genderVariants[defaultGender].normal;
     const shiny = genderVariants[defaultGender].shiny;
-    const abilities = await pokedexAbilities(db, data.abilities);
+    const abilities = pokedexAbilities(data.abilities);
     const payload = pokedexResponseSchema.parse({
       source: "PokéAPI",
       ...(identity.nationalDexId ? { pokedexId: identity.nationalDexId } : {}),
@@ -346,6 +305,60 @@ function evolutionMethods(details: EvolutionDetail[]): string[][] {
   return alternatives.length ? alternatives : [["Evolution method unavailable"]];
 }
 
+function evolutionConditions(details: EvolutionDetail[]): EvolutionCondition[][] {
+  // Keep these alternatives in the same order as evolutionMethods so the UI
+  // can render official, localized requirements without parsing English copy.
+  const scarletViolet = details.filter((detail) => detail.version_group?.name === "scarlet-violet");
+  const defaults = details.filter((detail) => detail.is_default === true);
+  const chosen = scarletViolet.length ? scarletViolet : defaults.length ? defaults : details;
+  const alternatives = new Map<string, EvolutionCondition[]>();
+  for (const detail of chosen) {
+    const conditions: EvolutionCondition[] = [];
+    const addString = (field: EvolutionCondition["field"], value?: string | null) => {
+      if (value) conditions.push({ field, value });
+    };
+    const addNumber = (field: EvolutionCondition["field"], value?: number | null) => {
+      if (value != null) conditions.push({ field, value });
+    };
+    const addFlag = (field: EvolutionCondition["field"], value?: boolean) => {
+      if (value) conditions.push({ field, value });
+    };
+    addString("trigger", detail.trigger?.name);
+    addString("item", detail.item?.name);
+    addString("held_item", detail.held_item?.name);
+    addString("known_move", detail.known_move?.name);
+    addString("known_move_type", detail.known_move_type?.name);
+    addString("location", detail.location?.name);
+    addNumber("min_level", detail.min_level);
+    addNumber("min_happiness", detail.min_happiness);
+    addNumber("min_beauty", detail.min_beauty);
+    addNumber("min_affection", detail.min_affection);
+    if (detail.gender === 1) conditions.push({ field: "gender", value: "female" });
+    if (detail.gender === 2) conditions.push({ field: "gender", value: "male" });
+    addString("time_of_day", detail.time_of_day);
+    addNumber("relative_physical_stats", detail.relative_physical_stats);
+    addString("party_species", detail.party_species?.name);
+    addString("party_type", detail.party_type?.name);
+    addString("trade_species", detail.trade_species?.name);
+    addString("required_pokemon_form", detail.required_pokemon_form?.name);
+    addString("evolved_pokemon_form", detail.evolved_pokemon_form?.name);
+    addFlag("needs_overworld_rain", detail.needs_overworld_rain);
+    addFlag("needs_multiplayer", detail.needs_multiplayer);
+    addFlag("near_special_rock", detail.near_special_rock);
+    addFlag("turn_upside_down", detail.turn_upside_down);
+    addString("region", detail.region?.name);
+    addString("used_move", detail.used_move?.name);
+    addNumber("min_move_count", detail.min_move_count);
+    addNumber("min_steps", detail.min_steps);
+    addNumber("min_damage_taken", detail.min_damage_taken);
+    for (const nature of detail.allowed_natures ?? []) addString("allowed_natures", nature.name);
+    if (detail.condition_expression?.expression) addString("condition_expression", detail.condition_expression.expression);
+    const key = conditions.map(({ field, value }) => `${field}:${value}`).join("\u0000");
+    if (!alternatives.has(key)) alternatives.set(key, conditions);
+  }
+  return [...alternatives.values()];
+}
+
 function identityForFormName(speciesId: number, formName: string): { key: string; identity: PokedexIdentity } | undefined {
   const normalizedForm = toID(formName);
   const matching = Object.entries(pokedexIdentities).find(([, identity]) => identity.eligible && identity.speciesId === speciesId &&
@@ -379,7 +392,7 @@ function makeNode(key: string, identity: PokedexIdentity): EvolutionNode | undef
     const officialArtwork = spriteUrl(`${SPRITE_ROOT}other/official-artwork/${stem}.png`);
     return isFemale ? [female, ordinary, officialArtwork] : [ordinary, officialArtwork];
   });
-  return { key, name: speciesName(key), pokedexId: identity.nationalDexId, iconCandidates: unique(candidates) };
+  return { key, name: speciesName(key), pokedexId: identity.nationalDexId, pokedexSlug: identity.pokedexSlug, pokedexIsBaseForm: identity.pokedexIsBaseForm, iconCandidates: unique(candidates) };
 }
 
 const gen = Generations.get(9);
@@ -425,10 +438,14 @@ function buildEvolutionResponse(chain: EvolutionTree, selected: PokedexIdentity)
         const targetNode = addNode(targetIdentity.key, targetIdentity.identity);
         if (!sourceNode || !targetNode || sourceNode.key === targetNode.key) continue;
         const methods = evolutionMethods(group.details);
+        const conditions = evolutionConditions(group.details);
         const existing = edges.find((edge) => edge.from === sourceNode.key && edge.to === targetNode.key);
         if (existing) {
           existing.alternatives = [...existing.alternatives, ...methods.filter((method) => !existing.alternatives.some((prior) => prior.join("\u0000") === method.join("\u0000")))];
-        } else edges.push({ from: sourceNode.key, to: targetNode.key, alternatives: methods });
+          if (existing.conditionAlternatives) {
+            existing.conditionAlternatives = [...existing.conditionAlternatives, ...conditions.filter((method) => !existing.conditionAlternatives?.some((prior) => JSON.stringify(prior) === JSON.stringify(method)))];
+          } else if (conditions.length) existing.conditionAlternatives = conditions;
+        } else edges.push({ from: sourceNode.key, to: targetNode.key, alternatives: methods, ...(conditions.length ? { conditionAlternatives: conditions } : {}) });
         const targetForm = group.targetFormName ?? targetIdentity.identity.pokemonFormName ?? undefined;
         visit(child, targetForm, nextAncestors);
       }
@@ -465,7 +482,7 @@ export async function pokedexEvolution(db: Database, species: string): Promise<E
   }
   if (!identity.evolutionChainId) return { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
 
-  const cacheKey = `evolution:v1:${identity.evolutionChainId}`;
+  const cacheKey = `evolution:v2:${identity.evolutionChainId}`;
   let previous: { payload: unknown; fetchedAt: Date } | null = null;
   try { previous = await db.pokedexCache.findUnique({ where: { key: cacheKey } }); } catch { /* cache is best effort */ }
   const cached = previous ? cachedEvolutionChain(previous.payload) : undefined;

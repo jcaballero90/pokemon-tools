@@ -1,23 +1,28 @@
-# Pokémon Tools 
+[![English](https://img.shields.io/badge/lang-en-red.svg)](README.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](README.es.md)
 
-An English-first Generation 9 Scarlet/Violet web app for exploring battle data, planning teams, and estimating damage. Guests can draft and compare two teams in their browser. An account adds private saved teams.
+# Pokémon Tools
+
+A bilingual English and Spain-Spanish Generation 9 Scarlet/Violet web app for exploring battle data, planning teams, and estimating damage. Guests can draft and compare two teams in their browser. An account adds private saved teams.
 
 This repository is the working TFM project. The application is deployed to staging and production on the owner's mini PC, with production reachable at `https://jcrserver.duckdns.org`. Several end-to-end product and security checks remain open; see the [requirements](docs/requirements/requirements.md) and [test strategy](docs/testing/test-strategy.md).
 
 ## Features
 
-- Explore defensive Generation 9 type matchups by type or Pokémon and browse Pokémon statistics.
+- Explore defensive Generation 9 type matchups by type or Pokémon and browse Pokémon statistics in national Pokédex order.
+- Search the complete Pokédex catalog, load entries progressively, and open an entry directly at `/pokedex/:slug`.
+- Review Scarlet/Violet moves grouped into Level, TM, Egg, and (when present) Other tabs, with localized move names and category icons.
 - Draft and compare two teams of up to six Pokémon each; guest drafts stay in that browser's local storage.
 - Estimate a move's damage range and one-hit KO chance **conditional on the move hitting**.
 - Create an email/password account and save, reopen, list, or delete private teams.
+- Switch between English and Spanish from Spain. The browser locale selects the initial language unless the user has saved a preference.
 
-Battle facts and mechanics come from pinned `@smogon/calc` data. PokéAPI supplies server-cached descriptive details where available; an outage or unmapped form does not replace battle values. The [data source policy](docs/data-sources.md) explains authority, provenance, and current limitations. The API accepts known species, moves, abilities, and items without tournament-legality checks. Spanish localization, older generations, Google sign-in, and a player battle simulator are later possibilities, not first-release features.
+Battle facts and mechanics come from pinned `@smogon/calc` data. PokéAPI supplies server-cached descriptive details and Spain-Spanish labels where available; generated snapshots keep translation data reproducible without startup downloads. An outage or unmapped form does not replace battle values. The [data source policy](docs/data-sources.md) explains authority, provenance, and current limitations. The API accepts known species, moves, abilities, and items without tournament-legality checks. Older generations, Google sign-in, and a player battle simulator remain outside the current release scope.
 
 ## Stack and project structure
 
 | Area | Current implementation |
 | --- | --- |
-| Web | React, TypeScript, Vite, Tailwind CSS, and a Radix-based Button component. |
+| Web | React, TypeScript, Vite, React Router, Tailwind CSS, and Radix UI components. |
 | API and contracts | Fastify 5, Node.js 24, Zod 4, generated OpenAPI, Better Auth, Helmet, and Fastify rate limiting. |
 | Data | PostgreSQL 18, Prisma 7, pinned `@smogon/calc`, and a server-side PokéAPI cache. |
 | Verification | Vitest, Testing Library, Playwright, static Compose checks, GitHub Actions Checks, CodeQL, and Dependabot configuration. |
@@ -81,11 +86,10 @@ pnpm check
 pnpm lint
 pnpm test
 pnpm config:check
+pnpm docs:check
 ```
 
-`pnpm test:e2e` runs the Playwright browser journeys and needs local PostgreSQL; the Playwright configuration starts the API and web servers and waits for both. The [test strategy](docs/testing/test-strategy.md) distinguishes checks that have run from host drills that remain pending. On 2026-10-03, lint, type checks, production builds, configuration checks, 24 API tests, 15 web tests, and all four expanded Playwright journeys passed. The account journey used a disposable PostgreSQL database and tested two-account isolation; desktop/mobile visual checks used stubbed APIs. Docker image/Compose and deployed ingress checks remain unverified locally. The earlier 2026-09-27 result remains historical evidence.
-
-The 2026-10-04 localization follow-up passed lint, type checks, production builds, configuration checks, 29 API tests, 37 web tests, and three guest Playwright journeys. The account/database journey was not repeated. Interface strings and optional catalog-label dictionaries are registered through [`apps/web/src/i18n.ts`](apps/web/src/i18n.ts); browser language falls back to English, currently the only locale. Recognized translated selections retain canonical API values. No language selector has been added; the [website guide](docs/website-guide.md#translation-resources-and-canonical-values) explains where future translations belong.
+`pnpm test:e2e` runs the Playwright browser journeys and needs the configured browser and local PostgreSQL; Playwright starts the API and web servers and waits for both. The [test strategy](docs/testing/test-strategy.md) distinguishes completed checks from host drills and human review that remain pending. On 2026-10-22, repository ESLint, TypeScript checks, the contracts build, the Vite production build, the UI-copy audit, 49 API tests, and 82 web tests passed. The Pokédex browser test could not launch in that environment because the configured Chromium executable was unavailable. The [workflow record](docs/tfm/ai-methodology/workflows/007-post-rollout-product-evolution.md) preserves earlier dated test results and current limits.
 
 ## Deployment status and documentation
 
@@ -98,4 +102,4 @@ The release path uses successful Checks on `staging` to build one image, deploy 
 | Slides and explanatory video | Pending; links will be added when created. |
 | Reviewer login | `<user>` / `<password>` are placeholders only. The owner will arrange usable test access for final delivery without committing real credentials. |
 
-Further project records: [security plan](docs/security/security-plan.md), [AI methodology and workflow evidence](docs/tfm/ai-methodology/README.md), [documentation-pass workflow](docs/tfm/ai-methodology/workflows/005-project-documentation-pass.md), and [staging-to-production rollout workflow](docs/tfm/ai-methodology/workflows/006-staging-production-rollout.md). The README will need a final review against the actual GitHub URL, live app, delivery materials, and reviewer access before TFM submission.
+Further project records: [security plan](docs/security/security-plan.md), [AI methodology and workflow evidence](docs/tfm/ai-methodology/README.md), and the [latest product-evolution workflow](docs/tfm/ai-methodology/workflows/007-post-rollout-product-evolution.md). Review the GitHub URL, live app, delivery materials, and reviewer access before TFM submission.

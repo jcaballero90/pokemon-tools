@@ -3,7 +3,11 @@ import { apiErrorResponseSchema, zodValidationIssues, type ApiErrorCode, type Ap
 import { formatMessage, getMessages } from "../i18n";
 
 export class UserFacingError extends Error {
-  constructor(message: string, readonly status?: number) {
+  constructor(
+    message: string,
+    readonly status?: number,
+    readonly source?: { kind: "message"; key: "network" | "invalidResponse" } | { kind: "api"; status: number; body: unknown }
+  ) {
     super(message);
     this.name = "UserFacingError";
   }
@@ -81,7 +85,11 @@ export function formatApiFailure(status: number, body: unknown, locale?: string)
 }
 
 export function formatUiError(error: unknown, locale?: string): string {
-  if (error instanceof UserFacingError) return error.message;
+  if (error instanceof UserFacingError) {
+    if (error.source?.kind === "api") return formatApiFailure(error.source.status, error.source.body, locale);
+    if (error.source?.kind === "message") return getMessages(locale).errors[error.source.key];
+    return error.message;
+  }
   if (error instanceof ZodError) return zodValidationIssues(error.issues).map((issue) => formatValidationIssue(issue, locale)).join("; ");
   return getMessages(locale).errors.codes["request-failed"];
 }

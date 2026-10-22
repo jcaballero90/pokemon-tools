@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "../../components/ui/button";
 import { formatMessage, t } from "../../i18n/presentation";
 import { api } from "../../lib/api";
-import { formatUiError } from "../../lib/errors";
+import type { UiNotice } from "../../lib/ui-notice.js";
 
 export type AccountUser = { id: string; name: string; email: string };
 type AccountMode = "sign-in" | "sign-up";
@@ -11,7 +11,7 @@ export type AccountProps = {
   user: AccountUser | null;
   onDone: () => Promise<AccountUser | null>;
   onSigningOut: () => void;
-  onNotice: (message: string) => void;
+  onNotice: (notice: UiNotice) => void;
 };
 
 export function Account({ user, onDone, onSigningOut, onNotice }: AccountProps) {
@@ -33,10 +33,12 @@ export function Account({ user, onDone, onSigningOut, onNotice }: AccountProps) 
       });
 
       const refreshedUser = await onDone();
-      const successNotice = mode === "sign-up" ? t.account.created : t.account.signedIn;
-      onNotice(refreshedUser ? successNotice : t.account.sessionUnavailable);
+      const successNotice: UiNotice = refreshedUser
+        ? { kind: "message", id: mode === "sign-up" ? "accountCreated" : "accountSignedIn" }
+        : { kind: "message", id: "accountSessionUnavailable" };
+      onNotice(successNotice);
     } catch (error) {
-      onNotice(formatUiError(error));
+      onNotice({ kind: "error", error });
     }
   }
 
@@ -47,7 +49,7 @@ export function Account({ user, onDone, onSigningOut, onNotice }: AccountProps) 
       await onDone();
     } catch (error) {
       await onDone();
-      onNotice(formatUiError(error));
+      onNotice({ kind: "error", error });
     }
   }
 
