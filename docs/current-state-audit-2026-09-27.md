@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](current-state-audit-2026-09-27.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](current-state-audit-2026-09-27.es.md)
+
 # Current state audit — 2026-09-27
 
 > **Point-in-time snapshot, not living documentation.** This audit describes the repository and limited local observations on 2026-09-27. Future code, dependency, configuration, or deployment changes may make parts of it obsolete. Update the living [requirements](requirements/requirements.md), [architecture](architecture/architecture.md), and plans for accepted changes; retain this file as a dated assessment.

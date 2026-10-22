@@ -1,8 +1,11 @@
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
+import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { teamInputSchema, type CatalogResponse, type DamageResponse, type EvolutionResponse, type PokedexResponse, type SavedTeamResponse, type TeamDraft } from "@pokemon-tools/contracts";
 import { App } from "./main.js";
+import { LocaleProvider } from "./i18n/LocaleProvider.js";
+import { setLocale } from "./i18n.js";
 import { Account } from "./features/account/Account.js";
 import { Damage } from "./features/damage/Damage.js";
 import { Pokedex } from "./features/pokedex/Pokedex.js";
@@ -22,7 +25,12 @@ const catalog: CatalogResponse = {
     { name: "Pikachu", types: ["Electric"], baseStats: { hp: 35, atk: 55, def: 40, spa: 50, spd: 50, spe: 90 } },
     { name: "Charizard", types: ["Fire", "Flying"], baseStats: { hp: 78, atk: 84, def: 78, spa: 109, spd: 85, spe: 100 } }
   ],
-  moves: ["Thunderbolt", "Protect"], abilities: [], items: [], types: ["Electric", "Fire", "Flying"], natures: ["Serious"]
+  moves: ["Thunderbolt", "Protect"], abilities: [], items: [], types: ["Electric", "Fire", "Flying"], natures: ["Serious"],
+  translations: {
+    species: { pikachu: "Pikachu", charizard: "Charizard" },
+    moves: { thunderbolt: "Rayo", protect: "Protección" }, abilities: {}, items: {},
+    types: { electric: "Eléctrico", fire: "Fuego", flying: "Volador" }, natures: { serious: "Seria" }
+  }
 };
 
 const savedTeam: SavedTeamResponse = {
@@ -33,7 +41,9 @@ const savedTeam: SavedTeamResponse = {
 const defaults = () => teamInputSchema.parse({ name: "Draft", pokemon: [] });
 
 beforeEach(() => {
+  window.history.replaceState(null, "", "/");
   localStorage.clear();
+  setLocale("en");
   apiMock.mockReset();
 });
 
@@ -43,6 +53,150 @@ afterEach(() => {
 });
 
 describe("website interaction regressions", () => {
+  it("opens direct Pokémon URLs and updates localized canonical metadata", async () => {
+    window.history.replaceState(null, "", "/pokedex/pikachu");
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({});
+      if (path === "/site-config") return Promise.resolve({ publicBaseUrl: "https://pokemon.example", deployEnv: "production" });
+      if (path.endsWith("/evolution")) return Promise.resolve({ source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true });
+      if (path.endsWith("/moves")) return Promise.resolve({ source: null, moves: [], unavailable: true });
+      if (path === "/pokedex/Pikachu") return Promise.resolve({ source: "PokéAPI", pokedexId: 25, familyKey: "pikachu" });
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+
+    expect(await screen.findByText("National Pokédex #25")).toBeTruthy();
+    expect(document.title).toBe("Pikachu · Pokédex | Pokémon Tools");
+    expect(document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe("https://pokemon.example/pokedex/pikachu");
+    expect(document.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toBe("index,follow");
+
+    fireEvent.click(screen.getByRole("switch", { name: "Change language to Spain Spanish" }));
+    expect(document.title).toBe("Pikachu · Pokédex | Pokémon Tools");
+    expect(document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content).toContain("Consulta los datos de Pikachu");
+  });
+
+  it("renders localized not-found content for an unknown Pokémon slug", async () => {
+    window.history.replaceState(null, "", "/pokedex/not-a-pokemon");
+    setLocale("es-ES");
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({});
+      if (path === "/site-config") return Promise.resolve({ publicBaseUrl: "https://pokemon.example", deployEnv: "production" });
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+
+    expect(await screen.findByRole("heading", { name: "Página no encontrada" })).toBeTruthy();
+    expect(document.title).toBe("Página no encontrada · Pokémon Tools");
+    expect(screen.getByRole("link", { name: "Volver a la Pokédex" })).toBeTruthy();
+    expect(document.querySelector('link[rel="canonical"]')).toBeNull();
+  });
+
+  it("switches languages in place and keeps the edited team draft", async () => {
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({});
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
+    const name = screen.getAllByLabelText("Team name")[0] as HTMLInputElement;
+    fireEvent.change(name, { target: { value: "My saved draft" } });
+
+    fireEvent.click(screen.getByRole("switch", { name: "Change language to Spain Spanish" }));
+
+    expect(screen.getByRole("link", { name: "Creador de equipos" })).toBeTruthy();
+    expect((screen.getAllByLabelText("Nombre del equipo")[0] as HTMLInputElement).value).toBe("My saved draft");
+    expect(document.documentElement.lang).toBe("es-ES");
+    expect(screen.getByRole("switch", { name: "Cambiar idioma a inglés" }).getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("reformats a visible data notice immediately when the locale changes", async () => {
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.reject(new Error("upstream detail must stay hidden"));
+      if (path === "/type-chart") return Promise.resolve([{ attack: "Electric", against: { Electric: 1 } }]);
+      if (path === "/auth/get-session") return Promise.resolve({});
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+    expect(await screen.findByText("Pokémon data is temporarily unavailable.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("switch", { name: "Change language to Spain Spanish" }));
+    expect(screen.getByText("Los datos de Pokémon no están disponibles temporalmente.")).toBeTruthy();
+  });
+
+  it("keeps the selected Pokédex entry and search text when changing locale", async () => {
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({});
+      if (path.endsWith("/evolution")) return Promise.resolve({ source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true });
+      if (path === "/pokedex/Pikachu") return Promise.resolve({ source: "PokéAPI", pokedexId: 25, familyKey: "pikachu" });
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+    fireEvent.click(screen.getByRole("link", { name: "Pokédex" }));
+    fireEvent.click(await screen.findByRole("link", { name: /Pikachu/ }));
+    fireEvent.change(screen.getByLabelText("Find a Pokémon"), { target: { value: "Pika" } });
+    expect((await screen.findAllByText("Electric")).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole("switch", { name: "Change language to Spain Spanish" }));
+
+    expect((screen.getByLabelText("Buscar un Pokémon") as HTMLInputElement).value).toBe("Pika");
+    expect(screen.getAllByText("Eléctrico").length).toBeGreaterThan(0);
+    expect(screen.getByRole("heading", { name: "Pikachu" })).toBeTruthy();
+  });
+
+  it("renders structured evolution requirements with Spain Spanish wording", async () => {
+    const familyCatalog: CatalogResponse = {
+      ...catalog,
+      species: [
+        { name: "Rookidee", types: ["Flying"], baseStats: { hp: 38, atk: 47, def: 35, spa: 33, spd: 35, spe: 57 } },
+        { name: "Corvisquire", types: ["Flying"], baseStats: { hp: 68, atk: 67, def: 55, spa: 77, spd: 55, spe: 77 } },
+        { name: "Corviknight", types: ["Flying", "Steel"], baseStats: { hp: 98, atk: 87, def: 105, spa: 53, spd: 85, spe: 67 } }
+      ],
+      translations: { species: {}, moves: {}, abilities: {}, items: {}, types: { flying: "Volador", steel: "Acero" }, natures: {} }
+    };
+    const family: EvolutionResponse = {
+      source: "PokéAPI",
+      nodes: [
+        { key: "rookidee", name: "Rookidee", pokedexId: 821, iconCandidates: [] },
+        { key: "corvisquire", name: "Corvisquire", pokedexId: 822, iconCandidates: [] },
+        { key: "corviknight", name: "Corviknight", pokedexId: 823, iconCandidates: [] }
+      ],
+      edges: [
+        { from: "rookidee", to: "corvisquire", alternatives: [["Level 18"]], conditionAlternatives: [[{ field: "trigger", value: "level-up" }, { field: "min_level", value: 18 }]] },
+        { from: "corvisquire", to: "corviknight", alternatives: [["Level 38"]], conditionAlternatives: [[{ field: "trigger", value: "level-up" }, { field: "min_level", value: 38 }]] }
+      ],
+      megaForms: []
+    };
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(familyCatalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({});
+      if (path.endsWith("/evolution")) return Promise.resolve(family);
+      if (path.startsWith("/pokedex/")) return Promise.resolve({ source: "PokéAPI", pokedexId: 822, familyKey: "corvisquire" });
+      return Promise.resolve(undefined);
+    });
+
+    setLocale("es-ES");
+    render(<LocaleProvider><App /></LocaleProvider>);
+    fireEvent.click(screen.getByRole("link", { name: "Pokédex" }));
+    fireEvent.change(screen.getByLabelText("Buscar un Pokémon"), { target: { value: "Corvisquire" } });
+    fireEvent.click(await screen.findByRole("link", { name: /Corvisquire/ }));
+
+    expect(await screen.findByText("Nivel 18")).toBeTruthy();
+    expect(screen.getByText("Nivel 38")).toBeTruthy();
+  });
+
   it("lists a Pokémon's abilities and reveals their description by focus or tap", async () => {
     const family: EvolutionResponse = { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
     apiMock.mockImplementation((path: string) => path.endsWith("/evolution")
@@ -52,8 +206,8 @@ describe("website interaction regressions", () => {
         { name: "Lightning Rod", isHidden: true, description: "Draws in Electric-type moves." }
       ] }));
 
-    render(<Pokedex catalog={catalog} />);
-    fireEvent.click(screen.getByRole("button", { name: /Pikachu/ }));
+    render(<MemoryRouter><Pokedex catalog={catalog} /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("link", { name: /Pikachu/ }));
 
     const staticAbility = await screen.findByRole("button", { name: "Static" });
     expect(screen.getByRole("heading", { name: "Abilities" })).toBeTruthy();
@@ -76,14 +230,14 @@ describe("website interaction regressions", () => {
       return Promise.resolve(undefined);
     });
 
-    render(<App />);
+    render(<LocaleProvider><App /></LocaleProvider>);
     await screen.findByText("Trainer");
-    fireEvent.click(screen.getByRole("button", { name: "Team builder" }));
+    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
     expect(await screen.findByRole("button", { name: "Saved team" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    fireEvent.click(screen.getByRole("link", { name: "Account" }));
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
     await screen.findByText("Guest mode");
-    fireEvent.click(screen.getByRole("button", { name: "Team builder" }));
+    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
 
     expect(screen.queryByRole("button", { name: "Saved team" })).toBeNull();
   });
@@ -99,14 +253,14 @@ describe("website interaction regressions", () => {
       return Promise.resolve(undefined);
     });
 
-    render(<App />);
+    render(<LocaleProvider><App /></LocaleProvider>);
     await screen.findByText("Trainer");
-    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    fireEvent.click(screen.getByRole("link", { name: "Account" }));
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
     await screen.findByText("Guest mode");
     await act(async () => oldList.resolve([savedTeam]));
 
-    fireEvent.click(screen.getByRole("button", { name: "Team builder" }));
+    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
     expect(screen.queryByRole("button", { name: "Saved team" })).toBeNull();
   });
 
@@ -116,9 +270,9 @@ describe("website interaction regressions", () => {
     const family: EvolutionResponse = { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
     apiMock.mockImplementation((path: string) => path.endsWith("/evolution") ? Promise.resolve(family) : path.endsWith("Pikachu") ? first.promise : second.promise);
 
-    render(<Pokedex catalog={catalog} />);
-    fireEvent.click(screen.getByRole("button", { name: /Pikachu/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Charizard/ }));
+    render(<MemoryRouter><Pokedex catalog={catalog} /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("link", { name: /Pikachu/ }));
+    fireEvent.click(screen.getByRole("link", { name: /Charizard/ }));
     await act(async () => second.resolve({ source: "PokéAPI", pokedexId: 6, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" }));
     expect(await screen.findByAltText("Charizard")).toBeTruthy();
     await act(async () => first.resolve({ source: "PokéAPI", pokedexId: 25, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" }));
@@ -143,8 +297,8 @@ describe("website interaction regressions", () => {
         { key: "corviknight", name: "Corviknight", pokedexId: 823, iconCandidates: [] }
       ],
       edges: [
-        { from: "rookidee", to: "corvisquire", alternatives: [["Level 18"]] },
-        { from: "corvisquire", to: "corviknight", alternatives: [["Level 38"]] }
+        { from: "rookidee", to: "corvisquire", alternatives: [["Level 18"]], conditionAlternatives: [[{ field: "trigger", value: "level-up" }, { field: "min_level", value: 18 }]] },
+        { from: "corvisquire", to: "corviknight", alternatives: [["Level 38"]], conditionAlternatives: [[{ field: "trigger", value: "level-up" }, { field: "min_level", value: 38 }]] }
       ], megaForms: []
     };
     apiMock.mockImplementation((path: string) => {
@@ -166,9 +320,9 @@ describe("website interaction regressions", () => {
       return Promise.resolve({ source: "PokéAPI", pokedexId: 823, familyKey: "corviknight", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ix/scarlet-violet/823.webp", artwork: { normal: [], shiny: [] } });
     });
 
-    render(<Pokedex catalog={familyCatalog} />);
+    render(<MemoryRouter><Pokedex catalog={familyCatalog} /></MemoryRouter>);
     fireEvent.change(screen.getByLabelText("Find a Pokémon"), { target: { value: "Corvisquire" } });
-    fireEvent.click(screen.getByRole("button", { name: /Corvisquire/ }));
+    fireEvent.click(screen.getByRole("link", { name: /Corvisquire/ }));
 
     expect(await screen.findByAltText("Corvisquire")).toBeTruthy();
     const artwork = screen.getByAltText("Corvisquire") as HTMLImageElement;
@@ -193,7 +347,7 @@ describe("website interaction regressions", () => {
     fireEvent.click(femaleToggle);
     expect((screen.getByAltText("Corvisquire") as HTMLImageElement).src).toContain("shiny/female/822.webp");
 
-    fireEvent.click(screen.getByRole("button", { name: "View Corviknight details" }));
+    fireEvent.click(screen.getByRole("link", { name: "View Corviknight details" }));
     expect(await screen.findByAltText("Corviknight")).toBeTruthy();
     expect((screen.getByLabelText("Find a Pokémon") as HTMLInputElement).value).toBe("Corvisquire");
     expect(screen.getByRole("button", { name: "Shiny artwork" }).getAttribute("aria-pressed")).toBe("false");
@@ -334,12 +488,12 @@ describe("website interaction regressions", () => {
       return Promise.resolve(undefined);
     });
 
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: /^Damage$/ }));
+    render(<LocaleProvider><App /></LocaleProvider>);
+    fireEvent.click(screen.getByRole("link", { name: /^Damage$/ }));
     fireEvent.change(screen.getByLabelText("Move"), { target: { value: "Protect" } });
     fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));
-    fireEvent.click(screen.getByRole("button", { name: /^Overview$/ }));
-    fireEvent.click(screen.getByRole("button", { name: /^Damage$/ }));
+    fireEvent.click(screen.getByRole("link", { name: /^Overview$/ }));
+    fireEvent.click(screen.getByRole("link", { name: /^Damage$/ }));
     expect((screen.getByLabelText("Move") as HTMLInputElement).value).toBe("Thunderbolt");
 
     fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));

@@ -9,6 +9,7 @@ import {
 } from "@pokemon-tools/contracts";
 import { api } from "../../lib/api";
 import { formatUiError } from "../../lib/errors";
+import { locale } from "../../i18n/presentation";
 import { emptySet, submittedSet } from "../teams/team-model";
 import {
   DamageForm,
@@ -49,7 +50,7 @@ export function Damage({ catalog, initialAttacker, initialDefender }: DamageProp
   const [move, setMove] = useState("Thunderbolt");
   const [field, setField] = useState<DamageField>({ ...damageDefaults });
   const [result, setResult] = useState<{ key: string; value: DamageResponse } | null>(null);
-  const [error, setError] = useState<{ key: string; message: string } | null>(null);
+  const [error, setError] = useState<{ key: string; cause: unknown } | null>(null);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
   const requestId = useRef(0);
   const currentKey = JSON.stringify({ attacker, defender, move, field });
@@ -81,7 +82,7 @@ export function Damage({ catalog, initialAttacker, initialDefender }: DamageProp
       }
     } catch (cause) {
       if (id === requestId.current && requestKey === currentKeyRef.current) {
-        setError({ key: requestKey, message: formatUiError(cause) });
+        setError({ key: requestKey, cause });
       }
     } finally {
       if (id === requestId.current) setPendingKey(null);
@@ -121,7 +122,7 @@ export function Damage({ catalog, initialAttacker, initialDefender }: DamageProp
   }
 
   const visibleResult = result?.key === currentKey ? result.value : null;
-  const visibleError = error?.key === currentKey ? error.message : null;
+  const visibleError = error?.key === currentKey ? formatUiError(error.cause, locale) : null;
   const isCalculating = pendingKey === currentKey;
   return (
     <div className="damage-layout">
@@ -148,6 +149,9 @@ export function Damage({ catalog, initialAttacker, initialDefender }: DamageProp
         result={visibleResult}
         attackerName={attacker.species}
         defenderName={defender.species}
+        attacker={attacker}
+        defender={defender}
+        field={field}
         moveName={move}
         isCalculating={isCalculating}
         hasCatalog={catalog !== null}

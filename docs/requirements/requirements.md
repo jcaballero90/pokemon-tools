@@ -1,12 +1,14 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](requirements.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](requirements.es.md)
+
 # Pokémon Tools requirements: first release
 
-This living specification records the project owner's approved Generation 9 Scarlet/Violet architecture and release plan. It separates **requirement approval** from **implementation progress**. All entries in the index below come from that approved plan; neither the course examples nor the implementation alone add requirements.
+This living specification records the project owner's approved Generation 9 Scarlet/Violet architecture and product plan. It separates **requirement approval** from **implementation progress**. All entries in the index below come from the owner's approved plan; neither the course examples nor the implementation alone add requirements.
 
 The project owner has approved first-release scope without assigning relative priority to each item, so the priority field is **Undecided**. **Implemented** means supporting code or configuration exists but the full acceptance check has not passed. **Verified** means the recorded check has evidence. **In progress** means part of the requested behavior or its required environment is still absent. Verification of a local behavior does not imply the public deployment has passed its release gates.
 
 | ID | Title | Type | Priority | Implementation |
 | --- | --- | --- | --- | --- |
-| [REQ-001](#req-001) | English Generation 9 release | Constraint | Undecided | Implemented |
+| [REQ-001](#req-001) | Generation 9 first-release scope | Constraint | Undecided | Implemented |
 | [REQ-002](#req-002) | Type chart | Functional | Undecided | Verified |
 | [REQ-003](#req-003) | Pokémon statistics | Functional | Undecided | Implemented |
 | [REQ-004](#req-004) | Damage calculation | Functional | Undecided | Implemented |
@@ -23,16 +25,19 @@ The project owner has approved first-release scope without assigning relative pr
 | [REQ-015](#req-015) | Image promotion and rollback | Constraint | Undecided | In progress |
 | [REQ-016](#req-016) | Backup and production gates | Nonfunctional | Undecided | In progress |
 | [REQ-017](#req-017) | Verification journeys | Nonfunctional | Undecided | In progress |
+| [REQ-018](#req-018) | English and Spain-Spanish interface | Functional | Undecided | Implemented |
+| [REQ-019](#req-019) | Pokédex browsing and move data | Functional | Undecided | Implemented |
+| [REQ-020](#req-020) | Direct Pokédex routes and basic SEO | Functional | Undecided | Implemented |
 
 ## Requirement details
 
 ### REQ-001
 
-The first release shall present English-language utilities for Generation 9 Scarlet/Violet.
+The first release shall present Generation 9 Scarlet/Violet utilities in English and Spanish from Spain.
 
 - **Origin:** Project owner's approved architecture and release plan.
-- **Acceptance:** The released UI and battle catalog use this scope. Spanish, older generations, and a player battle simulator are not first-release commitments.
-- **Current evidence:** The web app and API are implemented around the Generation 9 catalog. The owner reports the production page is live at `https://jcrserver.duckdns.org`; feature acceptance still needs product review.
+- **Acceptance:** The released UI and battle catalog use this scope and the supported languages are English and `es-ES`. Older generations and a player battle simulator are not first-release commitments.
+- **Current evidence:** The web app and API are implemented around the Generation 9 catalog and provide English and Spain-Spanish presentation. The owner reports the production page is live at `https://jcrserver.duckdns.org`; feature acceptance still needs product review.
 
 ### REQ-002
 
@@ -156,7 +161,32 @@ Critical guest, account, data-adapter, and ingress behavior shall have automated
 
 - **Origin:** Project owner's approved architecture and release plan.
 - **Acceptance:** Run Vitest, adapter integration tests, Testing Library, and Playwright for the relevant journeys; run spoofed-header and network-boundary checks on each ingress path. Record any gap that cannot be exercised locally.
-- **Current evidence:** On 2026-10-03, 24 API tests, 15 web tests, and all four Playwright journeys passed with lint, type, production build, and static configuration checks. Desktop/mobile visual preview used stubbed API responses. The database-backed account journey used an isolated disposable database; Docker image/Compose and host ingress checks remain pending.
+- **Historical evidence (2026-10-03):** 24 API tests, 15 web tests, and all four Playwright journeys passed with lint, type, production build, and static configuration checks. Desktop/mobile visual preview used stubbed API responses. The database-backed account journey used an isolated disposable database; Docker image/Compose and host ingress checks remained pending.
+- **Current evidence (2026-10-22):** 49 API tests, 82 web tests, repository ESLint, TypeScript checks, contracts build, Vite production build, and UI-copy audit passed. The current Pokédex Playwright test could not launch because Chromium is absent; host ingress and human visual review remain pending.
+
+### REQ-018
+
+The website shall provide English and Spain-Spanish interface text and official localized Pokémon catalog labels, with a user-controlled language switch.
+
+- **Origin:** Project owner's approved bilingual localization plan on 2026-10-22, including the explicit requirement for Spain Spanish and official Pokémon wording.
+- **Acceptance:** The initial language follows a saved choice or supported browser locale, with English as fallback; a Spanish browser locale selects `es-ES`. Switching languages updates visible interface text and metadata without losing active forms, drafts, selected Pokémon, searches, account state, or results. Spanish catalog labels use PokéAPI language 7 rather than `es-419` (language 14). Canonical battle identifiers remain the values submitted to the API.
+- **Current evidence:** Locale, persistence/fallback, dictionary shape, catalog labels, canonical input, and app-state retention are covered by unit/component tests and the AST UI-copy audit. Human review of the complete screens in both themes and viewport sizes remains pending.
+
+### REQ-019
+
+The Pokédex shall support complete-catalog search and progressive browsing in National Dex order, with official base Scarlet/Violet move data for eligible entries where available.
+
+- **Origin:** Project owner's approved Pokédex improvements on 2026-10-22, including national ordering, list loading, move acquisition groups, category icons, and explicitly informational base-game data.
+- **Acceptance:** Entries sort by National Dex number, base form before alternate forms, then canonical name. Search covers the full catalog using canonical and localized names regardless of the visible page limit. The interface appends more entries at the list end and exposes an accessible control. A selected entry's moves are grouped by acquisition method and show localized names, type/category icons, levels or machine numbers when the source supplies them; missing metadata and learnsets are shown as unavailable. Learnsets identify Scarlet/Violet base-game data and do not claim egg parents or enforce team legality.
+- **Current evidence:** Component and API tests cover national/form ordering, full-catalog accent-insensitive search, progressive loading, move grouping, icons, acquisition details, machine numbers, unavailable entries, and source version group. The current Pokédex Playwright test could not launch because Chromium is absent; human visual review remains pending.
+
+### REQ-020
+
+Each eligible Pokédex entry shall have a stable direct URL and basic localized discovery metadata.
+
+- **Origin:** Project owner's approved direct-entry and basic SEO plan on 2026-10-22.
+- **Acceptance:** A stable collision-checked slug opens the corresponding entry on direct navigation and refresh, participates in browser history, and canonicalizes its path. Localized title and description, canonical URL, sitemap entry, and environment-specific indexing rules use the configured public base URL. Unknown entry slugs return HTTP 404 and localized not-found content. No search-engine ranking or indexing outcome is guaranteed.
+- **Current evidence:** Route, metadata, sitemap, robots, and static-fallback tests cover the route contract and exceptional names. Playwright direct-route verification could not launch because Chromium is absent; deployed canonical origin and external indexing remain unverified.
 
 ## Open questions and deferred scope
 
@@ -166,7 +196,7 @@ These points are **not** accepted first-release requirements until the owner dec
 - Is email verification required for the first public release, or is email/password sign-in sufficient when SMTP is not configured?
 - What relative priorities should be assigned to the approved first-release requirements?
 
-Spanish localization, Google sign-in, older generations, a player battle simulator, Kubernetes, a remote backup copy, and Prisma 8 remain deferred decisions. Sentry, Husky, ElevenLabs, and local AI tooling mentioned during exploration have not been selected as first-release requirements.
+Google sign-in, older generations, a player battle simulator, server-rendered SEO, separate language URL namespaces, Kubernetes, a remote backup copy, and Prisma 8 remain deferred decisions. Sentry, Husky, ElevenLabs, and local AI tooling mentioned during exploration have not been selected as first-release requirements.
 
 ## Source and decision traceability
 

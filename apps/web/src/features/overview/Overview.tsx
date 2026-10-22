@@ -1,23 +1,16 @@
 import { Button } from "../../components/ui/button";
 import { t } from "../../i18n/presentation";
+import { Link } from "react-router";
+import { siteTabPaths, type SiteTab } from "../../lib/pokedex-routes";
 
-type OverviewDestination = "typeChart" | "damage" | "teamBuilder";
-type OverviewProps = { goTo: (tab: OverviewDestination) => void };
+type OverviewDestination = Extract<SiteTab, "typeChart" | "damage" | "teamBuilder">;
 type OverviewCardData = { number: string; title: string; body: string; tab: OverviewDestination };
 
-const overviewCards: OverviewCardData[] = [
-  { number: "01", tab: "typeChart", ...t.overview.cards.typeCoverage },
-  { number: "02", tab: "damage", ...t.overview.cards.battleNumbers },
-];
-
-export function Overview({ goTo }: OverviewProps) {
-  function openTeamBuilder() {
-    goTo("teamBuilder");
-  }
-
-  function openDamageCalculator() {
-    goTo("damage");
-  }
+export function Overview() {
+  const overviewCards: OverviewCardData[] = [
+    { number: "01", tab: "typeChart", ...t.overview.cards.typeCoverage },
+    { number: "02", tab: "damage", ...t.overview.cards.battleNumbers },
+  ];
 
   return (
     <div className="overview">
@@ -29,32 +22,27 @@ export function Overview({ goTo }: OverviewProps) {
         </h2>
         <p>{t.overview.introduction}</p>
         <div className="actions">
-          <Button onClick={openTeamBuilder}>{t.overview.buildTeam}</Button>
-          <Button variant="outline" onClick={openDamageCalculator}>
-            {t.overview.openCalculator}
-          </Button>
+          <Button asChild><Link to={siteTabPaths.teamBuilder}>{t.overview.buildTeam}</Link></Button>
+          <Button asChild variant="outline"><Link to={siteTabPaths.damage}>{t.overview.openCalculator}</Link></Button>
         </div>
       </section>
 
       <div className="overview-cards">
-        {overviewCards.map((card) => (
-          <OverviewCard key={card.number} card={card} onSelect={goTo} />
-        ))}
+        {overviewCards.map((card) => <OverviewCard key={card.number} card={card} />)}
       </div>
     </div>
   );
 }
 
-function OverviewCard({ card, onSelect }: {
+function OverviewCard({ card }: {
   card: OverviewCardData;
-  onSelect: (destination: OverviewDestination) => void;
 }) {
   return (
-    <button className="feature panel" onClick={() => onSelect(card.tab)}>
+    <Link className="feature panel" to={siteTabPaths[card.tab]}>
       <span>{card.number}</span>
       <h3>{card.title}</h3>
       <p>{card.body}</p>
       <b>{t.overview.explore}</b>
-    </button>
+    </Link>
   );
 }

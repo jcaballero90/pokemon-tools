@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](ADR-004-compose-and-shared-caddy.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](ADR-004-compose-and-shared-caddy.es.md)
+
 # ADR-004: Deploy one application image through Compose and shared Caddy
 
 - **Date:** 2026-09-27
