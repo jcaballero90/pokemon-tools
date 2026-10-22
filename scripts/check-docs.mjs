@@ -51,9 +51,43 @@ for (const file of markdown) {
   }
 }
 
+function stripHtmlTags(value) {
+  let result = '';
+  let tagBuffer = '';
+  let insideTag = false;
+  let quote = '';
+
+  for (const character of value) {
+    if (!insideTag) {
+      if (character === '<') {
+        insideTag = true;
+        tagBuffer = character;
+      } else {
+        result += character;
+      }
+      continue;
+    }
+
+    tagBuffer += character;
+    if (quote) {
+      if (character === quote) quote = '';
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      quote = character;
+    } else if (character === '>') {
+      insideTag = false;
+      tagBuffer = '';
+    }
+  }
+
+  // Keep a literal or malformed less-than sequence instead of dropping text.
+  if (insideTag) result += tagBuffer;
+  return result;
+}
+
 function headingSlug(heading) {
-  return heading
-    .replace(/<[^>]*>/g, '')
+  return stripHtmlTags(heading)
     .replace(/!?(\[[^\]]*\])\([^)]*\)/g, '$1')
     .replace(/[`*_~]/g, '')
     .trim()
