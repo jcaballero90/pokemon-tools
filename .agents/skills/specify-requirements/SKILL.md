@@ -21,7 +21,7 @@ Present candidate requirements and assumptions for review. Accept a requirement 
 
 ## Maintain the specification
 
-Use one living file: `<repo-root>/docs/requirements/requirements.md`. Create or update it only when the user has requested requirements documentation or approved the change. Default to English unless the user requests another language.
+Use `<repo-root>/docs/requirements/requirements.md` as the canonical structured requirements file, and maintain its Spanish-from-Spain counterpart at `requirements.es.md`. Create or update these files only when the user has requested requirements documentation or approved the change. Keep accepted requirement IDs, decisions, priorities, implementation states, and acceptance criteria synchronized; translate the explanatory prose rather than creating independent requirements.
 
 At the start of the file, keep a table containing every accepted requirement. Use columns **ID**, **Title**, **Type**, **Priority**, and **Implementation**. Link each ID to a detail heading containing only its stable identifier, such as `### REQ-001`. Put the title, type, priority, and implementation state only in the table; do not repeat their values in the detail section. This table is the single source for those fields.
 

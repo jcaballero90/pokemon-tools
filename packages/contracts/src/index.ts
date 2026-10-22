@@ -78,10 +78,25 @@ export const damageResponseSchema = z.object({
 export const catalogResponseSchema = z.object({
   species: z.array(z.object({
     name: z.string(), types: z.array(z.string()), baseStats: z.record(z.string(), z.number()),
-    pokedexEligible: z.boolean().optional()
+    pokedexEligible: z.boolean().optional(),
+    nationalDexId: z.number().int().positive().optional(),
+    pokedexSlug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+    pokedexIsBaseForm: z.boolean().optional()
   })),
   moves: z.array(z.string()), abilities: z.array(z.string()), items: z.array(z.string()),
-  types: z.array(z.string()), natures: z.array(z.string())
+  types: z.array(z.string()), natures: z.array(z.string()),
+  translations: z.object({
+    species: z.record(z.string(), z.string()),
+    moves: z.record(z.string(), z.string()),
+    abilities: z.record(z.string(), z.string()),
+    items: z.record(z.string(), z.string()),
+    types: z.record(z.string(), z.string()),
+    natures: z.record(z.string(), z.string()),
+    evolutionLocations: z.object({
+      en: z.record(z.string(), z.string()),
+      esES: z.record(z.string(), z.string())
+    }).optional()
+  }).optional()
 });
 
 export const typeChartResponseSchema = z.array(z.object({
@@ -105,12 +120,18 @@ export const pokedexResponseSchema = z.object({
   abilities: z.array(z.object({
     name: z.string().trim().min(1).max(80),
     isHidden: z.boolean(),
-    description: z.string().trim().max(2000).optional()
+    description: z.string().trim().max(2000).optional(),
+    descriptions: z.object({
+      en: z.string().trim().max(2000),
+      esES: z.string().trim().max(2000),
+      sources: z.object({ en: z.string(), esES: z.string() }).optional()
+    }).optional()
   })).optional(),
   heightDecimeters: z.number().int().nonnegative().optional(),
   weightHectograms: z.number().int().nonnegative().optional(),
   unavailable: z.boolean().optional(),
   reason: z.string().optional(),
+  unavailableReasonCode: z.enum(["official-form-not-in-pokeapi", "pokemon-details-unavailable"]).optional(),
   stale: z.boolean().optional()
 });
 
@@ -118,12 +139,26 @@ export const evolutionNodeSchema = z.object({
   key: z.string(),
   name: z.string(),
   pokedexId: z.number().int().positive(),
+  pokedexSlug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
+  pokedexIsBaseForm: z.boolean().optional(),
   iconCandidates: z.array(z.url())
+});
+export const evolutionConditionSchema = z.object({
+  field: z.enum([
+    "trigger", "item", "held_item", "known_move", "known_move_type", "location", "min_level",
+    "min_happiness", "min_beauty", "min_affection", "gender", "time_of_day",
+    "relative_physical_stats", "party_species", "party_type", "trade_species",
+    "required_pokemon_form", "evolved_pokemon_form", "needs_overworld_rain", "needs_multiplayer",
+    "near_special_rock", "turn_upside_down", "region", "used_move", "min_move_count",
+    "min_steps", "min_damage_taken", "allowed_natures", "condition_expression"
+  ]),
+  value: z.union([z.string(), z.number(), z.boolean()])
 });
 export const evolutionEdgeSchema = z.object({
   from: z.string(),
   to: z.string(),
-  alternatives: z.array(z.array(z.string()))
+  alternatives: z.array(z.array(z.string())),
+  conditionAlternatives: z.array(z.array(evolutionConditionSchema)).optional()
 });
 export const evolutionResponseSchema = z.object({
   source: z.literal("PokéAPI"),
@@ -131,7 +166,34 @@ export const evolutionResponseSchema = z.object({
   edges: z.array(evolutionEdgeSchema),
   megaForms: z.array(evolutionNodeSchema),
   unavailable: z.boolean().optional(),
+  unavailableReasonCode: z.literal("evolution-chain-unavailable").optional(),
   stale: z.boolean().optional()
+});
+
+export const moveLearnAcquisitionSchema = z.object({
+  method: z.string().trim().min(1).max(60),
+  level: z.number().int().positive().optional(),
+  machineNumbers: z.array(z.number().int().positive()).optional(),
+  event: z.boolean().optional()
+});
+export const pokedexLearnedMoveSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  type: z.string().trim().min(1).max(40).nullable(),
+  category: z.enum(["physical", "special", "status"]).nullable(),
+  acquisition: z.array(moveLearnAcquisitionSchema).min(1)
+});
+export const pokedexMovesResponseSchema = z.object({
+  source: z.object({
+    provider: z.literal("PokéAPI"),
+    repository: z.url(),
+    revision: z.string().regex(/^[0-9a-f]{40}$/),
+    versionGroup: z.literal("scarlet-violet"),
+    versionGroupId: z.number().int().positive()
+  }),
+  species: z.string().trim().min(1).max(100),
+  moves: z.array(pokedexLearnedMoveSchema),
+  unavailable: z.boolean().optional(),
+  unavailableReasonCode: z.literal("no-scarlet-violet-learnset").optional()
 });
 
 export const savedTeamResponseSchema = teamInputSchema.extend({
@@ -197,7 +259,11 @@ export type CatalogResponse = z.infer<typeof catalogResponseSchema>;
 export type TypeChartResponse = z.infer<typeof typeChartResponseSchema>;
 export type PokedexResponse = z.infer<typeof pokedexResponseSchema>;
 export type EvolutionNode = z.infer<typeof evolutionNodeSchema>;
+export type EvolutionCondition = z.infer<typeof evolutionConditionSchema>;
 export type EvolutionEdge = z.infer<typeof evolutionEdgeSchema>;
 export type EvolutionResponse = z.infer<typeof evolutionResponseSchema>;
+export type MoveLearnAcquisition = z.infer<typeof moveLearnAcquisitionSchema>;
+export type PokedexLearnedMove = z.infer<typeof pokedexLearnedMoveSchema>;
+export type PokedexMovesResponse = z.infer<typeof pokedexMovesResponseSchema>;
 export type SavedTeamResponse = z.infer<typeof savedTeamResponseSchema>;
 export type TeamDraft = z.infer<typeof teamDraftSchema>;

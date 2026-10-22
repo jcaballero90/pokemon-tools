@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](README.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](README.es.md)
+
 # AI-assisted development methodology
 
 **Purpose:** explain how AI work is governed and where its reviewable evidence lives for Pokémon Tools. This page is a navigation and synthesis of existing records, not a new execution log or a final TFM report. Its claims are limited to the [project rules](../../../AGENTS.md), the linked prompts and workflows, and the current public project artifacts. Writing this overview was owner-authorized; that authorization is not itself a human content-validation result.
@@ -32,8 +34,11 @@ The validated course lessons **Introducción → IA en el proceso de desarrollo 
 | [004 — documentation skills](workflows/004-documentation-skills-design-and-validation.md) | Owner-approved skill plan and [AGENTS.md](../../../AGENTS.md) → focused skills for requirements, architecture, ADRs, security, testing, infrastructure, delivery readiness, and workflow recording. | Explicitly says no separate saved execution prompt exists; records individual owner review and read-only skill checks, not successful future use of every skill. |
 | [005 — project documentation pass](workflows/005-project-documentation-pass.md) | Owner-approved documentation audit → requirements, architecture, security, test, infrastructure, API, and methodology records. | Records the documentation pass as it stood before host deployment; later status changes belong in living docs and later workflow records. |
 | [006 — staging and production rollout](workflows/006-staging-production-rollout.md) | Host preparation, GitHub environment setup, staging and production workflows → reported live public boilerplate. | Captures repository workflow behavior and owner-reported results; does not invent run IDs or claim untested security/product behavior. |
+| [007 — post-rollout product evolution](workflows/007-post-rollout-product-evolution.md) | Repository changes after workflow 006 → bilingual documentation policy, English/es-ES localization, Pokédex catalog and moves, entry routes, and basic SEO. | Tracks implementation and checks in bounded parts. It records browser and visual-review limits rather than inferring product acceptance. |
 
-The [prompt archive](prompts/) contains reusable or final instructions from the preparation work. A prompt's filename and content should not be mistaken for an implementation log. Workflow 005 records the earlier documentation pass; workflow 006 records the subsequent staging-to-production rollout. When a future task materially changes a decision or methodology, update an existing workflow record if it continues the same workflow or create one new record under [workflows](workflows/) after approval. Routine chat and minor corrections do not each need a record.
+The [prompt archive](prompts/) contains reusable or final instructions from the preparation work. A prompt's filename and content should not be mistaken for an implementation log. Workflow 005 records the earlier documentation pass; workflow 006 records the subsequent staging-to-production rollout; workflow 007 tracks the later product evolution. When a future task materially changes a decision or methodology, update an existing workflow record if it continues the same workflow or create one new record under [workflows](workflows/) after approval. Routine chat and minor corrections do not each need a record.
+
+Public project documentation is maintained in English and Spain Spanish in adjacent `.md` and `.es.md` files, with reciprocal language links and synchronized updates. The [documentation check](../../../scripts/check-docs.mjs) checks language pairs and local Markdown links. Agent instructions and archived prompts remain in English.
 
 ## How the project documentation uses this method
 
@@ -47,7 +52,7 @@ The current public documents serve different evidence roles:
 | [Test strategy](../../testing/test-strategy.md) | Which checks have run, what remains unverified, and how each accepted requirement can be demonstrated. |
 | [Infrastructure plan](../../infrastructure/infrastructure-plan.md) and [operations guide](../../operations.md) | Approved deployment topology, release gates, host procedure, and current rollout status. |
 
-These artifacts were written after the initial application construction and reviewed against the repository during a separate documentation pass. They are useful outcome and decision records, but the six workflow files above do **not** constitute a complete AI execution history for that initial build or every later document. Do not infer missing prompts, model settings, test results, or human content approvals from their existence. Further review and corrections should be recorded in the relevant living document or a significant workflow record when there is concrete evidence.
+These artifacts were written after the initial application construction and reviewed against the repository during a separate documentation pass. They are useful outcome and decision records, but the seven workflow files above do **not** constitute a complete AI execution history for that initial build or every later document. Do not infer missing prompts, model settings, test results, or human content approvals from their existence. Further review and corrections should be recorded in the relevant living document or a significant workflow record when there is concrete evidence.
 
 ## Validation and present limits
 

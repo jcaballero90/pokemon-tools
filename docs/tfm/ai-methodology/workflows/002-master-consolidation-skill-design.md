@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](002-master-consolidation-skill-design.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](002-master-consolidation-skill-design.es.md)
+
 # AI Workflow: Master lesson consolidation skill design
 
 ## Purpose

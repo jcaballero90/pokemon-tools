@@ -259,6 +259,8 @@ Not every minor AI interaction needs to be documented. Prioritize documentation 
 
 Project documentation should explain decisions and reasoning, not merely describe implementation.
 
+Public project documentation is maintained in English and Spanish from Spain. Keep adjacent English and `.es.md` files with matching base names, and place reciprocal language links near the start of each document. Update both versions in the same change; keep identifiers, commands, code, URLs, evidence, and status consistent. Translate explanatory prose into natural Spanish from Spain. Pokémon names and terminology must use verified official Spanish data rather than literal translation. Archived prompts and agent/tool instructions remain in English unless explicitly requested otherwise.
+
 Maintain a clear separation between private course knowledge, project requirements, project architecture, ADRs, security documentation, testing documentation, infrastructure documentation, AI methodology, and the final TFM report.
 
 Do not copy large portions of private course material into public project documentation. When master's material influences public documentation, paraphrase and apply the relevant concept to pokemon-tools instead of reproducing course material.

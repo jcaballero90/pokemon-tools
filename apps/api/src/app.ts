@@ -8,12 +8,14 @@ import { z } from "zod";
 import { resolve } from "node:path";
 import {
   apiErrorResponseSchema, catalogResponseSchema, damageRequestSchema, damageResponseSchema,
-  evolutionResponseSchema, pokedexResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
+  evolutionResponseSchema, pokedexMovesResponseSchema, pokedexResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
   teamInputSchema, typeChartResponseSchema
 } from "@pokemon-tools/contracts";
 import { createAuth } from "./modules/auth/auth.js";
 import { catalog, typeChart } from "./modules/catalog/catalog.js";
 import { pokedex, pokedexEvolution } from "./modules/catalog/pokeapi-adapter.js";
+import { pokedexMoves } from "./modules/catalog/pokedex-moves.js";
+import { eligiblePokedexSlugs, pokedexIdentityBySlug } from "./modules/catalog/pokedex-identities.js";
 import { computeDamage } from "./modules/damage/damage.js";
 import { deleteTeam, listTeams, saveTeam, validateTeam, validateTeamIssues } from "./modules/teams/teams.js";
 import { PrismaTeamStore } from "./modules/teams/prisma-adapter.js";
@@ -35,7 +37,7 @@ export async function buildApp(config: Config, db: Database) {
     if (config.EDGE_CIDR && !inCidr(peer, config.EDGE_CIDR)) return reply.code(403).send(apiError("untrusted-ingress"));
     if (!config.EDGE_CIDR && config.NODE_ENV !== "development" && config.NODE_ENV !== "test") return reply.code(503).send(apiError("ingress-not-configured"));
   });
-  await app.register(helmet, { contentSecurityPolicy: { directives: { imgSrc: ["'self'", "data:", "https://raw.githubusercontent.com/PokeAPI/sprites/"] } } });
+  await app.register(helmet, { contentSecurityPolicy: { directives: { imgSrc: ["'self'", "data:", "https://raw.githubusercontent.com/PokeAPI/sprites/", "https://archives.bulbagarden.net"] } } });
   await app.register(rateLimit, { max: 120, timeWindow: "1 minute" });
   await app.register(swagger, { openapi: { info: { title: "Pokémon Tools API", version: "0.1.0" }, components: { securitySchemes: { cookieAuth: { type: "apiKey", in: "cookie", name: "better-auth.session_token" } } } } });
   if (config.DEPLOY_ENV !== "production") await app.register(swaggerUi, { routePrefix: "/docs" });
@@ -82,6 +84,18 @@ export async function buildApp(config: Config, db: Database) {
     return (await auth.api.getSession({ headers }))?.user.id;
   }
   app.get("/api/health", { schema: { tags: ["operations"], response: { 200: { type: "object", required: ["status"], properties: { status: { type: "string" } }, additionalProperties: false } } } }, async () => ({ status: "ok" }));
+  app.get("/api/site-config", { schema: { tags: ["operations"], summary: "Public site metadata configuration" } }, async () => ({ publicBaseUrl: config.PUBLIC_BASE_URL, deployEnv: config.DEPLOY_ENV }));
+  app.get("/sitemap.xml", async (_request, reply) => {
+    const siteBase = new URL(config.PUBLIC_BASE_URL);
+    const paths = ["/", "/type-chart", "/pokedex", "/team-builder", "/damage", "/account", ...eligiblePokedexSlugs().map((slug) => `/pokedex/${slug}`)];
+    const urls = paths.map((path) => `<url><loc>${escapeXml(new URL(path, siteBase).toString())}</loc></url>`).join("");
+    return reply.header("content-type", "application/xml; charset=utf-8").header("cache-control", "public, max-age=3600").send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`);
+  });
+  app.get("/robots.txt", async (_request, reply) => {
+    if (config.DEPLOY_ENV !== "production") return reply.type("text/plain; charset=utf-8").header("cache-control", "public, max-age=300").send("User-agent: *\nDisallow: /\n");
+    const sitemap = new URL("/sitemap.xml", config.PUBLIC_BASE_URL).toString();
+    return reply.type("text/plain; charset=utf-8").header("cache-control", "public, max-age=3600").send(`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${sitemap}\n`);
+  });
   if (config.DEPLOY_ENV !== "production") app.get("/api/ingress-debug", {
     schema: {
       tags: ["operations"],
@@ -105,6 +119,7 @@ export async function buildApp(config: Config, db: Database) {
   app.get("/api/catalog", { schema: { tags: ["catalog"], summary: "Pinned Generation 9 battle catalog", response: { 200: json(catalogResponseSchema) } } }, async () => catalog);
   app.get("/api/type-chart", { schema: { tags: ["catalog"], summary: "Generation 9 type effectiveness", response: { 200: json(typeChartResponseSchema) } } }, async () => typeChart());
   app.get<{ Params: { species: string } }>("/api/pokedex/:species", { schema: { tags: ["catalog"], params: { type: "object", required: ["species"], properties: { species: { type: "string" } } }, response: { 200: json(pokedexResponseSchema), 400: errors, 500: errors } } }, async (request) => pokedex(db, request.params.species));
+  app.get<{ Params: { species: string } }>("/api/pokedex/:species/moves", { schema: { tags: ["catalog"], summary: "Scarlet/Violet moves and acquisition methods for one Pokédex entry", params: { type: "object", required: ["species"], properties: { species: { type: "string" } } }, response: { 200: json(pokedexMovesResponseSchema), 400: errors, 500: errors } } }, async (request) => pokedexMoves(request.params.species));
   app.get<{ Params: { species: string } }>("/api/pokedex/:species/evolution", { schema: { tags: ["catalog"], summary: "Official evolution family and Mega forms", params: { type: "object", required: ["species"], properties: { species: { type: "string" } } }, response: { 200: json(evolutionResponseSchema), 400: errors, 500: errors } } }, async (request) => pokedexEvolution(db, request.params.species));
   app.post("/api/damage", { schema: { tags: ["damage"], body: z.toJSONSchema(damageRequestSchema, { target: "draft-7", io: "input" }), response: { 200: json(damageResponseSchema), 400: errors, 500: errors }, summary: "Damage range and one-hit KO chance conditional on a hit" } }, async (request, reply) => {
     const parsed = damageRequestSchema.safeParse(request.body);
@@ -135,9 +150,24 @@ export async function buildApp(config: Config, db: Database) {
   });
   if (config.STATIC_DIR) {
     await app.register(staticFiles, { root: resolve(config.STATIC_DIR), prefix: "/" });
-    app.setNotFoundHandler((request, reply) => request.url.startsWith("/api/") ? reply.code(404).send(apiError("not-found")) : reply.sendFile("index.html"));
+    app.setNotFoundHandler((request, reply) => {
+      if (request.url.startsWith("/api/")) return reply.code(404).send(apiError("not-found"));
+      const pathname = new URL(request.url, "http://localhost").pathname;
+      const isPage = ["/", "/type-chart", "/pokedex", "/team-builder", "/damage", "/account"].includes(pathname);
+      const entryPath = pathname.match(/^\/pokedex\/([^/]+)\/?$/);
+      let validEntry = false;
+      if (entryPath?.[1]) {
+        try { validEntry = Boolean(pokedexIdentityBySlug(decodeURIComponent(entryPath[1]))); } catch { validEntry = false; }
+      }
+      if (isPage || validEntry || entryPath) return reply.code(entryPath && !validEntry ? 404 : 200).type("text/html; charset=utf-8").sendFile("index.html");
+      return reply.code(404).type("text/plain; charset=utf-8").send("Not found");
+    });
   } else {
     app.setNotFoundHandler((_request, reply) => reply.code(404).send(apiError("not-found")));
   }
   return app;
+}
+
+function escapeXml(value: string) {
+  return value.replace(/[<>&'"]/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", "\"": "&quot;" })[character] ?? character);
 }

@@ -1,7 +1,13 @@
 export type CatalogCategory = "species" | "moves" | "items" | "abilities" | "natures" | "types";
 
 // These optional labels never replace canonical names in drafts or API requests.
-export type CatalogTranslations = Partial<Record<CatalogCategory, Readonly<Record<string, string>>>>;
+type CatalogCategoryTranslations = Partial<Record<CatalogCategory, Readonly<Record<string, string>>>>;
+export type CatalogTranslations = CatalogCategoryTranslations & {
+  evolutionLocations?: Readonly<Record<string, string>>;
+};
+export type CatalogTranslationSource = CatalogCategoryTranslations & {
+  evolutionLocations?: Partial<Record<"en" | "es-ES", Readonly<Record<string, string>>>>;
+};
 
 export type CatalogOption = { value: string; label: string };
 

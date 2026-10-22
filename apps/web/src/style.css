@@ -78,14 +78,54 @@
 /* Pokédex detail and family redesign */
 .pokedex-layout { grid-template-columns: minmax(250px, 290px) minmax(0, 1fr); align-items: start; gap: 20px; }
 .pokedex-layout .panel { min-width: 0; }
+.site-header nav a { display: block; border-radius: 9px; padding: 11px 14px; color: #657285; font-size: .9rem; text-decoration: none; white-space: nowrap; }
+.site-header nav a:hover { background: #f0f5f4; }
+.site-header nav a:focus-visible { outline: 3px solid #258d7a; outline-offset: 2px; }
+.actions .button { display: inline-block; text-decoration: none; }
+.feature { display: block; text-decoration: none; }
+.text-link { display: inline-block; text-decoration: none; }
+.route-not-found { padding: 22px; }
+.route-not-found p { margin-bottom: 12px; }
 .pokedex-sidebar { position: sticky; top: 18px; }
 .pokedex-sidebar > label { font-size: .82rem; }
 .pokedex-sidebar > input { margin-top: 8px; }
 .pokedex-layout .species-list { height: min(72vh, 760px); margin-top: 14px; border-top: 1px solid #edf1f2; }
-.pokedex-layout .species-list button { padding: 11px 10px; border-bottom: 1px solid #edf1f2; border-radius: 7px; }
-.pokedex-layout .species-list button[aria-pressed="true"] { background: #e5f2ed; color: #0e6256; box-shadow: inset 3px 0 #168575; }
+.pokedex-layout .species-list a { display: block; width: 100%; padding: 11px 10px; border-bottom: 1px solid #edf1f2; border-radius: 7px; background: #fff; color: #253549; font-weight: 700; text-align: left; text-decoration: none; }
+.pokedex-layout .species-list a:hover { background: #eef8f4; }
+.pokedex-layout .species-list a[aria-current="page"] { background: #e5f2ed; color: #0e6256; box-shadow: inset 3px 0 #168575; }
 .pokedex-layout .species-list .species-name { color: inherit; font-size: .84rem; font-weight: 700; }
+.pokedex-layout .species-count { margin: 10px 0 0; color: #82909d; font-size: .7rem; }
+.pokedex-layout .species-list .species-row-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pokedex-layout .species-list .species-national-number { flex: 0 0 auto; color: #82909d; font-size: .67rem; font-variant-numeric: tabular-nums; }
 .pokedex-layout .species-list .species-types { margin-top: 3px; color: #7c8a96; font-size: .71rem; }
+.pokedex-layout .species-empty { padding: 12px 4px; color: #82909d; font-size: .82rem; }
+.pokedex-layout .pokedex-load-more { width: 100%; margin-top: 11px; }
+.pokedex-moves-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.pokedex-moves-heading h2 { margin: 0 0 6px; font-size: 1.3rem; }
+.pokedex-moves-heading p { margin: 0; font-size: .83rem; }
+.pokedex-moves-heading small { display: block; margin-top: 4px; color: #82909d; font-size: .68rem; }
+.pokedex-generation-nav { margin-top: 17px; border-bottom: 1px solid #dbe4e4; }
+.pokedex-generation-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0 5px; }
+.pokedex-generation-tab { position: relative; margin-bottom: -1px; padding: 8px 14px 9px; border: 1px solid #dbe4e4; border-bottom-color: #dbe4e4; border-radius: 10px 10px 0 0; background: #f5f8f8; color: #657285; font-size: .78rem; }
+.pokedex-generation-tab[aria-selected="true"] { border-color: #dbe4e4; border-bottom-color: #fff; background: #fff; color: #176e63; font-weight: 750; }
+.pokedex-moves > [role="tabpanel"] { padding-top: 16px; }
+.pokedex-moves [role="tabpanel"] > label { margin-top: 0; }
+.pokedex-move-method-nav { margin-top: 12px; }
+.pokedex-move-scroll[role="tabpanel"] { padding-top: 0; }
+.pokedex-move-scroll { max-height: min(70vh, 680px); overflow: auto; margin-top: 15px; padding: 0 5px 2px 0; }
+.pokedex-move-group + .pokedex-move-group { margin-top: 17px; padding-top: 12px; border-top: 1px solid #e6eceb; }
+.pokedex-move-group h3 { margin: 0 0 5px; color: #415165; font-size: .86rem; }
+.pokedex-move-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.pokedex-move-row { display: grid; grid-template-columns: 54px minmax(0, 1fr) minmax(75px, auto); gap: 10px; align-items: center; min-height: 35px; padding: 5px 8px; border-bottom: 1px solid #edf1f1; }
+.pokedex-move-icons { display: inline-flex; align-items: center; gap: 7px; }
+.pokedex-move-type-icon, .pokedex-move-category-icon { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; color: #68788b; }
+.pokedex-move-category-icon img { display: block; width: 20px; height: 16px; object-fit: contain; }
+.pokedex-move-category-icon--physical { color: #b45d45; }
+.pokedex-move-category-icon--special { color: #7958b6; }
+.pokedex-move-category-icon--status { color: #43836e; }
+.pokedex-move-name { min-width: 0; overflow-wrap: anywhere; color: #27394d; font-size: .82rem; font-weight: 650; }
+.pokedex-move-acquisition { color: #66768a; font-size: .73rem; font-variant-numeric: tabular-nums; text-align: right; }
+.pokedex-moves-error p { margin-bottom: 8px; }
 .pokedex-content { display: grid; gap: 18px; min-width: 0; }
 .pokemon-detail { min-height: 0; }
 .pokedex-primary-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: clamp(22px, 3vw, 40px); align-items: center; }
@@ -149,9 +189,9 @@ button.pokedex-ability-chip { cursor: help; }
 .evolution-paths { display: grid; gap: 12px; min-width: 0; }
 .evolution-path { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 7px; min-width: 0; padding: 12px; border: 1px solid #edf1ef; border-radius: 13px; background: #fbfcfb; }
 .evolution-path-step { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-width: 0; }
-.evolution-species { display: grid; width: 88px; flex: none; justify-items: center; gap: 4px; padding: 5px 3px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: #334458; text-align: center; font-size: .72rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.evolution-species { display: grid; width: 88px; flex: none; justify-items: center; gap: 4px; padding: 5px 3px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: #334458; text-align: center; text-decoration: none; font-size: .72rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .evolution-species:hover { border-color: #dce9e3; background: #f4f9f6; }
-.evolution-species[aria-current="true"] { border-color: #8dc8b4; background: #eaf6f0; color: #135e50; box-shadow: inset 0 0 0 1px #c1e1d3; }
+.evolution-species[aria-current="page"] { border-color: #8dc8b4; background: #eaf6f0; color: #135e50; box-shadow: inset 0 0 0 1px #c1e1d3; }
 .evolution-species--static { cursor: default; }
 .evolution-icon { display: grid; width: 72px; height: 72px; place-items: center; }
 .evolution-icon img { display: block; width: 72px; height: 72px; object-fit: contain; image-rendering: auto; }
@@ -163,9 +203,9 @@ button.pokedex-ability-chip { cursor: help; }
 .mega-forms { display: grid; gap: 8px; margin-top: 16px; padding-top: 13px; border-top: 1px solid #edf0ee; }
 .mega-forms h3 { margin: 0; color: #516153; font-size: .78rem; letter-spacing: .025em; }
 .mega-form-links { display: flex; flex-wrap: wrap; gap: 7px; }
-.mega-form-link { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px 3px 4px; border: 1px solid #e3e9e5; border-radius: 999px; background: #fff; color: #4f5e55; font-size: .7rem; font-weight: 650; }
+.mega-form-link { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px 3px 4px; border: 1px solid #e3e9e5; border-radius: 999px; background: #fff; color: #4f5e55; text-decoration: none; font-size: .7rem; font-weight: 650; }
 .mega-form-link:hover { background: #f1f7f3; }
-.mega-form-link[aria-current="true"] { border-color: #8dc8b4; background: #eaf6f0; color: #135e50; }
+.mega-form-link[aria-current="page"] { border-color: #8dc8b4; background: #eaf6f0; color: #135e50; }
 @media (max-width: 1050px) {
   .pokedex-layout { grid-template-columns: minmax(230px, 270px) minmax(0, 1fr); }
   .pokedex-primary-grid { grid-template-columns: minmax(0, 1fr) minmax(230px, 300px); gap: 20px; }
@@ -175,6 +215,7 @@ button.pokedex-ability-chip { cursor: help; }
   .pokedex-layout { grid-template-columns: 1fr; }
   .pokedex-sidebar { position: static; }
   .pokedex-layout .species-list { height: 220px; }
+  .site-header nav a { padding: 8px; }
   .pokedex-primary-grid { grid-template-columns: 1fr; }
   .pokemon-artwork { grid-row: 1; }
   .pokemon-artwork-frame { width: min(100%, 320px); }

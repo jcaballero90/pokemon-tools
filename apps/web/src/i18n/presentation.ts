@@ -1,9 +1,22 @@
-import { getCatalogTranslations, getMessages, resolveLocale, formatMessage } from "../i18n";
-import { catalogLabel, type CatalogCategory } from "../lib/catalog-labels";
+import {
+  formatMessage,
+  getCatalogTranslations,
+  getCurrentLocale,
+  getMessages,
+  subscribeLocale
+} from "../i18n.js";
+import { catalogLabel, type CatalogCategory } from "../lib/catalog-labels.js";
 
-export const locale = resolveLocale();
-export const t = getMessages(locale);
-export const catalogTranslations = getCatalogTranslations(locale);
+export let locale = getCurrentLocale();
+export let t = getMessages(locale);
+export let catalogTranslations = getCatalogTranslations(locale);
+
+subscribeLocale(() => {
+  locale = getCurrentLocale();
+  t = getMessages(locale);
+  catalogTranslations = getCatalogTranslations(locale);
+});
+
 export const label = (category: CatalogCategory, canonicalName: string) =>
   catalogLabel(category, canonicalName, catalogTranslations);
 

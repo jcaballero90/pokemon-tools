@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
+import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { teamInputSchema, type CatalogResponse, type DamageResponse, type EvolutionResponse, type TeamDraft } from "@pokemon-tools/contracts";
 import { Damage } from "./features/damage/Damage";
@@ -82,14 +83,14 @@ describe("localized website values", () => {
   it("finds localized Pokémon labels and requests descriptions using the canonical species", async () => {
     const evolution: EvolutionResponse = { source: "PokéAPI", nodes: [], edges: [], megaForms: [], unavailable: true };
     apiMock.mockImplementation((path: string | undefined) => path?.endsWith("/evolution") ? Promise.resolve(evolution) : Promise.resolve({ source: "PokéAPI", pokedexId: 6, familyKey: "charizard", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" }));
-    render(<Pokedex catalog={catalog} />);
+    render(<MemoryRouter><Pokedex catalog={catalog} /></MemoryRouter>);
     fireEvent.change(screen.getByLabelText("Find a Pokémon"), { target: { value: "Translated Char" } });
-    expect(screen.queryByRole("button", { name: /Translated Pikachu/ })).toBeNull();
-    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Translated Charizard/ })));
+    expect(screen.queryByRole("link", { name: /Translated Pikachu/ })).toBeNull();
+    await act(async () => fireEvent.click(screen.getByRole("link", { name: /Translated Charizard/ })));
 
-    expect(apiMock.mock.calls[0]?.[0]).toBe("/pokedex/Charizard");
+    expect(apiMock.mock.calls.some(([path]) => path === "/pokedex/Charizard")).toBe(true);
     expect(await screen.findByAltText("Translated Charizard")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Translated Charizard/ }).textContent).toContain("Translated Fire");
+    expect(screen.getByRole("link", { name: /Translated Charizard/ }).textContent).toContain("Translated Fire");
   });
 
   it("uses translated Pokémon suggestions to select canonical defensive types", async () => {

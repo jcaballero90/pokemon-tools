@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](003-master-knowledge-consolidation-and-validation.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](003-master-knowledge-consolidation-and-validation.es.md)
+
 # Master knowledge consolidation and validation
 
 ## Objective

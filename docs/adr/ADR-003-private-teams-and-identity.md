@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](ADR-003-private-teams-and-identity.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](ADR-003-private-teams-and-identity.es.md)
+
 # ADR-003: Store private teams with PostgreSQL, Prisma 7, and Better Auth
 
 - **Date:** 2026-09-27
