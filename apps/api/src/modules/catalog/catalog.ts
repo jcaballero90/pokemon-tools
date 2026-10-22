@@ -1,14 +1,32 @@
 import { Generations, toID } from "@smogon/calc";
 import { pokedexIdentity } from "./pokedex-identities.js";
+import pokemonTranslations from "./pokemon-translations.generated.json" with { type: "json" };
 
 const gen = Generations.get(9);
 export const catalog = {
-  species: [...gen.species].map((p) => ({ name: p.name, types: p.types, baseStats: p.baseStats, pokedexEligible: pokedexIdentity(p.name)?.eligible ?? false })).sort((a, b) => a.name.localeCompare(b.name)),
+  species: [...gen.species].map((p) => {
+    const identity = pokedexIdentity(p.name);
+    return {
+      name: p.name,
+      types: p.types,
+      baseStats: p.baseStats,
+      pokedexEligible: identity?.eligible ?? false,
+      ...(identity?.eligible ? {
+        nationalDexId: identity.nationalDexId,
+        pokedexSlug: identity.pokedexSlug,
+        pokedexIsBaseForm: identity.pokedexIsBaseForm
+      } : {})
+    };
+  }).sort((a, b) => a.name.localeCompare(b.name)),
   moves: [...gen.moves].map((m) => m.name).sort(),
   abilities: [...gen.abilities].map((a) => a.name).sort(),
   items: [...gen.items].map((i) => i.name).sort(),
   types: [...gen.types].map((t) => t.name).filter((name) => name !== "???").sort(),
-  natures: [...gen.natures].map((n) => n.name).sort()
+  natures: [...gen.natures].map((n) => n.name).sort(),
+  translations: {
+    ...pokemonTranslations.catalog,
+    evolutionLocations: pokemonTranslations.evolutionLocations.labels
+  }
 };
 
 export function knownSpecies(name: string) { return gen.species.get(toID(name)) !== undefined; }

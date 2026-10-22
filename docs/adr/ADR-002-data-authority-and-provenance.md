@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](ADR-002-data-authority-and-provenance.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](ADR-002-data-authority-and-provenance.es.md)
+
 # ADR-002: Separate battle and descriptive data sources
 
 - **Date:** 2026-09-27

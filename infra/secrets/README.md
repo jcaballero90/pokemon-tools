@@ -1,3 +1,9 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](README.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](README.es.md)
+
+[![English](https://img.shields.io/badge/lang-en-red.svg)](README.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](README.es.md)
+
+[![English](https://img.shields.io/badge/lang-en-red.svg)](README.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](README.es.md)
+
 Copy the matching `.env.example` files to root-owned `staging.env`, `production.env`, `caddy.env`, and `backup.env` here on the mini PC, with mode `0600`. Replace all placeholders before use. Keep existing configured files when repeating setup. Only the examples belong in Git; the real files remain ignored.
 
 - [`caddy.env.example`](caddy.env.example): Caddy process UID/GID and ingress hostnames.

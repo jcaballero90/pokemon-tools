@@ -1,6 +1,10 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](infrastructure-plan.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](infrastructure-plan.es.md)
+
 # Infrastructure plan
 
 **Scope:** the approved first release on one owner-operated mini PC. **Status (2026-09-30):** the owner reports successful staging and production workflow runs and a live production page at `https://jcrserver.duckdns.org`. The mini PC foundation, shared Caddy, separate app/database environments, private staging Serve, and encrypted USB restore drill were configured. Funnel is optional and not confirmed enabled. Full product, security, and rollback verification remains open. The [operations guide](../operations.md) gives current setup and recovery procedures; the [requirements](../requirements/requirements.md) track acceptance evidence.
+
+**Product update (2026-10-22):** the web app now uses client-side routes for its main pages and stable Pokédex entry URLs. Fastify's SPA fallback serves those page routes and returns 404 for unknown Pokédex slugs; no Caddy or container topology change was needed. Entry metadata, sitemap, and robots output provide basic client-rendered discovery signals, not a server-rendering or indexing guarantee. The [workflow record](../tfm/ai-methodology/workflows/007-post-rollout-product-evolution.md) records implementation and checks.
 
 ## Decision basis
 

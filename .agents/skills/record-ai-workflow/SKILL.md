@@ -19,7 +19,7 @@ Reflect the actual workflow, even if it differed from the normal ChatGPT Assista
 
 ## Maintain the workflow record
 
-Use `<repo-root>/docs/tfm/ai-methodology/workflows/`. Update an existing record when continuing the same workflow; otherwise use a new, stable sequential filename after the highest assigned number. Do not create duplicates.
+Use `<repo-root>/docs/tfm/ai-methodology/workflows/`. Update an existing record when continuing the same workflow; otherwise use a new, stable sequential filename after the highest assigned number. Do not create duplicates. Maintain each public workflow record as a synchronized English and Spanish-from-Spain pair, using adjacent `.es.md` files and reciprocal language links. Do not translate archived prompts.
 
 Keep the public record concise: purpose, inputs and knowledge routing, roles and significant steps, decisions and their evidence, outputs, validation, human review, limitations, and lessons learned where supported. Link to actual artifacts. Capture approved rationale and alternatives, not a chat transcript or private internal reasoning. Mark unfinished work and pending review honestly.
 
@@ -27,4 +27,4 @@ Do not expose private course material, credentials, or personal data. Do not mod
 
 ## Check the result
 
-Verify that linked prompts and outputs exist, factual claims have evidence, models and review state are not guessed, course guidance is attributed accurately, and no existing workflow is duplicated.
+Verify both language versions are present and linked, local artifact links resolve in each version, factual claims have evidence, models and review state are not guessed, course guidance is attributed accurately, and no existing workflow is duplicated. Keep dates, evidence, and completion states consistent across languages.

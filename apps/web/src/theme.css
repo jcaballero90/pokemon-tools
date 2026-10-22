@@ -38,7 +38,8 @@
 }
 :root[data-theme="dark"] .brand small,
 :root[data-theme="dark"] .header-user { color: var(--theme-muted); }
-:root[data-theme="dark"] .site-header nav button { color: var(--theme-muted); }
+:root[data-theme="dark"] .site-header nav button,
+:root[data-theme="dark"] .site-header nav a { color: var(--theme-muted); }
 :root[data-theme="dark"] .site-header nav .nav-active {
   background: var(--theme-accent-soft);
   color: var(--theme-accent);
@@ -75,7 +76,25 @@
   color: #526478;
   transition: background .16s ease, border-color .16s ease;
 }
+.locale-toggle {
+  position: relative;
+  display: inline-flex;
+  width: 48px;
+  height: 30px;
+  flex: none;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid #cbd6dc;
+  border-radius: 999px;
+  background: #e9eff2;
+  color: #526478;
+  transition: background .16s ease, border-color .16s ease;
+}
 .theme-toggle:focus-visible {
+  outline: 3px solid #258d7a;
+  outline-offset: 3px;
+}
+.locale-toggle:focus-visible {
   outline: 3px solid #258d7a;
   outline-offset: 3px;
 }
@@ -102,12 +121,36 @@
   background: #182b36;
   color: #9be4d2;
 }
+:root[data-theme="dark"] .locale-toggle {
+  border-color: #496071;
+  background: #244c4b;
+}
+.locale-toggle-thumb {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  transform: translateX(0);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px #18253535;
+  transition: transform .16s ease;
+}
+.locale-toggle-thumb img {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+}
+.locale-toggle[aria-checked="true"] .locale-toggle-thumb { transform: translateX(18px); }
 :root[data-theme="dark"] .theme-toggle { border-color: #496071; }
 
 :root[data-theme="dark"] .panel,
 :root[data-theme="dark"] .effectiveness-group,
 :root[data-theme="dark"] .type-chart th,
 :root[data-theme="dark"] .species-list button,
+:root[data-theme="dark"] .species-list a,
 :root[data-theme="dark"] .compare-columns > div,
 :root[data-theme="dark"] .account-layout .panel {
   background: var(--theme-surface);
@@ -253,17 +296,20 @@
 :root[data-theme="dark"] .type-water { --defend-bg:#2b394c; --defend-border:#5d7fa9; --defend-ink:#c8e0fb; }
 
 :root[data-theme="dark"] .pokedex-layout .species-list { border-color: var(--theme-border); }
-:root[data-theme="dark"] .pokedex-layout .species-list button {
+:root[data-theme="dark"] .pokedex-layout .species-list a {
   border-color: var(--theme-border);
   background: transparent;
   color: var(--theme-text);
 }
-:root[data-theme="dark"] .pokedex-layout .species-list button:hover { background: #24354a; }
-:root[data-theme="dark"] .pokedex-layout .species-list button[aria-pressed="true"] {
+:root[data-theme="dark"] .pokedex-layout .species-list a:hover { background: #24354a; }
+:root[data-theme="dark"] .pokedex-layout .species-list a[aria-current="page"] {
   background: #203b3c;
   color: #b4f0dc;
   box-shadow: inset 3px 0 #75d6bd;
 }
+:root[data-theme="dark"] .pokedex-layout .species-count,
+:root[data-theme="dark"] .pokedex-layout .species-empty,
+:root[data-theme="dark"] .pokedex-layout .species-national-number { color: #aab7c6; }
 :root[data-theme="dark"] .pokemon-detail h2,
 :root[data-theme="dark"] .pokedex-stats h3,
 :root[data-theme="dark"] .pokedex-abilities h3,
@@ -318,7 +364,7 @@
 }
 :root[data-theme="dark"] .evolution-species { color: #d5e0ec; }
 :root[data-theme="dark"] .evolution-species:hover { border-color: #49645a; background: #24372f; }
-:root[data-theme="dark"] .evolution-species[aria-current="true"] {
+:root[data-theme="dark"] .evolution-species[aria-current="page"] {
   border-color: #568c79;
   background: #203e39;
   color: #c1f0de;
@@ -333,12 +379,28 @@
   color: #d5e1e8;
 }
 :root[data-theme="dark"] .mega-form-link:hover { background: #2c4056; }
-:root[data-theme="dark"] .mega-form-link[aria-current="true"] {
+:root[data-theme="dark"] .mega-form-link[aria-current="page"] {
   border-color: #568c79;
   background: #203e39;
   color: #c1f0de;
 }
-
+:root[data-theme="dark"] .pokedex-moves-heading small,
+:root[data-theme="dark"] .pokedex-move-acquisition { color: var(--theme-muted); }
+:root[data-theme="dark"] .pokedex-generation-nav,
+:root[data-theme="dark"] .pokedex-move-group + .pokedex-move-group,
+:root[data-theme="dark"] .pokedex-move-row { border-color: var(--theme-border); }
+:root[data-theme="dark"] .pokedex-generation-tab {
+  border-color: var(--theme-border);
+  background: var(--theme-inset);
+  color: var(--theme-muted);
+}
+:root[data-theme="dark"] .pokedex-generation-tab[aria-selected="true"] {
+  border-bottom-color: var(--theme-raised);
+  background: var(--theme-raised);
+  color: var(--theme-accent);
+}
+:root[data-theme="dark"] .pokedex-move-group h3 { color: #c7d5e3; }
+:root[data-theme="dark"] .pokedex-move-name { color: var(--theme-text); }
 @media (max-width: 1100px) {
   .header-actions { order: 2; }
 }
@@ -353,4 +415,6 @@
   .header-user { max-width: min(26vw, 120px); }
   .theme-toggle { width: 46px; }
   .theme-toggle[aria-checked="true"] .theme-toggle-thumb { transform: translateX(16px); }
+  .locale-toggle { width: 46px; }
+  .locale-toggle[aria-checked="true"] .locale-toggle-thumb { transform: translateX(16px); }
 }

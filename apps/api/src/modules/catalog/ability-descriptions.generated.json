@@ -1,0 +1,2524 @@
+{
+  "source": {
+    "repository": "https://github.com/PokeAPI/pokeapi",
+    "revision": "2bf639e5572812a67d2b94903fdcb9d095f5aeb2",
+    "languageIds": {
+      "en": 9,
+      "esES": 7,
+      "es419Excluded": 14
+    },
+    "files": [
+      "data/v2/csv/pokemon.csv",
+      "data/v2/csv/pokemon_forms.csv",
+      "data/v2/csv/pokemon_species.csv",
+      "data/v2/csv/pokemon_dex_numbers.csv",
+      "data/v2/csv/pokedexes.csv",
+      "data/v2/csv/languages.csv",
+      "data/v2/csv/pokemon_species_names.csv",
+      "data/v2/csv/pokemon_form_names.csv",
+      "data/v2/csv/moves.csv",
+      "data/v2/csv/move_names.csv",
+      "data/v2/csv/pokemon_moves.csv",
+      "data/v2/csv/pokemon_move_methods.csv",
+      "data/v2/csv/machines.csv",
+      "data/v2/csv/abilities.csv",
+      "data/v2/csv/ability_names.csv",
+      "data/v2/csv/ability_flavor_text.csv",
+      "data/v2/csv/version_groups.csv",
+      "data/v2/csv/items.csv",
+      "data/v2/csv/item_names.csv",
+      "data/v2/csv/natures.csv",
+      "data/v2/csv/nature_names.csv",
+      "data/v2/csv/types.csv",
+      "data/v2/csv/type_names.csv",
+      "data/v2/csv/locations.csv",
+      "data/v2/csv/location_names.csv",
+      "data/v2/csv/pokemon_evolution.csv",
+      "data/v2/csv/egg_groups.csv",
+      "data/v2/csv/pokemon_egg_groups.csv"
+    ],
+    "namingReferences": [
+      "https://assets.pokemon.com/assets/cms2-es-es/pdf/trading-card-game/rulebook/svi_rulebook_es.pdf",
+      "https://legends.pokemon.com/es-es/mega-pokemon",
+      "https://www.wikidex.net/wiki/Lista_de_movimientos",
+      "https://www.wikidex.net/wiki/Lista_de_habilidades_en_todos_los_idiomas",
+      "https://www.wikidex.net/wiki/Lista_de_objetos_en_todos_los_idiomas?oldid=3554608",
+      "https://www.wikidex.net/wiki/Baya",
+      "https://www.wikidex.net/wiki/Cintalunares",
+      "https://bulbapedia.bulbagarden.net/wiki/Berserk_Gene",
+      "https://www.wikidex.net/wiki/Aura_Guard?mobileaction=toggle_view_mobile",
+      "https://www.wikidex.net/wiki/Eelevate_%28habilidad%29",
+      "https://www.wikidex.net/wiki/Crin_de_Fuego",
+      "https://www.wikidex.net/wiki/Monte_Corona",
+      "https://www.wikidex.net/wiki/Bosque_Eterna",
+      "https://www.wikidex.net/wiki/Ruta_217",
+      "https://www.wikidex.net/wiki/Chargestone_Cave",
+      "https://www.wikidex.net/wiki/Pinwheel_Forest",
+      "https://www.wikidex.net/wiki/Monte_tuerca",
+      "https://www.wikidex.net/wiki/Dusty_Bowl"
+    ],
+    "officialMoveOverrideKeys": [
+      "gmaxwildfire",
+      "gmaxbefuddle",
+      "gmaxvoltcrash",
+      "gmaxgoldrush",
+      "gmaxchistrike",
+      "gmaxterror",
+      "gmaxresonance",
+      "gmaxcuddle",
+      "gmaxreplenish",
+      "gmaxmalodor",
+      "gmaxstonesurge",
+      "gmaxwindrage",
+      "gmaxstunshock",
+      "gmaxfinale",
+      "gmaxdepletion",
+      "gmaxgravitas",
+      "gmaxvolcalith",
+      "gmaxsandblast",
+      "gmaxsnooze",
+      "gmaxtartness",
+      "gmaxsweetness",
+      "gmaxsmite",
+      "gmaxsteelsurge",
+      "gmaxmeltdown",
+      "gmaxfoamburst",
+      "gmaxcentiferno",
+      "gmaxvinelash",
+      "gmaxcannonade",
+      "gmaxdrumsolo",
+      "gmaxfireball",
+      "gmaxhydrosnipe",
+      "gmaxoneblow",
+      "gmaxrapidflow",
+      "nihillight"
+    ],
+    "officialItemOverrideKeys": [
+      "aloraichiumz",
+      "buginiumz",
+      "darkiniumz",
+      "decidiumz",
+      "dragoniumz",
+      "eeviumz",
+      "electriumz",
+      "fairiumz",
+      "fightiniumz",
+      "firiumz",
+      "flyiniumz",
+      "ghostiumz",
+      "grassiumz",
+      "groundiumz",
+      "iciumz",
+      "inciniumz",
+      "kommoniumz",
+      "lunaliumz",
+      "lycaniumz",
+      "marshadiumz",
+      "mewniumz",
+      "mimikiumz",
+      "normaliumz",
+      "pikaniumz",
+      "pikashuniumz",
+      "poisoniumz",
+      "primariumz",
+      "psychiumz",
+      "rockiumz",
+      "snorliumz",
+      "solganiumz",
+      "steeliumz",
+      "tapuniumz",
+      "ultranecroziumz",
+      "wateriumz",
+      "prettyfeather",
+      "leek",
+      "berry",
+      "berserkgene",
+      "bitterberry",
+      "burntberry",
+      "iceberry",
+      "mintberry",
+      "miracleberry",
+      "mysteryberry",
+      "przcureberry",
+      "goldberry",
+      "pinkbow",
+      "polkadotbow",
+      "psncureberry",
+      "mail"
+    ],
+    "officialAbilityOverrideKeys": [
+      "auraguard",
+      "eelevate",
+      "firemane"
+    ],
+    "officialEvolutionLocationOverrideKeys": [
+      "mtcoronet",
+      "eternaforest",
+      "sinnohroute217",
+      "chargestonecave",
+      "pinwheelforest",
+      "twistmountain",
+      "dustybowl"
+    ],
+    "abilityFlavorTextCoverage": {
+      "available": 267,
+      "unavailable": 50
+    },
+    "formFallbackPolicy": "Prefer PokéAPI language 7 form labels. For missing labels use documented Spain Spanish regional and Mega naming; otherwise retain the official localized species name.",
+    "battleCatalog": "@smogon/calc 0.12.0 Generation 9",
+    "moveLearnsets": {
+      "provider": "PokéAPI",
+      "repository": "https://github.com/PokeAPI/pokeapi",
+      "revision": "2bf639e5572812a67d2b94903fdcb9d095f5aeb2",
+      "versionGroup": "scarlet-violet",
+      "versionGroupId": 25,
+      "includedVersionGroups": [
+        "scarlet-violet"
+      ],
+      "excludedVersionGroups": [
+        "the-teal-mask",
+        "the-indigo-disk"
+      ]
+    }
+  },
+  "descriptions": {
+    "airlock": {
+      "en": "Eliminates the effects of weather.",
+      "esES": "Neutraliza todos los efectos del tiempo atmosférico.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "arenatrap": {
+      "en": "Prevents opposing Pokémon from fleeing from battle.",
+      "esES": "Evita que el rival huya.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "battlearmor": {
+      "en": "Hard armor protects the Pokémon from critical hits.",
+      "esES": "La robusta coraza que lo protege bloquea los golpes críticos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "blaze": {
+      "en": "Powers up Fire-type moves when the Pokémon's HP is low.",
+      "esES": "Potencia sus movimientos de tipo Fuego cuando le quedan pocos PS.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "chlorophyll": {
+      "en": "Boosts the Pokémon's Speed stat in harsh sunlight.",
+      "esES": "Sube su Velocidad cuando hace sol.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "clearbody": {
+      "en": "Prevents other Pokémon's moves or Abilities from lowering the Pokémon's stats.",
+      "esES": "Evita que bajen sus características a causa de movimientos o habilidades de otros Pokémon.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "cloudnine": {
+      "en": "Eliminates the effects of weather.",
+      "esES": "Anula todos los efectos del tiempo atmosférico.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "colorchange": {
+      "en": "The Pokémon’s type becomes the type of the move used on it.",
+      "esES": "Adopta el tipo del último movimiento del que es blanco.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "compoundeyes": {
+      "en": "The Pokémon's compound eyes boost its accuracy.",
+      "esES": "Aumenta la precisión de sus movimientos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "cutecharm": {
+      "en": "The Pokémon may infatuate attackers that make direct contact with it.",
+      "esES": "Puede causar enamoramiento al rival que lo toque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "drizzle": {
+      "en": "The Pokémon makes it rain when it enters a battle.",
+      "esES": "Hace que llueva al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "damp": {
+      "en": "The Pokémon dampens its surroundings, preventing all Pokémon from using explosive moves such as Self-Destruct.",
+      "esES": "Aumenta la humedad del entorno y evita que se puedan utilizar movimientos explosivos, tales como Autodestrucción.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "drought": {
+      "en": "Turns the sunlight harsh when the Pokémon enters a battle.",
+      "esES": "Cuando entra en combate, el tiempo pasa a ser soleado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "earlybird": {
+      "en": "The Pokémon awakens from sleep twice as fast as other Pokémon.",
+      "esES": "Si se duerme, tardará la mitad de tiempo en despertarse.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "effectspore": {
+      "en": "Contact with the Pokémon may inflict poison, sleep, or paralysis on the attacker.",
+      "esES": "Puede dormir, envenenar o paralizar al Pokémon con el que entre en contacto al recibir un ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "flamebody": {
+      "en": "Contact with the Pokémon may burn the attacker.",
+      "esES": "Puede quemar al mínimo contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "flashfire": {
+      "en": "If hit by a Fire-type move, the Pokémon absorbs the flames and uses them to power up its own Fire-type moves.",
+      "esES": "Si le alcanza algún movimiento de tipo Fuego, potencia sus propios movimientos de dicho tipo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "forecast": {
+      "en": "The Pokémon transforms with the weather to change its type to Water, Fire, or Ice.",
+      "esES": "Cambia a tipo Agua, Fuego o Hielo en función del tiempo atmosférico.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "guts": {
+      "en": "It's so gutsy that having a status condition boosts the Pokémon's Attack stat.",
+      "esES": "Si sufre un problema de estado, se viene arriba y aumenta su Ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "hugepower": {
+      "en": "Doubles the Pokémon's Attack stat.",
+      "esES": "Duplica la potencia de sus ataques físicos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "hustle": {
+      "en": "Boosts the Pokémon's Attack stat but lowers its accuracy.",
+      "esES": "Aumenta su Ataque, pero reduce su Precisión.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "hypercutter": {
+      "en": "The Pokémon's prized, mighty pincers prevent other Pokémon from lowering its Attack stat.",
+      "esES": "Evita que el rival le baje el Ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "illuminate": {
+      "en": "By illuminating its surroundings, the Pokémon prevents its accuracy from being lowered.",
+      "esES": "Aumenta la probabilidad de encontrar Pokémon al iluminar el entorno.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "immunity": {
+      "en": "The Pokémon's immune system prevents it from being poisoned.",
+      "esES": "Su sistema inmunitario evita el envenenamiento.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "innerfocus": {
+      "en": "The Pokémon's intense focus prevents it from flinching or being affected by Intimidate.",
+      "esES": "Gracias a su profunda concentración, no se amedrenta ante los ataques del rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "insomnia": {
+      "en": "The Pokémon's insomnia prevents it from falling asleep.",
+      "esES": "Su resistencia al sueño le impide quedarse dormido.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "intimidate": {
+      "en": "When the Pokémon enters a battle, it intimidates opposing Pokémon and makes them cower, lowering their Attack stats.",
+      "esES": "Al entrar en combate amilana al rival de tal manera que su Ataque disminuye.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "keeneye": {
+      "en": "The Pokémon's keen eyes prevent its accuracy from being lowered.",
+      "esES": "Su aguda vista evita que le disminuya la Precisión.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "levitate": {
+      "en": "By floating in the air, the Pokémon receives full immunity to all Ground-type moves.",
+      "esES": "Su capacidad de flotar sobre el suelo le proporciona inmunidad frente a los movimientos de tipo Tierra.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "lightningrod": {
+      "en": "The Pokémon draws in all Electric-type moves. Instead of taking damage from them, its Sp. Atk stat is boosted.",
+      "esES": "Atrae y neutraliza los movimientos de tipo Eléctrico, que además le suben el Ataque Especial.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "limber": {
+      "en": "The Pokémon's limber body prevents it from being paralyzed.",
+      "esES": "Evita ser paralizado gracias a la flexibilidad de su cuerpo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "liquidooze": {
+      "en": "The strong stench of the Pokémon's oozed liquid damages attackers that use HP-draining moves.",
+      "esES": "Exuda una sustancia tóxica de intenso hedor que hiere a quienes intentan drenarle PS.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "magmaarmor": {
+      "en": "The Pokémon’s hot magma coating prevents it from being frozen.",
+      "esES": "Gracias al magma candente que lo envuelve, no puede ser congelado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "magnetpull": {
+      "en": "Prevents Steel-type Pokémon from fleeing by pulling them in with magnetism.",
+      "esES": "Su magnetismo atrae a los Pokémon de tipo Acero y les impide huir.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "marvelscale": {
+      "en": "The Pokémon's marvelous scales boost its Defense stat if it has a status condition.",
+      "esES": "Sube su Defensa si sufre un problema de estado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "minus": {
+      "en": "Boosts the Sp. Atk stat of the Pokémon if an ally with the Plus or Minus Ability is also in battle.",
+      "esES": "Potencia su Ataque Especial si un Pokémon aliado tiene la habilidad Más o Menos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "naturalcure": {
+      "en": "The Pokémon's status conditions are cured when it switches out.",
+      "esES": "Cura sus problemas de estado al cambiarse con otro Pokémon.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "oblivious": {
+      "en": "The Pokémon is oblivious, keeping it from being infatuated, falling for taunts, or being affected by Intimidate.",
+      "esES": "Su indiferencia evita que sea provocado o caiga presa del enamoramiento.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "overgrow": {
+      "en": "Powers up Grass-type moves when the Pokémon's HP is low.",
+      "esES": "Potencia sus movimientos de tipo Planta cuando le quedan pocos PS.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "owntempo": {
+      "en": "The Pokémon sticks to its own tempo, preventing it from becoming confused or being affected by Intimidate.",
+      "esES": "Como le gusta hacer las cosas a su manera, los rivales no logran confundirlo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "pickup": {
+      "en": "The Pokémon may pick up an item another Pokémon used during a battle. It may pick up items outside of battle, too.",
+      "esES": "Puede recoger objetos que el rival haya usado, o bien otros que encuentre en plena aventura.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "plus": {
+      "en": "Boosts the Sp. Atk stat of the Pokémon if an ally with the Plus or Minus Ability is also in battle.",
+      "esES": "Potencia su Ataque Especial si un Pokémon aliado tiene la habilidad Más o Menos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "poisonpoint": {
+      "en": "Contact with the Pokémon may poison the attacker.",
+      "esES": "Puede envenenar al mínimo contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "pressure": {
+      "en": "Puts other Pokémon under pressure, causing them to expend more PP to use their moves.",
+      "esES": "Presiona al rival para que sus PP se acaben antes.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "purepower": {
+      "en": "Using its pure power, the Pokémon doubles its Attack stat.",
+      "esES": "Duplica la potencia de sus ataques físicos gracias al yoga.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "raindish": {
+      "en": "The Pokémon gradually regains HP in rain.",
+      "esES": "Recupera PS de forma gradual cuando llueve.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "rockhead": {
+      "en": "Protects the Pokémon from recoil damage.",
+      "esES": "No puede dañarse con sus propios movimientos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "roughskin": {
+      "en": "The Pokémon's rough skin damages attackers that make direct contact with it.",
+      "esES": "Hiere con su piel áspera al rival que lo ataque con un movimiento de contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "runaway": {
+      "en": "Enables a sure getaway from wild Pokémon.",
+      "esES": "Puede escaparse de todos los Pokémon salvajes.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sandstream": {
+      "en": "The Pokémon summons a sandstorm when it enters a battle.",
+      "esES": "Crea una tormenta de arena al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sandveil": {
+      "en": "Boosts the Pokémon's evasiveness in a sandstorm.",
+      "esES": "Aumenta su Evasión durante las tormentas de arena.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "serenegrace": {
+      "en": "Raises the likelihood of additional effects occurring when the Pokémon uses its moves.",
+      "esES": "Aumenta la probabilidad de que los movimientos causen efectos secundarios.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "shadowtag": {
+      "en": "The Pokémon steps on the opposing Pokémon's shadows to prevent them from fleeing or switching out.",
+      "esES": "Impide que el enemigo huya o sea cambiado por otro.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "shedskin": {
+      "en": "The Pokémon may cure its own status conditions by shedding its skin.",
+      "esES": "Puede curar sus problemas de estado al mudar la piel.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "shellarmor": {
+      "en": "A hard shell protects the Pokémon from critical hits.",
+      "esES": "La robusta coraza que lo protege bloquea los golpes críticos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "shielddust": {
+      "en": "Protective dust shields the Pokémon from the additional effects of moves.",
+      "esES": "El polvo de escamas que lo envuelve lo protege de los efectos secundarios de los ataques recibidos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "soundproof": {
+      "en": "Soundproofing gives the Pokémon full immunity to all sound-based moves.",
+      "esES": "Su aislamiento acústico lo protege de movimientos que usan sonido.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "speedboost": {
+      "en": "The Pokémon's Speed stat is boosted every turn.",
+      "esES": "Aumenta su Velocidad en cada turno.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "static": {
+      "en": "The Pokémon is charged with static electricity and may paralyze attackers that make direct contact with it.",
+      "esES": "La electricidad estática que lo envuelve puede paralizar al mínimo contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "stench": {
+      "en": "By releasing a stench when attacking, the Pokémon may cause the target to flinch.",
+      "esES": "Puede amedrentar al rival al atacarlo debido al mal olor que emana.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "stickyhold": {
+      "en": "The Pokémon's held items cling to its sticky body and cannot be removed by other Pokémon.",
+      "esES": "Los objetos se quedan pegados a su cuerpo, por lo que no pueden robárselos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sturdy": {
+      "en": "The Pokémon cannot be knocked out by a single hit as long as its HP is full. One-hit KO moves will also fail to knock it out.",
+      "esES": "Evita que el rival pueda debilitarlo de un solo golpe cuando tiene los PS al máximo. También evita los movimientos fulminantes.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "suctioncups": {
+      "en": "The Pokémon uses suction cups to stay in one spot. This protects it from moves and items that would force it to switch out.",
+      "esES": "Sus ventosas se aferran al suelo, con lo cual anula movimientos y objetos que fuerzan el relevo.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "swarm": {
+      "en": "Powers up Bug-type moves when the Pokémon's HP is low.",
+      "esES": "Potencia sus movimientos de tipo Bicho cuando le quedan pocos PS.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "swiftswim": {
+      "en": "Boosts the Pokémon's Speed stat in rain.",
+      "esES": "Sube su Velocidad cuando llueve.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "synchronize": {
+      "en": "If the Pokémon is burned, paralyzed, or poisoned by another Pokémon, that Pokémon will be inflicted with the same status condition.",
+      "esES": "Contagia el envenenamiento, las quemaduras o la parálisis al Pokémon que le cause ese estado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "thickfat": {
+      "en": "The Pokémon is protected by a layer of thick fat, which halves the damage taken from Fire- and Ice-type moves.",
+      "esES": "Gracias a la gruesa capa de grasa que lo protege, reduce a la mitad el daño que recibe de ataques de tipo Fuego o Hielo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "torrent": {
+      "en": "Powers up Water-type moves when the Pokémon's HP is low.",
+      "esES": "Potencia sus movimientos de tipo Agua cuando le quedan pocos PS.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "trace": {
+      "en": "When it enters a battle, the Pokémon copies an opposing Pokémon's Ability.",
+      "esES": "Al entrar en combate copia la habilidad del rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "truant": {
+      "en": "Each time the Pokémon uses a move, it spends the next turn loafing around.",
+      "esES": "Al ejecutar un movimiento, descansará en el turno siguiente.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "vitalspirit": {
+      "en": "The Pokémon is full of vitality, and that prevents it from falling asleep.",
+      "esES": "Su determinación le impide quedarse dormido.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "voltabsorb": {
+      "en": "If hit by an Electric-type move, the Pokémon has its HP restored instead of taking damage.",
+      "esES": "Si le alcanza un movimiento de tipo Eléctrico, recupera PS en vez de sufrir daño.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "waterabsorb": {
+      "en": "If hit by a Water-type move, the Pokémon has its HP restored instead of taking damage.",
+      "esES": "Si le alcanza un movimiento de tipo Agua, recupera PS en vez de sufrir daño.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "waterveil": {
+      "en": "The Pokémon's water veil prevents it from being burned.",
+      "esES": "Evita las quemaduras gracias a la capa de agua que lo envuelve.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "whitesmoke": {
+      "en": "The Pokémon is protected by its white smoke, which prevents other Pokémon from lowering its stats.",
+      "esES": "El humo blanco que lo protege evita que otros Pokémon le bajen las características.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "wonderguard": {
+      "en": "Its mysterious power only lets supereffective moves hit the Pokémon.",
+      "esES": "Gracias a un poder misterioso, solo le hacen daño los movimientos supereficaces.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "adaptability": {
+      "en": "Powers up moves of the same type as the Pokémon.",
+      "esES": "Potencia aún más los movimientos cuyo tipo coincida con el suyo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "aftermath": {
+      "en": "Damages the attacker if it knocks out the Pokémon with a move that makes direct contact.",
+      "esES": "Daña al agresor que le ha dado el golpe de gracia con un movimiento de contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "angerpoint": {
+      "en": "The Pokémon is angered when it takes a critical hit, and that maxes its Attack stat.",
+      "esES": "Si recibe un golpe crítico, monta en cólera y sube su Ataque hasta el máximo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "anticipation": {
+      "en": "The Pokémon can sense an opposing Pokémon's dangerous moves.",
+      "esES": "Prevé los movimientos peligrosos del rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "baddreams": {
+      "en": "Damages opposing Pokémon that are asleep.",
+      "esES": "Inflige daño a cualquier rival que esté dormido.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "download": {
+      "en": "The Pokémon compares an opposing Pokémon's Defense and Sp. Def stats before raising its own Attack or Sp. Atk stat—whichever will be more effective.",
+      "esES": "Compara la Defensa y la Defensa Especial del rival para ver cuál es inferior y aumenta su propio Ataque o Ataque Especial según sea lo más eficaz.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "dryskin": {
+      "en": "Restores the Pokémon's HP in rain or when it is hit by Water-type moves. Reduces HP in harsh sunlight, and increases the damage received from Fire-type moves.",
+      "esES": "Pierde PS si hace sol y los recupera si llueve o recibe un movimiento de tipo Agua. Los movimientos de tipo Fuego, por su parte, le hacen más daño de lo normal.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "filter": {
+      "en": "Reduces the power of supereffective attacks that hit the Pokémon.",
+      "esES": "Mitiga el daño que le infligen los movimientos supereficaces.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "flowergift": {
+      "en": "Boosts the Attack and Sp. Def stats of itself and allies in harsh sunlight.",
+      "esES": "Si hace sol, aumenta su Ataque y su Defensa Especial, así como los de sus aliados.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "forewarn": {
+      "en": "When it enters a battle, the Pokémon can tell one of the moves an opposing Pokémon has.",
+      "esES": "Indica el movimiento más potente del rival al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "frisk": {
+      "en": "When it enters a battle, the Pokémon can check an opposing Pokémon's held item.",
+      "esES": "Puede ver el objeto que lleva el rival al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "gluttony": {
+      "en": "If the Pokémon is holding a Berry to be eaten when its HP is low, it will instead eat the Berry when its HP drops to half or less.",
+      "esES": "Cuando sus PS se ven reducidos a la mitad, engulle la baya que normalmente solo se comería cuando le quedasen pocos PS.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "heatproof": {
+      "en": "The Pokémon's heatproof body halves the damage taken from Fire-type moves.",
+      "esES": "Su cuerpo, resistente al calor, reduce a la mitad el daño recibido por movimientos de tipo Fuego.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "honeygather": {
+      "en": "The Pokémon may gather Honey after a battle.",
+      "esES": "Puede que encuentre Miel una vez concluido el combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "hydration": {
+      "en": "Cures the Pokémon's status conditions in rain.",
+      "esES": "Cura los problemas de estado si está lloviendo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "icebody": {
+      "en": "The Pokémon gradually regains HP in snow.",
+      "esES": "Recupera PS de forma gradual cuando hay tormentas de granizo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "ironfist": {
+      "en": "Powers up punching moves.",
+      "esES": "Aumenta la potencia de los puñetazos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "klutz": {
+      "en": "The Pokémon can't use any held items.",
+      "esES": "No puede usar objetos equipados.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "leafguard": {
+      "en": "Prevents status conditions in harsh sunlight.",
+      "esES": "Evita los problemas de estado si hace sol.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "magicguard": {
+      "en": "The Pokémon only takes damage from attacks.",
+      "esES": "Solo recibe daño de ataques.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "moldbreaker": {
+      "en": "The Pokémon's moves are unimpeded by the Ability of the target.",
+      "esES": "Las habilidades del objetivo no afectan a los movimientos que emplea.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "motordrive": {
+      "en": "The Pokémon takes no damage when hit by Electric-type moves. Instead, its Speed stat is boosted.",
+      "esES": "Si le alcanza un movimiento de tipo Eléctrico, le sube la Velocidad en vez de sufrir daño.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "multitype": {
+      "en": "Changes the Pokémon's type to match the plate it holds.",
+      "esES": "Cambia su tipo al de la tabla o al del Cristal Z que lleve.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "noguard": {
+      "en": "The Pokémon employs no-guard tactics to ensure incoming and outgoing attacks always land.",
+      "esES": "Al quedar ambos expuestos, tanto sus movimientos como los del rival acertarán siempre.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "normalize": {
+      "en": "All the Pokémon’s moves become Normal type. The power of those moves is boosted a little.",
+      "esES": "Hace que todos sus movimientos se vuelvan de tipo Normal y aumenten ligeramente su potencia.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "poisonheal": {
+      "en": "If poisoned, the Pokémon has its HP restored instead of taking damage.",
+      "esES": "Si resulta envenenado, recupera PS en vez de perderlos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "quickfeet": {
+      "en": "Boosts the Speed stat if the Pokémon has a status condition.",
+      "esES": "Aumenta la Velocidad si sufre problemas de estado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "reckless": {
+      "en": "Powers up moves that have recoil damage.",
+      "esES": "Potencia los movimientos que también dañan al usuario.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "rivalry": {
+      "en": "The Pokémon's competitive spirit makes it deal more damage to Pokémon of the same gender, but less damage to Pokémon of the opposite gender.",
+      "esES": "Si el objetivo es del mismo sexo, su competitividad le lleva a infligir más daño. Si es del sexo contrario, en cambio, el daño será menor.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "scrappy": {
+      "en": "The Pokémon can hit Ghost-type Pokémon with Normal- and Fighting-type moves. It is also unaffected by Intimidate.",
+      "esES": "Puede alcanzar a Pokémon de tipo Fantasma con movimientos de tipo Normal o Lucha.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "simple": {
+      "en": "Doubles the effects of the Pokémon's stat changes.",
+      "esES": "Duplica los cambios en las características.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "skilllink": {
+      "en": "Maximizes the number of times multistrike moves hit.",
+      "esES": "Ejecuta siempre los movimientos múltiples con el número máximo de golpes.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "slowstart": {
+      "en": "For five turns, the Pokémon's Attack and Speed stats are halved.",
+      "esES": "Baja a la mitad su Ataque y su Velocidad durante cinco turnos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sniper": {
+      "en": "If the Pokémon's attack lands a critical hit, the attack is powered up even further.",
+      "esES": "Potencia los golpes críticos que asesta aún más de lo normal.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "snowcloak": {
+      "en": "Boosts the Pokémon's evasiveness in snow.",
+      "esES": "Sube la Evasión cuando graniza.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "snowwarning": {
+      "en": "The Pokémon makes it snow when it enters a battle.",
+      "esES": "Invoca una tormenta de granizo al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "solarpower": {
+      "en": "In harsh sunlight, the Pokémon's Sp. Atk stat is boosted, but its HP decreases every turn.",
+      "esES": "Si hace sol, aumenta su Ataque Especial, pero pierde PS en cada turno.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "solidrock": {
+      "en": "Reduces the power of supereffective attacks that hit the Pokémon.",
+      "esES": "Mitiga el daño que le infligen los movimientos supereficaces.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "stall": {
+      "en": "The Pokémon is always the last to use its moves.",
+      "esES": "Ejecuta su movimiento tras todos los demás.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "steadfast": {
+      "en": "The Pokémon's determination boosts its Speed stat every time it flinches.",
+      "esES": "Cada vez que se amedrenta sube su Velocidad, debido a su voluntad inquebrantable.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "stormdrain": {
+      "en": "The Pokémon draws in all Water-type moves. Instead of taking damage from them, its Sp. Atk stat is boosted.",
+      "esES": "Atrae y neutraliza los movimientos de tipo Agua, que además le suben el Ataque Especial.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "superluck": {
+      "en": "The Pokémon is so lucky that the critical-hit ratios of its moves are boosted.",
+      "esES": "Su buena suerte aumenta la probabilidad de asestar golpes críticos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "tangledfeet": {
+      "en": "Boosts the Pokémon's evasiveness if it is confused.",
+      "esES": "Sube su Evasión si está confuso.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "technician": {
+      "en": "Powers up weak moves so the Pokémon can deal more damage with them.",
+      "esES": "Potencia sus movimientos más débiles.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "tintedlens": {
+      "en": "The Pokémon can use “not very effective” moves to deal regular damage.",
+      "esES": "Potencia los movimientos que no son muy eficaces, que infligen ahora un daño normal.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "unaware": {
+      "en": "When attacking, the Pokémon ignores the target's stat changes.",
+      "esES": "Pasa por alto las mejoras en las características del rival al atacar.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "unburden": {
+      "en": "Boosts the Speed stat if the Pokémon's held item is used or lost.",
+      "esES": "Sube su Velocidad si usa o pierde el objeto que lleva.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "analytic": {
+      "en": "Boosts the power of the Pokémon's move if it is the last to act that turn.",
+      "esES": "Aumenta la potencia de su movimiento si es el último en atacar.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "bigpecks": {
+      "en": "Prevents the Pokémon from having its Defense stat lowered.",
+      "esES": "Impide que el rival le baje la Defensa.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "contrary": {
+      "en": "Reverses any stat changes affecting the Pokémon so that attempts to boost its stats instead lower them—and attempts to lower its stats will boost them.",
+      "esES": "Invierte los cambios en las características: bajan cuando les toca subir y suben cuando les toca bajar.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "cursedbody": {
+      "en": "May disable a move that has dealt damage to the Pokémon.",
+      "esES": "Puede anular el movimiento usado en su contra.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "defeatist": {
+      "en": "Halves the Pokémon’s Attack and Sp. Atk stats when its HP becomes half or less.",
+      "esES": "Se debilita tanto cuando sus PS se ven reducidos a la mitad que su Ataque y su Ataque Especial bajan.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "defiant": {
+      "en": "If the Pokémon has any stat lowered by an opposing Pokémon, its Attack stat will be boosted sharply.",
+      "esES": "Sube mucho su Ataque cuando el rival le baja las características.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "flareboost": {
+      "en": "Powers up special moves when the Pokémon is burned.",
+      "esES": "Aumenta la potencia de sus ataques especiales cuando sufre quemaduras.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "friendguard": {
+      "en": "Reduces damage dealt to allies.",
+      "esES": "Reduce el daño que sufren los aliados.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "harvest": {
+      "en": "May create another Berry after one is used.",
+      "esES": "Puede reutilizar varias veces una misma baya.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "healer": {
+      "en": "Sometimes cures the status conditions of the Pokémon's allies.",
+      "esES": "A veces cura los problemas de estado de un aliado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "heavymetal": {
+      "en": "Doubles the Pokémon's weight.",
+      "esES": "Duplica su peso.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "illusion": {
+      "en": "The Pokémon fools opponents by entering battle disguised as the last Pokémon in its Trainer's party.",
+      "esES": "Adopta el aspecto del último Pokémon del equipo al entrar en combate para desconcertar al rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "imposter": {
+      "en": "The Pokémon transforms itself into the Pokémon it's facing.",
+      "esES": "Se transforma en el Pokémon que tiene enfrente.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "infiltrator": {
+      "en": "The Pokémon's moves are unaffected by the target's barriers, substitutes, and the like.",
+      "esES": "Ataca sorteando la barrera o el sustituto del rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "ironbarbs": {
+      "en": "Inflicts damage on the attacker upon contact with iron barbs.",
+      "esES": "Inflige daño al rival si este le golpea con un movimiento de contacto.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "lightmetal": {
+      "en": "Halves the Pokémon's weight.",
+      "esES": "Reduce a la mitad su peso.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "justified": {
+      "en": "When the Pokémon is hit by a Dark-type attack, its Attack stat is boosted by its sense of justice.",
+      "esES": "Si le alcanza un movimiento de tipo Siniestro, aumenta el Ataque debido a su integridad.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "magicbounce": {
+      "en": "The Pokémon reflects status moves instead of getting hit by them.",
+      "esES": "Puede devolver los movimientos de estado lanzados por el rival, sin verse afectado por ellos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "moody": {
+      "en": "Every turn, one of the Pokémon's stats will be boosted sharply but another stat will be lowered.",
+      "esES": "Una característica le sube mucho en cada turno, pero le baja otra.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "moxie": {
+      "en": "When the Pokémon knocks out a target, it shows moxie, which boosts its Attack stat.",
+      "esES": "Al debilitar a un objetivo, su confianza se refuerza de tal manera que aumenta su Ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "multiscale": {
+      "en": "Reduces the amount of damage the Pokémon takes while its HP is full.",
+      "esES": "Reduce el daño que sufre si sus PS están al máximo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "mummy": {
+      "en": "Contact with the Pokémon changes the attacker’s Ability to Mummy.",
+      "esES": "Contagia la habilidad Momia al rival que entre en contacto con él.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "overcoat": {
+      "en": "The Pokémon takes no damage from sandstorms. It is also protected from the effects of powders and spores.",
+      "esES": "No le afectan las tormentas de arena, el granizo y los movimientos con polvos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "pickpocket": {
+      "en": "The Pokémon steals the held item from attackers that made direct contact with it.",
+      "esES": "Si el rival usa un movimiento de contacto al atacar, le roba el objeto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "poisontouch": {
+      "en": "May poison a target when the Pokémon makes contact.",
+      "esES": "Puede envenenar al objetivo con solo tocarlo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "prankster": {
+      "en": "Gives priority to the Pokémon's status moves.",
+      "esES": "Sus movimientos de estado tienen prioridad alta.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "rattled": {
+      "en": "The Pokémon gets scared when hit by a Dark-, Ghost-, or Bug-type attack or if intimidated, which boosts its Speed stat.",
+      "esES": "Si le alcanza un movimiento de tipo Siniestro, Bicho o Fantasma, el miedo hace que le suba la Velocidad.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "regenerator": {
+      "en": "The Pokémon has a little of its HP restored when withdrawn from battle.",
+      "esES": "Recupera unos pocos PS al ser cambiado por otro Pokémon.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sandforce": {
+      "en": "Boosts the power of Rock-, Ground-, and Steel-type moves in a sandstorm.",
+      "esES": "Potencia los movimientos de tipo Tierra, Acero y Roca durante las tormentas de arena.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sandrush": {
+      "en": "Boosts the Pokémon's Speed stat in a sandstorm.",
+      "esES": "Aumenta su Velocidad durante las tormentas de arena.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sapsipper": {
+      "en": "The Pokémon takes no damage when hit by Grass-type moves. Instead, its Attack stat is boosted.",
+      "esES": "Neutraliza los movimientos de tipo Planta y sube su Ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sheerforce": {
+      "en": "Removes any additional effects from the Pokémon's moves, but increases the moves' power.",
+      "esES": "Sube la potencia de sus movimientos en detrimento de los efectos secundarios, que se ven anulados.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "telepathy": {
+      "en": "The Pokémon anticipates and dodges the attacks of its allies.",
+      "esES": "Elude los ataques de los aliados durante el combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "teravolt": {
+      "en": "The Pokémon's moves are unimpeded by the Ability of the target.",
+      "esES": "Las habilidades del objetivo no afectan a los movimientos que emplea.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "toxicboost": {
+      "en": "Powers up physical moves when the Pokémon is poisoned.",
+      "esES": "Aumenta la potencia de sus ataques físicos cuando está envenenado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "turboblaze": {
+      "en": "The Pokémon's moves are unimpeded by the Ability of the target.",
+      "esES": "Las habilidades del objetivo no afectan a los movimientos que emplea.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "unnerve": {
+      "en": "Unnerves opposing Pokémon and makes them unable to eat Berries.",
+      "esES": "Pone nervioso al rival y le impide usar bayas.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "victorystar": {
+      "en": "Boosts the accuracy of its allies and itself.",
+      "esES": "Sube su Precisión y la de sus aliados.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "weakarmor": {
+      "en": "The Pokémon's Defense stat is lowered when it takes damage from physical moves, but its Speed stat is sharply boosted.",
+      "esES": "Al recibir daño de un ataque físico, le baja la Defensa, pero le sube mucho la Velocidad.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "wonderskin": {
+      "en": "Makes status moves more likely to miss the Pokémon.",
+      "esES": "Presenta una mayor resistencia ante los movimientos de estado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "zenmode": {
+      "en": "Changes the Pokémon’s shape when HP is half or less.",
+      "esES": "Cambia de forma si sus PS se ven reducidos a la mitad.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "aerilate": {
+      "en": "Normal-type moves become Flying-type moves. The power of those moves is boosted a little.",
+      "esES": "Convierte los movimientos de tipo Normal en tipo Volador y aumenta ligeramente su potencia.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "aurabreak": {
+      "en": "The effects of “Aura” Abilities are reversed to lower the power of affected moves.",
+      "esES": "Invierte los efectos de las auras, por lo que baja la potencia de ciertos movimientos en vez de subirla.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "aromaveil": {
+      "en": "Protects the Pokémon and its allies from effects that prevent the use of moves.",
+      "esES": "Se protege a sí mismo y a sus aliados de ataques que impiden elegir movimientos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "bulletproof": {
+      "en": "Protects the Pokémon from ball and bomb moves.",
+      "esES": "No le afectan las bombas ni algunos proyectiles.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "cheekpouch": {
+      "en": "The Pokémon's HP is restored when it eats any Berry, in addition to the Berry's usual effect.",
+      "esES": "Recupera PS al comer cualquier baya.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "competitive": {
+      "en": "Boosts the Pokémon's Sp. Atk stat sharply when its stats are lowered by an opposing Pokémon.",
+      "esES": "Aumenta mucho su Ataque Especial cuando el rival le baja cualquiera de sus características.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "darkaura": {
+      "en": "Powers up each Pokémon’s Dark-type moves.",
+      "esES": "Aumenta la potencia de todos los movimientos de tipo Siniestro.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "deltastream": {
+      "en": "The Pokémon changes the weather to eliminate all of the Flying type’s weaknesses.",
+      "esES": "Altera el clima para anular las vulnerabilidades del tipo Volador.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "desolateland": {
+      "en": "The Pokémon changes the weather to nullify Water-type attacks.",
+      "esES": "Altera el clima para anular los ataques de tipo Agua.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "fairyaura": {
+      "en": "Powers up each Pokémon’s Fairy-type moves.",
+      "esES": "Aumenta la potencia de todos los movimientos de tipo Hada.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "flowerveil": {
+      "en": "Ally Grass-type Pokémon are protected from status conditions and the lowering of their stats.",
+      "esES": "Evita que los Pokémon de tipo Planta aliados sufran problemas de estado o que les bajen sus características.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "furcoat": {
+      "en": "Halves the damage from physical moves.",
+      "esES": "Reduce a la mitad el daño que recibe de ataques físicos del rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "galewings": {
+      "en": "Gives priority to the Pokémon's Flying-type moves while its HP is full.",
+      "esES": "Da prioridad a los movimientos de tipo Volador si sus PS están al máximo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "gooey": {
+      "en": "Contact with the Pokémon lowers the attacker's Speed stat.",
+      "esES": "Baja la Velocidad del rival cuando este le ataca con un movimiento de contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "grasspelt": {
+      "en": "Boosts the Pokémon's Defense stat on Grassy Terrain.",
+      "esES": "Aumenta su Defensa si hay un campo de hierba en el terreno de combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "magician": {
+      "en": "The Pokémon steals the held item from any target it hits with a move.",
+      "esES": "Roba el objeto del Pokémon al que alcance con un movimiento.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "megalauncher": {
+      "en": "Powers up pulse moves.",
+      "esES": "Aumenta la potencia de algunos movimientos de pulsos y auras.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "parentalbond": {
+      "en": "Parent and child each attacks.",
+      "esES": "Une fuerzas con su cría y ataca dos veces.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "pixilate": {
+      "en": "Normal-type moves become Fairy-type moves. The power of those moves is boosted a little.",
+      "esES": "Convierte los movimientos de tipo Normal en tipo Hada y aumenta ligeramente su potencia.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "primordialsea": {
+      "en": "The Pokémon changes the weather to nullify Fire-type attacks.",
+      "esES": "Altera el clima para anular los ataques de tipo Fuego.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "protean": {
+      "en": "Changes the Pokémon's type to the type of the move it's about to use. This works only once each time the Pokémon enters battle.",
+      "esES": "Cambia su tipo al del movimiento que va a usar.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "refrigerate": {
+      "en": "Normal-type moves become Ice-type moves. The power of those moves is boosted a little.",
+      "esES": "Convierte los movimientos de tipo Normal en tipo Hielo y aumenta ligeramente su potencia.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "stancechange": {
+      "en": "The Pokémon changes its form to Blade Forme when it uses an attack move and changes to Shield Forme when it uses King’s Shield.",
+      "esES": "Adopta la Forma Filo al lanzar un ataque, o bien la Forma Escudo si usa el movimiento Escudo Real.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "strongjaw": {
+      "en": "The Pokémon's strong jaw boosts the power of its biting moves.",
+      "esES": "Su robusta mandíbula le confiere una mordedura potente.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sweetveil": {
+      "en": "Prevents the Pokémon and its allies from falling asleep.",
+      "esES": "No cae dormido y evita también que sus aliados se duerman.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "symbiosis": {
+      "en": "The Pokémon passes its held item to an ally that has used up an item.",
+      "esES": "Pasa su objeto a un aliado que ya haya utilizado el suyo.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "toughclaws": {
+      "en": "Powers up moves that make direct contact.",
+      "esES": "Aumenta la potencia de los movimientos de contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "battery": {
+      "en": "Powers up ally Pokémon's special moves.",
+      "esES": "Potencia los ataques especiales de los aliados.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "battlebond": {
+      "en": "When the Pokémon knocks out a target, its bond with its Trainer is strengthened, and its Attack, Sp. Atk, and Speed stats are boosted.",
+      "esES": "Al derrotar a un rival, los vínculos con su Entrenador se refuerzan y se convierte en Greninja Ash. Su Shuriken de Agua también se ve potenciado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "beastboost": {
+      "en": "The Pokémon boosts its most proficient stat each time it knocks out a Pokémon.",
+      "esES": "Si derrota a un rival en ese turno, aumenta su característica más fuerte.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "berserk": {
+      "en": "Boosts the Pokémon's Sp. Atk stat when it takes a hit that causes its HP to drop to half or less.",
+      "esES": "Aumenta su Ataque Especial si sus PS se ven reducidos a la mitad debido a algún ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "comatose": {
+      "en": "The Pokémon is always drowsing and will never wake up. It can attack while in its sleeping state.",
+      "esES": "No despierta jamás de su profundo letargo e incluso ataca dormido.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "corrosion": {
+      "en": "The Pokémon can poison the target even if it's a Steel or Poison type.",
+      "esES": "Puede envenenar incluso a rivales de tipo Acero o Veneno.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "dancer": {
+      "en": "Whenever a dance move is used in battle, the Pokémon will copy the user to immediately perform that dance move itself.",
+      "esES": "Puede copiar inmediatamente cualquier movimiento de baile que haya usado otro Pokémon presente en el combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "dazzling": {
+      "en": "The Pokémon dazzles its opponents, making them unable to use priority moves against the Pokémon or its allies.",
+      "esES": "Desconcierta al rival y le impide utilizar movimientos con prioridad en su contra.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "disguise": {
+      "en": "Once per battle, the shroud that covers the Pokémon can protect it from an attack.",
+      "esES": "Puede eludir un ataque valiéndose de la tela que le cubre el cuerpo una vez por combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "electricsurge": {
+      "en": "Turns the ground into Electric Terrain when the Pokémon enters a battle.",
+      "esES": "Crea un campo eléctrico al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "emergencyexit": {
+      "en": "The Pokémon, sensing danger, switches out when its HP becomes half or less.",
+      "esES": "Abandona el terreno de combate cuando sus PS se ven reducidos a la mitad para evitar males mayores.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "fluffy": {
+      "en": "Halves the damage taken from moves that make direct contact, but doubles that of Fire-type moves.",
+      "esES": "Reduce a la mitad el daño provocado por los movimientos de contacto, pero duplica el infligido por los de tipo Fuego.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "fullmetalbody": {
+      "en": "Prevents other Pokémon’s moves or Abilities from lowering the Pokémon’s stats.",
+      "esES": "Evita que bajen sus características a causa de movimientos o habilidades de otros Pokémon.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "galvanize": {
+      "en": "Normal-type moves become Electric-type moves. The power of those moves is boosted a little.",
+      "esES": "Convierte los movimientos de tipo Normal en tipo Eléctrico y aumenta ligeramente su potencia.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "grassysurge": {
+      "en": "Turns the ground into Grassy Terrain when the Pokémon enters a battle.",
+      "esES": "Crea un campo de hierba al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "innardsout": {
+      "en": "Damages the attacker landing the finishing hit by the amount equal to its last HP.",
+      "esES": "Al caer debilitado, inflige al rival un daño equivalente a los PS que le quedaran.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "liquidvoice": {
+      "en": "Sound-based moves become Water-type moves.",
+      "esES": "Hace que todos sus movimientos que usan sonido pasen a ser de tipo Agua.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "longreach": {
+      "en": "The Pokémon uses its moves without making contact with the target.",
+      "esES": "Puede usar cualquier movimiento sin entrar en contacto con el rival.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "merciless": {
+      "en": "The Pokémon's attacks become critical hits if the target is poisoned.",
+      "esES": "Hace que sus movimientos asesten siempre un golpe crítico si el rival está envenenado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "mistysurge": {
+      "en": "Turns the ground into Misty Terrain when the Pokémon enters a battle.",
+      "esES": "Crea un campo de niebla al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "neuroforce": {
+      "en": "Powers up moves that are super effective.",
+      "esES": "Potencia los ataques supereficaces.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "powerconstruct": {
+      "en": "Other Cells gather to aid when its HP becomes half or less. Then the Pokémon changes its form to Complete Forme.",
+      "esES": "Cuando sus PS se ven reducidos a la mitad, las células se reagrupan y adopta su Forma Completa.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "powerofalchemy": {
+      "en": "The Pokémon copies the Ability of a defeated ally.",
+      "esES": "Reacciona copiando la habilidad de un aliado debilitado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "prismarmor": {
+      "en": "Reduces the power of supereffective attacks taken.",
+      "esES": "Mitiga el daño que le infligen los movimientos supereficaces.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "psychicsurge": {
+      "en": "Turns the ground into Psychic Terrain when the Pokémon enters a battle.",
+      "esES": "Crea un campo psíquico al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "queenlymajesty": {
+      "en": "When the Pokémon uses Surf or Dive, it will come back with prey. When it takes damage, it will spit out the prey to attack.",
+      "esES": "Intimida al objetivo y le impide usar movimientos con prioridad.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "rkssystem": {
+      "en": "Changes the Pokémon’s type to match the memory disc it holds.",
+      "esES": "Cambia su tipo según el disco que lleve instalado.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "receiver": {
+      "en": "The Pokémon copies the Ability of a defeated ally.",
+      "esES": "Adquiere la habilidad de un aliado debilitado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "schooling": {
+      "en": "When it has a lot of HP, the Pokémon forms a powerful school. It stops schooling when its HP is low.",
+      "esES": "Forma bancos con sus congéneres cuando tiene muchos PS, lo cual le otorga más fuerza. Cuando le quedan pocos PS, el banco se dispersa.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "shadowshield": {
+      "en": "Reduces the amount of damage the Pokémon takes while its HP is full.",
+      "esES": "Reduce el daño que sufre si sus PS están al máximo.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "shieldsdown": {
+      "en": "When its HP drops to half or less, the Pokémon's shell breaks and it becomes aggressive.",
+      "esES": "Rompe su coraza cuando sus PS se ven reducidos a la mitad y adopta una forma ofensiva.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "slushrush": {
+      "en": "Boosts the Pokémon's Speed stat in snow.",
+      "esES": "Aumenta su Velocidad si está granizando.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "stamina": {
+      "en": "Boosts the Defense stat when the Pokémon is hit by an attack.",
+      "esES": "Aumenta su Defensa al recibir un ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "stakeout": {
+      "en": "Doubles the damage dealt to a target that has just switched into battle.",
+      "esES": "Si el objetivo de su ataque es sustituido por otro, duplica el daño que infligirá.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "steelworker": {
+      "en": "Powers up Steel-type moves.",
+      "esES": "Potencia los movimientos de tipo Acero.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "soulheart": {
+      "en": "Boosts the Pokémon's Sp. Atk stat every time another Pokémon faints.",
+      "esES": "Aumenta su Ataque Especial cada vez que un Pokémon cae debilitado.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "surgesurfer": {
+      "en": "Doubles the Pokémon's Speed stat on Electric Terrain.",
+      "esES": "Duplica su Velocidad si hay un campo eléctrico en el terreno de combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "tanglinghair": {
+      "en": "Contact with the Pokémon lowers the attacker's Speed stat.",
+      "esES": "Baja la Velocidad del rival cuando este le ataca con un movimiento de contacto.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "triage": {
+      "en": "Gives priority to the Pokémon's healing moves.",
+      "esES": "Da prioridad a los movimientos que restauran PS.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "waterbubble": {
+      "en": "Lowers the power of Fire-type moves that hit the Pokémon and prevents it from being burned.",
+      "esES": "Reduce el daño que le provocan los movimientos de tipo Fuego y es inmune a las quemaduras.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "watercompaction": {
+      "en": "Boosts the Defense stat sharply when the Pokémon is hit by a Water-type move.",
+      "esES": "Aumenta mucho su Defensa si le alcanza un movimiento de tipo Agua.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "wimpout": {
+      "en": "The Pokémon cowardly switches out when its HP becomes half or less.",
+      "esES": "Se asusta y abandona el terreno de combate cuando sus PS se ven reducidos a la mitad.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "asoneglastrier": {
+      "en": "This Ability combines the effects of both Calyrex's Unnerve Ability and Glastrier's Chilling Neigh Ability.",
+      "esES": "El Pokémon tiene dos habilidades: Relincho Blanco de Glastrier y Nerviosismo de Calyrex.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "asonespectrier": {
+      "en": "This Ability combines the effects of both Calyrex's Unnerve Ability and Spectrier's Grim Neigh Ability.",
+      "esES": "El Pokémon tiene dos habilidades: Relincho Negro de Spectrier y Nerviosismo de Calyrex.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "ballfetch": {
+      "en": "If the Pokémon is not holding an item, it will fetch the Poké Ball from the first failed throw of the battle.",
+      "esES": "Si no lleva equipado ningún objeto, recupera la Poké Ball del primer intento de captura fallido.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "chillingneigh": {
+      "en": "When the Pokémon knocks out a target, it utters a chilling neigh, which boosts its Attack stat.",
+      "esES": "Al derrotar a un objetivo, emite un relincho gélido y aumenta su Ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "cottondown": {
+      "en": "When the Pokémon is hit by an attack, it scatters cotton fluff around and lowers the Speed stat of all Pokémon except itself.",
+      "esES": "Al ser alcanzado por un ataque, suelta una pelusa de algodón que reduce la Velocidad de todos los demás Pokémon.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "curiousmedicine": {
+      "en": "When the Pokémon enters a battle, it scatters medicine from its shell, which removes all stat changes from allies.",
+      "esES": "Al entrar en combate, rezuma una substancia medicinal por la caracola que revierte los cambios en las características de los aliados.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "dauntlessshield": {
+      "en": "Boosts the Pokémon’s Defense stat the first time the Pokémon enters a battle.",
+      "esES": "Aumenta su Defensa al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "dragonsmaw": {
+      "en": "Powers up Dragon-type moves.",
+      "esES": "Potencia los movimientos de tipo Dragón.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "gorillatactics": {
+      "en": "Boosts the Pokémon’s Attack stat but only allows the use of the first selected move.",
+      "esES": "Potencia su Ataque, pero solo puede usar el primer movimiento escogido.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "grimneigh": {
+      "en": "When the Pokémon knocks out a target, it utters a terrifying neigh, which boosts its Sp. Atk stat.",
+      "esES": "Al derrotar a un objetivo, emite un relincho aterrador y aumenta su Ataque Especial.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "gulpmissile": {
+      "en": "When the Pokémon uses Surf or Dive, it will come back with prey. When it takes damage, it will spit out the prey to attack.",
+      "esES": "Tras usar Surf o Buceo, emerge con una presa en la boca. Al recibir daño, ataca escupiéndola al rival.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "hungerswitch": {
+      "en": "The Pokémon changes its form, alternating between its Full Belly Mode and Hangry Mode after the end of every turn.",
+      "esES": "Alterna entre su Forma Saciada y Forma Voraz al final de cada turno.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "iceface": {
+      "en": "The Pokémon's ice head can take a physical attack as a substitute, but the attack also changes the Pokémon's appearance. The ice will be restored when it snows.",
+      "esES": "Absorbe el daño de un ataque físico con el hielo de la cabeza, tras lo cual cambia de forma. El hielo se regenerará la próxima vez que granice.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "icescales": {
+      "en": "The Pokémon is protected by ice scales, which halve the damage taken from special moves.",
+      "esES": "Las gélidas escamas que protegen su cuerpo reducen a la mitad el daño que le infligen los ataques especiales.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "intrepidsword": {
+      "en": "Boosts the Pokémon’s Attack stat the first time the Pokémon enters a battle.",
+      "esES": "Aumenta su Ataque al entrar en combate.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "libero": {
+      "en": "Changes the Pokémon's type to the type of the move it's about to use. This works only once each time the Pokémon enters battle.",
+      "esES": "Cambia su tipo al del movimiento que va a usar.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "mimicry": {
+      "en": "Changes the Pokémon’s type depending on the terrain.",
+      "esES": "Cambia su tipo según el campo que haya en el terreno de combate.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "mirrorarmor": {
+      "en": "Bounces back only the stat-lowering effects that the Pokémon receives.",
+      "esES": "Refleja los efectos que reducen las características.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "neutralizinggas": {
+      "en": "While the Pokémon is in the battle, the effects of all other Pokémon's Abilities will be nullified or will not be triggered.",
+      "esES": "Anula los efectos de las habilidades de los demás Pokémon presentes mientras esté en el terreno de combate.",
+      "sources": {
+        "en": "the-teal-mask",
+        "esES": "sword-shield"
+      }
+    },
+    "pastelveil": {
+      "en": "Protects the Pokémon and its ally Pokémon from being poisoned.",
+      "esES": "Se protege a sí mismo y a sus aliados del envenenamiento.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "perishbody": {
+      "en": "When hit by a move that makes direct contact, the Pokémon and the attacker will faint after three turns unless they switch out of battle.",
+      "esES": "Si le alcanza un movimiento de contacto, se debilitará al cabo de 3 turnos, así como su agresor, a menos que abandonen el terreno de combate.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "powerspot": {
+      "en": "Just being next to the Pokémon powers up moves.",
+      "esES": "Potencia los movimientos de los Pokémon adyacentes.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "propellertail": {
+      "en": "Ignores the effects of opposing Pokémon's Abilities and moves that draw in moves.",
+      "esES": "Impide que el rival pueda atraer ataques hacia sí mismo por efecto de su habilidad o sus movimientos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "punkrock": {
+      "en": "Boosts the power of sound-based moves. The Pokémon also takes half the damage from these kinds of moves.",
+      "esES": "Potencia los movimientos que usan sonido y reduce a la mitad el daño que le infligen dichos movimientos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "quickdraw": {
+      "en": "Enables the Pokémon to move first occasionally.",
+      "esES": "A veces, puede atacar el primero.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "ripen": {
+      "en": "Ripens Berries and doubles their effect.",
+      "esES": "Hace madurar las bayas, por lo que duplica sus efectos.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "sandspit": {
+      "en": "The Pokémon creates a sandstorm when it's hit by an attack.",
+      "esES": "Provoca una tormenta de arena al recibir un ataque.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "screencleaner": {
+      "en": "When the Pokémon enters a battle, the effects of Light Screen, Reflect, and Aurora Veil are nullified for both opposing and ally Pokémon.",
+      "esES": "Anula los efectos de Pantalla de Luz, Reflejo y Velo Aurora tanto de rivales como de aliados al entrar en combate.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    },
+    "stalwart": {
+      "en": "Ignores the effects of opposing Pokémon's Abilities and moves that draw in moves.",
+      "esES": "Impide que el rival pueda atraer ataques hacia sí mismo por efecto de su habilidad o sus movimientos.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "steamengine": {
+      "en": "Boosts the Speed stat drastically when the Pokémon is hit by a Fire- or Water-type move.",
+      "esES": "Si le alcanza un movimiento de tipo Fuego o Agua, le sube muchísimo la Velocidad.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "steelyspirit": {
+      "en": "Powers up the Steel-type moves of the Pokémon and its allies.",
+      "esES": "Potencia los movimientos de tipo Acero de los aliados.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "transistor": {
+      "en": "Powers up Electric-type moves.",
+      "esES": "Potencia los movimientos de tipo Eléctrico.",
+      "sources": {
+        "en": "scarlet-violet",
+        "esES": "sword-shield"
+      }
+    },
+    "unseenfist": {
+      "en": "If the Pokémon uses moves that make direct contact, it can attack the target even if the target protects itself.",
+      "esES": "Si usa un movimiento de contacto, puede infligir daño al objetivo aunque este se proteja.",
+      "sources": {
+        "en": "the-indigo-disk",
+        "esES": "sword-shield"
+      }
+    },
+    "wanderingspirit": {
+      "en": "The Pokémon exchanges Abilities with a Pokémon that hits it with a move that makes direct contact.",
+      "esES": "Si le alcanza un movimiento de contacto, intercambia su habilidad con la del agresor.",
+      "sources": {
+        "en": "sword-shield",
+        "esES": "sword-shield"
+      }
+    }
+  },
+  "unavailable": [
+    {
+      "name": "Persistent",
+      "reason": "No official bilingual ability resource is present in the pinned PokéAPI revision."
+    },
+    {
+      "name": "Rebound",
+      "reason": "No official bilingual ability resource is present in the pinned PokéAPI revision."
+    },
+    {
+      "name": "mountaineer",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "anger-shell",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "armor-tail",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "beads-of-ruin",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "commander",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "costar",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "cud-chew",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "earth-eater",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "electromorphosis",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "embody-aspect",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "good-as-gold",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "guard-dog",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "hadron-engine",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "hospitality",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "lingering-aroma",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "minds-eye",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "mycelium-might",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "opportunist",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "orichalcum-pulse",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "poison-puppeteer",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "protosynthesis",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "purifying-salt",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "quark-drive",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "rocky-payload",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "seed-sower",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "sharpness",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "supersweet-syrup",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "supreme-overlord",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "sword-of-ruin",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "tablets-of-ruin",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "tera-shell",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "tera-shift",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "teraform-zero",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "thermal-exchange",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "toxic-chain",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "toxic-debris",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "vessel-of-ruin",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "well-baked-body",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "wind-power",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "wind-rider",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "zero-to-hero",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "aura-guard",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "dragonize",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "eelevate",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "fire-mane",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "mega-sol",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "piercing-drill",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    },
+    {
+      "name": "spicy-spray",
+      "reason": "No bilingual game flavor text is present for Scarlet/Violet or an earlier version group in the pinned PokéAPI revision."
+    }
+  ]
+}

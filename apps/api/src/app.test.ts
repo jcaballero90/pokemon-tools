@@ -1,10 +1,80 @@
 import { describe, expect, it } from "vitest";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { buildApp } from "./app.js";
 import { createDb } from "./db.js";
 import { readConfig } from "./config.js";
 import { apiErrorResponseSchema } from "@pokemon-tools/contracts";
+import { pokedexMovesResponseSchema } from "@pokemon-tools/contracts";
 
 describe("API composition", () => {
+  it("serves runtime site metadata, an environment-specific robots file, and a Pokédex sitemap", async () => {
+    const config = readConfig({
+      NODE_ENV: "test", DEPLOY_ENV: "production", DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+      BETTER_AUTH_SECRET: "a-secret-with-more-than-thirty-two-characters", PUBLIC_BASE_URL: "https://pokemon.example"
+    });
+    const db = createDb(config.DATABASE_URL);
+    const app = await buildApp(config, db);
+    try {
+      const siteConfig = await app.inject("/api/site-config");
+      expect(siteConfig.json()).toEqual({ publicBaseUrl: "https://pokemon.example", deployEnv: "production" });
+
+      const robots = await app.inject("/robots.txt");
+      expect(robots.statusCode).toBe(200);
+      expect(robots.body).toContain("Allow: /");
+      expect(robots.body).toContain("Sitemap: https://pokemon.example/sitemap.xml");
+
+      const sitemap = await app.inject("/sitemap.xml");
+      expect(sitemap.statusCode).toBe(200);
+      expect(sitemap.headers["content-type"]).toContain("application/xml");
+      expect(sitemap.body).toContain("https://pokemon.example/pokedex/abra");
+      expect(sitemap.body).toContain("https://pokemon.example/pokedex/mr-mime");
+      expect(sitemap.body).toContain("https://pokemon.example/pokedex/nidoran-f");
+      expect(sitemap.body).toContain("https://pokemon.example/pokedex/farfetchd");
+      expect(sitemap.body).toContain("https://pokemon.example/pokedex/charizard-mega-x");
+    } finally { await app.close(); await db.$disconnect(); }
+  });
+
+  it("prevents staging from being indexed", async () => {
+    const config = readConfig({
+      NODE_ENV: "test", DEPLOY_ENV: "staging", DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+      BETTER_AUTH_SECRET: "a-secret-with-more-than-thirty-two-characters", PUBLIC_BASE_URL: "https://staging.pokemon.example"
+    });
+    const db = createDb(config.DATABASE_URL);
+    const app = await buildApp(config, db);
+    try {
+      const robots = await app.inject("/robots.txt");
+      expect(robots.statusCode).toBe(200);
+      expect(robots.body).toContain("Disallow: /");
+      expect(robots.body).not.toContain("Sitemap:");
+    } finally { await app.close(); await db.$disconnect(); }
+  });
+
+  it("returns the SPA document for valid Pokédex slugs and HTTP 404 for unknown ones", async () => {
+    const staticDirectory = await mkdtemp(join(tmpdir(), "pokemon-tools-spa-"));
+    await writeFile(join(staticDirectory, "index.html"), "<!doctype html><main>Pokémon Tools shell</main>");
+    const config = readConfig({
+      NODE_ENV: "test", DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+      BETTER_AUTH_SECRET: "a-secret-with-more-than-thirty-two-characters", PUBLIC_BASE_URL: "http://localhost:4000", STATIC_DIR: staticDirectory
+    });
+    const db = createDb(config.DATABASE_URL);
+    const app = await buildApp(config, db);
+    try {
+      const valid = await app.inject("/pokedex/abra");
+      expect(valid.statusCode).toBe(200);
+      expect(valid.body).toContain("Pokémon Tools shell");
+
+      const invalid = await app.inject("/pokedex/not-a-pokemon");
+      expect(invalid.statusCode).toBe(404);
+      expect(invalid.body).toContain("Pokémon Tools shell");
+    } finally {
+      await app.close();
+      await db.$disconnect();
+      await rm(staticDirectory, { recursive: true, force: true });
+    }
+  });
+
   it("serves catalog and publishes key OpenAPI routes", async () => {
     const config = readConfig({
       NODE_ENV: "test", DATABASE_URL: "postgresql://test:test@localhost:5432/test",
@@ -19,6 +89,10 @@ describe("API composition", () => {
       expect(health.statusCode).toBe(200);
       const catalog = await app.inject("/api/catalog");
       expect(catalog.json().species.some((entry: { name: string }) => entry.name === "Pikachu")).toBe(true);
+      const pikachuMoves = await app.inject("/api/pokedex/Pikachu/moves");
+      expect(pokedexMovesResponseSchema.parse(pikachuMoves.json()).moves.some((move) => move.name === "Thunderbolt")).toBe(true);
+      const abraMoves = await app.inject("/api/pokedex/Abra/moves");
+      expect(abraMoves.json()).toMatchObject({ unavailable: true, unavailableReasonCode: "no-scarlet-violet-learnset", moves: [] });
       const damage = await app.inject({ method: "POST", url: "/api/damage", payload: { attacker: { species: "Pikachu" }, defender: { species: "Charizard" }, move: "Thunderbolt", field: {} } });
       expect(damage.statusCode).toBe(200);
       expect(damage.json().max).toBeGreaterThan(0);
@@ -36,6 +110,7 @@ describe("API composition", () => {
       expect(sameOriginSave.statusCode).toBe(401);
       const headers = await app.inject("/api/health");
       expect(headers.headers["content-security-policy"]).toContain("https://raw.githubusercontent.com/PokeAPI/sprites/");
+      expect(headers.headers["content-security-policy"]).toContain("https://archives.bulbagarden.net");
       expect(headers.headers["content-security-policy"]).toContain("script-src 'self'");
       const session = await app.inject({ url: "/api/auth/get-session", headers: { host: "localhost:4000" } });
       expect(session.statusCode).toBe(200);
@@ -46,6 +121,7 @@ describe("API composition", () => {
       expect(spec.paths?.["/api/type-chart"]?.get?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/pokedex/{species}"]?.get?.responses?.["400"]).toBeDefined();
       expect(spec.paths?.["/api/pokedex/{species}/evolution"]?.get?.responses?.["200"]).toBeDefined();
+      expect(spec.paths?.["/api/pokedex/{species}/moves"]?.get?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/pokedex/{species}/evolution"]?.get?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/damage"]?.post?.responses?.["200"]).toBeDefined();
       expect(spec.paths?.["/api/me/teams"]?.get?.responses?.["200"]).toBeDefined();

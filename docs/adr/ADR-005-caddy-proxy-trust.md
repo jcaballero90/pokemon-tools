@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](ADR-005-caddy-proxy-trust.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](ADR-005-caddy-proxy-trust.es.md)
+
 # ADR-005: Trust forwarding only through the controlled Caddy path
 
 - **Date:** 2026-09-27

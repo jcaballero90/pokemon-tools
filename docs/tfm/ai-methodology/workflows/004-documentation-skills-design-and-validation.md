@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](004-documentation-skills-design-and-validation.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](004-documentation-skills-design-and-validation.es.md)
+
 # Documentation skills: design and validation
 
 > Status: Validated — human review completed.

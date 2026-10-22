@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](ADR-006-immutable-release-and-recovery.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](ADR-006-immutable-release-and-recovery.es.md)
+
 # ADR-006: Promote one tested image digest with explicit recovery gates
 
 - **Date:** 2026-09-27

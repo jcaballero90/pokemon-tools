@@ -1,3 +1,5 @@
+[![English](https://img.shields.io/badge/lang-en-red.svg)](ADR-001-modular-monolith.md) [![Español](https://img.shields.io/badge/lang-es-yellow.svg)](ADR-001-modular-monolith.es.md)
+
 # ADR-001: Use a modular monolith with pragmatic Clean boundaries
 
 - **Date:** 2026-09-27

@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import type { PokedexResponse } from "@pokemon-tools/contracts";
-import { label, t } from "../../i18n/presentation";
+import { label, locale, t } from "../../i18n/presentation";
 
 type Ability = NonNullable<PokedexResponse["abilities"]>[number];
 
@@ -21,6 +21,9 @@ function PokemonAbility({ ability }: { ability: Ability }) {
   const tooltipId = useId();
   const [open, setOpen] = useState(false);
   const name = label("abilities", ability.name);
+  const description = locale === "es-ES"
+    ? ability.descriptions?.esES ?? (ability.description ? t.pokedex.abilityDescriptionUnavailable : undefined)
+    : ability.descriptions?.en ?? ability.description;
   const content = <>
     <span>{name}</span>
     {ability.isHidden && <small>{t.pokedex.hiddenAbility}</small>}
@@ -28,7 +31,7 @@ function PokemonAbility({ ability }: { ability: Ability }) {
 
   return (
     <li className={`pokedex-ability${open ? " pokedex-ability--open" : ""}`}>
-      {ability.description ? (
+      {description ? (
         <button
           type="button"
           className="pokedex-ability-chip"
@@ -40,7 +43,7 @@ function PokemonAbility({ ability }: { ability: Ability }) {
           {content}
         </button>
       ) : <span className="pokedex-ability-chip">{content}</span>}
-      {ability.description && <span id={tooltipId} className="pokedex-ability-tooltip" role="tooltip">{ability.description}</span>}
+      {description && <span id={tooltipId} className="pokedex-ability-tooltip" role="tooltip">{description}</span>}
     </li>
   );
 }

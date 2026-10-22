@@ -12,6 +12,7 @@
     "build": "pnpm --filter @pokemon-tools/contracts build && pnpm --filter @pokemon-tools/web build && pnpm --filter @pokemon-tools/api build",
     "check": "pnpm --filter @pokemon-tools/contracts build && pnpm -r check",
     "lint": "eslint .",
+    "docs:check": "node scripts/check-docs.mjs",
     "config:check": "node scripts/check-config.mjs",
     "test": "pnpm --filter @pokemon-tools/contracts build && pnpm -r test",
     "test:e2e": "pnpm --filter @pokemon-tools/web test:e2e",
