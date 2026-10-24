@@ -1,8 +1,8 @@
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useState } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { teamInputSchema, type CatalogResponse, type DamageResponse, type EvolutionResponse, type PokedexResponse, type SavedTeamResponse, type TeamDraft } from "@pokemon-tools/contracts";
+import { pokemonSetSchema, teamInputSchema, type CatalogResponse, type DamageResponse, type EvolutionResponse, type PokedexResponse, type SavedTeamResponse, type TeamDraft } from "@pokemon-tools/contracts";
 import { App } from "./main.js";
 import { LocaleProvider } from "./i18n/LocaleProvider.js";
 import { setLocale } from "./i18n.js";
@@ -25,7 +25,7 @@ const catalog: CatalogResponse = {
     { name: "Pikachu", types: ["Electric"], baseStats: { hp: 35, atk: 55, def: 40, spa: 50, spd: 50, spe: 90 } },
     { name: "Charizard", types: ["Fire", "Flying"], baseStats: { hp: 78, atk: 84, def: 78, spa: 109, spd: 85, spe: 100 } }
   ],
-  moves: ["Thunderbolt", "Protect"], abilities: [], items: [], types: ["Electric", "Fire", "Flying"], natures: ["Serious"],
+  moves: ["Thunderbolt", "Protect", "Flamethrower"], abilities: [], items: [], types: ["Electric", "Fire", "Flying"], natures: ["Serious"],
   translations: {
     species: { pikachu: "Pikachu", charizard: "Charizard" },
     moves: { thunderbolt: "Rayo", protect: "Protección" }, abilities: {}, items: {},
@@ -264,6 +264,26 @@ describe("website interaction regressions", () => {
     expect(screen.queryByRole("button", { name: "Saved team" })).toBeNull();
   });
 
+  it("blocks saving a team with a catalog name that does not exist", async () => {
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({ user: { id: "owner-1", name: "Trainer", email: "trainer@example.test" } });
+      if (path === "/me/teams") return Promise.resolve([]);
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+    await screen.findByText("Trainer");
+    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "+ Add Pokémon" })[0]!);
+    fireEvent.change(screen.getByLabelText("Species"), { target: { value: "Missingmon" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save your team" }));
+
+    expect(screen.getAllByRole("alert").some((alert) => alert.textContent?.includes("Missingmon"))).toBe(true);
+    expect(apiMock.mock.calls.some(([path, options]) => path === "/me/teams" && options?.method === "POST")).toBe(false);
+  });
+
   it("shows only the newest selected Pokémon when older descriptive responses finish late", async () => {
     const first = deferred<PokedexResponse>();
     const second = deferred<PokedexResponse>();
@@ -395,6 +415,27 @@ describe("website interaction regressions", () => {
     expect(screen.getByLabelText("Nickname")).toBeTruthy();
   });
 
+  it("clamps a Team Builder EV edit to the 510 point budget without changing other stats", () => {
+    const initialTeam = teamInputSchema.parse({ name: "Draft", pokemon: [{ species: "Pikachu", evs: { atk: 252, spe: 252 } }] }) as TeamDraft;
+    let updated = initialTeam;
+
+    function TeamEditorHarness() {
+      const [team, setTeam] = useState(initialTeam);
+      return <TeamEditor title="Your team" team={team} onChange={(next) => { updated = next; setTeam(next); }} catalog={catalog} />;
+    }
+
+    render(<TeamEditorHarness />);
+    const hpEvs = screen.getByRole("spinbutton", { name: "HP EVs" }) as HTMLInputElement;
+    expect(hpEvs.getAttribute("max")).toBe("6");
+    fireEvent.focus(hpEvs);
+    fireEvent.change(hpEvs, { target: { value: "500" } });
+
+    expect(hpEvs.value).toBe("6");
+    expect(updated.pokemon[0]?.evs).toMatchObject({ hp: 6, atk: 252, spe: 252 });
+    expect(screen.getByText("EV total: 510/510")).toBeTruthy();
+    expect(screen.getByText("Capped at 6; the other stats use 504/510 EVs.")).toBeTruthy();
+  });
+
   it("submits the selected account mode and refreshes the session before showing success", async () => {
     const events: string[] = [];
     apiMock.mockImplementation((path: string) => {
@@ -463,12 +504,84 @@ describe("website interaction regressions", () => {
     apiMock.mockReturnValue(response.promise);
     render(<Damage catalog={null} />);
 
+    fireEvent.click(screen.getByText("EVs and IVs (optional)"));
     fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));
-    fireEvent.change(screen.getByLabelText("Move"), { target: { value: "Protect" } });
+    fireEvent.change(screen.getByLabelText("Attacker Attack EVs"), { target: { value: "252" } });
     await act(async () => response.resolve({ generation: 9, min: 90, max: 110, minPercent: 90, maxPercent: 110, koChanceOnHit: 1, defenderHp: 100, description: "old matchup" }));
 
     expect(screen.queryByText("90–110%")).toBeNull();
     expect(screen.getByRole("status").textContent).toContain("Inputs changed");
+  });
+
+  it("uses optional per-side spreads, keeps team values in blank fields, and resets one side independently", async () => {
+    const initialAttacker = pokemonSetSchema.parse({ species: "Pikachu", moves: ["Thunderbolt"], evs: { atk: 252 }, ivs: { atk: 0 } });
+    const initialDefender = pokemonSetSchema.parse({ species: "Charizard", moves: ["Flamethrower"], evs: { hp: 252 } });
+    apiMock.mockResolvedValue({ generation: 9, min: 18, max: 20, minPercent: 18, maxPercent: 20, koChanceOnHit: 0, defenderHp: 100, description: "test" });
+    render(<Damage catalog={catalog} initialAttacker={initialAttacker} initialDefender={initialDefender} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));
+    await screen.findByText("18–20%");
+    const baseline = JSON.parse(apiMock.mock.calls[0]?.[1]?.body as string);
+    expect(baseline.attacker.evs.atk).toBe(252);
+    expect(baseline.attacker.ivs.atk).toBe(0);
+    expect(baseline.defender.evs.hp).toBe(252);
+    expect(baseline.defender.ivs.hp).toBe(31);
+
+    fireEvent.click(screen.getByText("EVs and IVs (optional)"));
+    fireEvent.change(screen.getByLabelText("Attacker Attack EVs"), { target: { value: "100" } });
+    fireEvent.change(screen.getByLabelText("Defender Hit Points IVs"), { target: { value: "0" } });
+    fireEvent.click(screen.getByText("EVs and IVs (optional)"));
+    fireEvent.click(screen.getByText("EVs and IVs (optional)"));
+    expect((screen.getByLabelText("Attacker Attack EVs") as HTMLInputElement).value).toBe("100");
+
+    fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));
+    await screen.findByText("18–20%");
+    const overridden = JSON.parse(apiMock.mock.calls[1]?.[1]?.body as string);
+    expect(overridden.attacker.evs.atk).toBe(100);
+    expect(overridden.attacker.ivs.atk).toBe(0);
+    expect(overridden.defender.ivs.hp).toBe(0);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Reset overrides" })[0]!);
+    fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));
+    await screen.findByText("18–20%");
+    const resetAttacker = JSON.parse(apiMock.mock.calls[2]?.[1]?.body as string);
+    expect(resetAttacker.attacker.evs.atk).toBe(252);
+    expect(resetAttacker.defender.ivs.hp).toBe(0);
+    expect(initialAttacker.evs.atk).toBe(252);
+  });
+
+  it("caps a Damage EV override to the remaining budget and keeps it when clearing would inherit an invalid total", () => {
+    const initialAttacker = pokemonSetSchema.parse({ species: "Pikachu", moves: ["Thunderbolt"], evs: { atk: 252, spe: 252 } });
+    initialAttacker.evs.hp = 8;
+    const initialDefender = pokemonSetSchema.parse({ species: "Charizard", moves: ["Flamethrower"] });
+    render(<Damage catalog={catalog} initialAttacker={initialAttacker} initialDefender={initialDefender} />);
+    fireEvent.click(screen.getByText("EVs and IVs (optional)"));
+
+    const attackEvs = screen.getByLabelText("Attacker Attack EVs") as HTMLInputElement;
+    expect(attackEvs.getAttribute("max")).toBe("250");
+    fireEvent.focus(attackEvs);
+    fireEvent.change(attackEvs, { target: { value: "500" } });
+    expect(attackEvs.value).toBe("250");
+    expect(screen.getByText("Capped at 250; the other stats use 260/510 EVs.")).toBeTruthy();
+    expect(screen.getByText("EV total: 510/510")).toBeTruthy();
+
+    fireEvent.change(attackEvs, { target: { value: "" } });
+    fireEvent.blur(attackEvs);
+    expect(attackEvs.value).toBe("250");
+    expect(screen.getByText("Kept an explicit value of 250 because inheriting the source would exceed the 510 EV budget.")).toBeTruthy();
+    expect(apiMock).not.toHaveBeenCalled();
+  });
+
+  it("shows localized side-specific spread validation and does not submit invalid values", () => {
+    setLocale("es-ES");
+    render(<Damage catalog={catalog} />);
+    fireEvent.click(screen.getByText("EV e IV (opcionales)"));
+    fireEvent.change(screen.getByLabelText("EV de Ataque del Atacante"), { target: { value: "1.5" } });
+    fireEvent.click(screen.getByRole("button", { name: /Calcular daño/ }));
+
+    expect(apiMock).not.toHaveBeenCalled();
+    expect(screen.getByText("Introduce un número entero.")).toBeTruthy();
+    expect(screen.getByText("Corrige los campos numéricos resaltados antes de continuar.")).toBeTruthy();
   });
 
   it("resets damage inputs on return and cannot show a delayed result from the previous visit", async () => {
@@ -490,6 +603,7 @@ describe("website interaction regressions", () => {
 
     render(<LocaleProvider><App /></LocaleProvider>);
     fireEvent.click(screen.getByRole("link", { name: /^Damage$/ }));
+    await waitFor(() => expect(screen.getByLabelText("Move").getAttribute("aria-invalid")).toBe("false"));
     fireEvent.change(screen.getByLabelText("Move"), { target: { value: "Protect" } });
     fireEvent.click(screen.getByRole("button", { name: /Calculate damage/ }));
     fireEvent.click(screen.getByRole("link", { name: /^Overview$/ }));

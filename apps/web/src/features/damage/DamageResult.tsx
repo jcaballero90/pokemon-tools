@@ -1,4 +1,4 @@
-import type { DamageResponse, FieldInput, PokemonSet } from "@pokemon-tools/contracts";
+import { statIds, type DamageResponse, type FieldInput, type PokemonSet } from "@pokemon-tools/contracts";
 import { formatMessage, label, t } from "../../i18n/presentation";
 
 type DamageResultProps = {
@@ -108,12 +108,16 @@ function DamageEstimate({ result, matchupLabels, attacker, defender, field }: {
           {attacker.item && <li>{formatMessage(t.damage.itemSummary, { side: t.damage.attackerSummary, value: label("items", attacker.item) })}</li>}
           {attacker.ability && <li>{formatMessage(t.damage.abilitySummary, { side: t.damage.attackerSummary, value: label("abilities", attacker.ability) })}</li>}
           <li>{formatMessage(t.damage.natureSummary, { side: t.damage.attackerSummary, value: label("natures", attacker.nature) })}</li>
+          <li>{formatSpreadSummary(t.damage.attackerSummary, t.damage.evs, attacker.evs)}</li>
+          <li>{formatSpreadSummary(t.damage.attackerSummary, t.damage.ivs, attacker.ivs)}</li>
           <li>{formatMessage(t.damage.teraSummary, { side: t.damage.attackerSummary, value: field.attackerTerastallized ? t.damage.teraYes : t.damage.teraNo })}</li>
           {attacker.teraType && <li>{formatMessage(t.damage.teraTypeSummary, { side: t.damage.attackerSummary, value: label("types", attacker.teraType) })}</li>}
           <li>{t.damage.defenderSummary}: {matchupLabels.defender} · {formatMessage(t.damage.levelSummary, { level: defender.level })}</li>
           {defender.item && <li>{formatMessage(t.damage.itemSummary, { side: t.damage.defenderSummary, value: label("items", defender.item) })}</li>}
           {defender.ability && <li>{formatMessage(t.damage.abilitySummary, { side: t.damage.defenderSummary, value: label("abilities", defender.ability) })}</li>}
           <li>{formatMessage(t.damage.natureSummary, { side: t.damage.defenderSummary, value: label("natures", defender.nature) })}</li>
+          <li>{formatSpreadSummary(t.damage.defenderSummary, t.damage.evs, defender.evs)}</li>
+          <li>{formatSpreadSummary(t.damage.defenderSummary, t.damage.ivs, defender.ivs)}</li>
           <li>{formatMessage(t.damage.teraSummary, { side: t.damage.defenderSummary, value: field.defenderTerastallized ? t.damage.teraYes : t.damage.teraNo })}</li>
           {defender.teraType && <li>{formatMessage(t.damage.teraTypeSummary, { side: t.damage.defenderSummary, value: label("types", defender.teraType) })}</li>}
           <li>{t.damage.gameTypeSummary}: {t.damage.gameTypes[field.gameType]}</li>
@@ -134,6 +138,11 @@ function DamageEstimate({ result, matchupLabels, attacker, defender, field }: {
       </details>
     </>
   );
+}
+
+function formatSpreadSummary(side: string, spread: string, values: PokemonSet["evs"] | PokemonSet["ivs"]): string {
+  const formatted = statIds.map((stat) => `${t.team.stats[stat]} ${values[stat]}`).join(" / ");
+  return formatMessage(t.damage.spreadSummary, { side, spread, values: formatted });
 }
 
 function activeFieldLabels(field: FieldInput): string[] {

@@ -19,6 +19,28 @@ describe("localized catalog contracts", () => {
     expect(catalog.species[0]).toMatchObject({ name: "Bulbasaur", nationalDexId: 1, pokedexSlug: "bulbasaur" });
     expect(catalog.translations?.types.grass).toBe("Planta");
     expect(catalog.moves).toEqual(["Tackle"]);
+    expect(catalog.moveDetails).toBeUndefined();
+  });
+
+  it("accepts canonical move details and rejects missing or invalid metadata", () => {
+    const catalog = {
+      species: [], moves: ["Thunderbolt", "Swords Dance"], abilities: [], items: [], types: [], natures: [],
+      moveDetails: {
+        Thunderbolt: { type: "Electric", category: "Special" },
+        "Swords Dance": { type: "Normal", category: "Status" }
+      }
+    };
+
+    expect(catalogResponseSchema.parse(catalog).moveDetails).toEqual(catalog.moveDetails);
+    expect(catalogResponseSchema.safeParse({
+      ...catalog, moveDetails: { Thunderbolt: { type: "Electric", category: "special" } }
+    }).success).toBe(false);
+    expect(catalogResponseSchema.safeParse({
+      ...catalog, moveDetails: { Thunderbolt: { category: "Special" } }
+    }).success).toBe(false);
+    expect(catalogResponseSchema.safeParse({
+      ...catalog, moveDetails: { Thunderbolt: { type: " ", category: "Special" } }
+    }).success).toBe(false);
   });
 
   it("accepts sourced bilingual ability text and structured evolution metadata", () => {

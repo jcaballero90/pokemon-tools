@@ -29,7 +29,8 @@ import { formatUiNotice, type UiNotice } from "./lib/ui-notice";
 import { api } from "./lib/api";
 import { resolveSiteRoute, siteTabPaths, type SiteTab } from "./lib/pokedex-routes";
 import { loadTeamDraft, saveTeamDraft } from "./lib/team-drafts";
-import { submittedTeam } from "./features/teams/team-model";
+import { copyPokemonSet, submittedTeam, type DamageTransfer } from "./features/teams/team-model";
+import { validateTeamDraft } from "./features/teams/set-validation";
 import { CatalogDatalists } from "./components/catalog-datalists";
 import { useTheme } from "./lib/use-theme";
 import "./style.css";
@@ -90,7 +91,12 @@ function AppContent() {
   const [siteConfig, setSiteConfig] = useState<PublicSiteConfig | null>(null);
   const [team, setTeam] = useState<TeamDraft>(() => loadTeamDraft("team", emptyTeam()));
   const [comparison, setComparison] = useState<TeamDraft>(() => loadTeamDraft("comparison", emptyTeam()));
+  const [invalidNumericSetsA, setInvalidNumericSetsA] = useState<ReadonlySet<number>>(() => new Set());
+  const [invalidNumericSetsB, setInvalidNumericSetsB] = useState<ReadonlySet<number>>(() => new Set());
+  const [showTeamValidationErrors, setShowTeamValidationErrors] = useState(false);
+  const [damageTransfer, setDamageTransfer] = useState<DamageTransfer | undefined>();
   const sessionGeneration = useRef(0);
+  const damageTransferSequence = useRef(0);
 
   const route = resolveSiteRoute(location.pathname, catalog);
   const tab = route.kind === "page" ? route.tab : null;
@@ -208,6 +214,9 @@ function AppContent() {
     const generation = sessionGeneration.current;
     if (!owner) return;
 
+    setShowTeamValidationErrors(true);
+    if (validateTeamDraft(team, catalog).length > 0 || invalidNumericSetsA.size > 0) return;
+
     try {
       const created = await api<SavedTeam>(
         "/me/teams",
@@ -241,6 +250,26 @@ function AppContent() {
 
   function handleSavedTeamOpen(savedTeam: SavedTeam) {
     setTeam(teamInputSchema.parse(savedTeam));
+  }
+
+  function handleTeamChange(nextTeam: TeamDraft) {
+    setTeam(nextTeam);
+    setShowTeamValidationErrors(false);
+  }
+
+  function handleDamageTransfer(pair: Omit<DamageTransfer, "id">) {
+    const id = `damage-transfer-${++damageTransferSequence.current}`;
+    setDamageTransfer({
+      id,
+      attacker: copyPokemonSet(pair.attacker),
+      defender: copyPokemonSet(pair.defender),
+      move: pair.move
+    });
+    navigate(siteTabPaths.damage);
+  }
+
+  function handleDamageTransferConsumed(id: string) {
+    setDamageTransfer((current) => current?.id === id ? undefined : current);
   }
 
   function handleNoticeDismiss() {
@@ -293,26 +322,41 @@ function AppContent() {
             <TeamEditor
               title={t.team.yourTeam}
               team={team}
-              onChange={setTeam}
+              onChange={handleTeamChange}
               catalog={catalog}
+              showValidationErrors={showTeamValidationErrors}
+              onNumericSetValidityChange={(index, valid) => {
+                setInvalidNumericSetsA((current) => updateInvalidIndexes(current, index, valid));
+              }}
             />
-            <div>
-              <TeamEditor
-                title={t.team.comparisonTeam}
-                team={comparison}
-                onChange={setComparison}
-                catalog={catalog}
-                compact
-              />
-              <Compare left={team} right={comparison} catalog={catalog} />
-              <PrivateTeamLibrary
-                user={user}
-                savedTeams={saved}
-                onSave={saveTeam}
-                onOpen={handleSavedTeamOpen}
-                onRemove={removeSavedTeam}
-              />
-            </div>
+            <TeamEditor
+              title={t.team.comparisonTeam}
+              team={comparison}
+              onChange={setComparison}
+              catalog={catalog}
+              side="b"
+              onNumericSetValidityChange={(index, valid) => {
+                setInvalidNumericSetsB((current) => updateInvalidIndexes(current, index, valid));
+              }}
+            />
+            <Compare
+              left={team}
+              right={comparison}
+              catalog={catalog}
+              chart={chart}
+              catalogStatus={catalogStatus}
+              chartStatus={chartStatus}
+              invalidSetIndexesA={getInvalidSetIndexes(team, catalog, invalidNumericSetsA)}
+              invalidSetIndexesB={getInvalidSetIndexes(comparison, catalog, invalidNumericSetsB)}
+              onOpenDamage={handleDamageTransfer}
+            />
+            <PrivateTeamLibrary
+              user={user}
+              savedTeams={saved}
+              onSave={saveTeam}
+              onOpen={handleSavedTeamOpen}
+              onRemove={removeSavedTeam}
+            />
           </div>
         )}
 
@@ -322,6 +366,8 @@ function AppContent() {
             catalog={catalog}
             initialAttacker={team.pokemon[0]}
             initialDefender={comparison.pokemon[0]}
+            transfer={damageTransfer}
+            onTransferConsumed={handleDamageTransferConsumed}
           />
         )}
         {route.kind === "page" && tab === "account" && (
@@ -444,3 +490,23 @@ function PrivateTeamLibrary({ user, savedTeams, onSave, onOpen, onRemove }: Priv
 
 const root = document.getElementById("root");
 if (root) createRoot(root).render(<StrictMode><LocaleProvider><App /></LocaleProvider></StrictMode>);
+
+function updateInvalidIndexes(current: ReadonlySet<number>, index: number, valid: boolean): ReadonlySet<number> {
+  const next = new Set(current);
+  if (valid) next.delete(index);
+  else next.add(index);
+  return next;
+}
+
+function getInvalidSetIndexes(
+  team: TeamDraft,
+  catalog: CatalogResponse | null,
+  transientIndexes: ReadonlySet<number>
+): ReadonlySet<number> {
+  const invalid = new Set(transientIndexes);
+  validateTeamDraft(team, catalog).forEach((issue) => {
+    const match = issue.field.match(/^(\d+)\./);
+    if (match) invalid.add(Number(match[1]));
+  });
+  return invalid;
+}
