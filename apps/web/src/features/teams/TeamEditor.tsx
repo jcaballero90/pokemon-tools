@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
-import type { CatalogResponse, PokemonSet, TeamDraft } from "@pokemon-tools/contracts";
+import type { CatalogResponse, PokemonSet, SavedTeamResponse, TeamDraft } from "@pokemon-tools/contracts";
 import { Button } from "../../components/ui/button";
-import { t } from "../../i18n/presentation";
+import { label, t } from "../../i18n/presentation";
 import { emptySet } from "./team-model";
 import { PokemonSetEditor } from "./PokemonSetEditor";
 import { ShowdownTeamImport } from "./ShowdownTeamImport";
@@ -18,9 +18,19 @@ export type TeamEditorProps = {
   side?: "a" | "b";
   showValidationErrors?: boolean;
   onNumericSetValidityChange?: (index: number, valid: boolean) => void;
+  userSignedIn?: boolean;
+  savedTeams?: SavedTeamResponse[];
+  libraryStatus?: "loading" | "ready" | "error";
+  libraryBusy?: boolean;
+  sourceTeamId?: string | null;
+  sourceIsVerified?: boolean;
+  onLoadSavedTeam?: (teamId: string) => void;
+  onSaveTeam?: () => void;
+  onSaveCopy?: () => void;
+  onRetryLibrary?: () => void;
 };
 
-export function TeamEditor({ title, team, onChange, catalog, side = "a", showValidationErrors = false, onNumericSetValidityChange }: TeamEditorProps) {
+export function TeamEditor({ title, team, onChange, catalog, side = "a", showValidationErrors = false, onNumericSetValidityChange, userSignedIn = false, savedTeams = [], libraryStatus = "loading", libraryBusy = false, sourceTeamId = null, sourceIsVerified = false, onLoadSavedTeam, onSaveTeam, onSaveCopy, onRetryLibrary }: TeamEditorProps) {
   const [teamTool, setTeamTool] = useState<"import" | "export" | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [numericValidity, setNumericValidity] = useState<Record<string, boolean>>({});
@@ -112,6 +122,33 @@ export function TeamEditor({ title, team, onChange, catalog, side = "a", showVal
           onChange={(event) => handleTeamNameChange(event.target.value)}
         />
       </label>
+
+      {userSignedIn ? (
+        <div className="saved-team-controls">
+          <label>
+            {t.team.loadSavedTeam}
+            <select value="" disabled={libraryBusy || libraryStatus !== "ready" || savedTeams.length === 0} onChange={(event) => event.target.value && onLoadSavedTeam?.(event.target.value)}>
+              <option value="">{libraryStatus === "loading" ? t.account.libraryLoading : t.team.chooseSavedTeam}</option>
+              {savedTeams.map((savedTeam) => {
+                const members = savedTeam.pokemon.map((pokemon) => label("species", pokemon.species)).join(", ");
+                return <option key={savedTeam.id} value={savedTeam.id}>{members ? `${savedTeam.name} — ${members}` : savedTeam.name}</option>;
+              })}
+            </select>
+          </label>
+          {libraryStatus === "error" && <div className="saved-library-error" role="status"><span>{t.account.libraryFailed}</span><Button type="button" variant="outline" disabled={libraryBusy} onClick={onRetryLibrary}>{t.account.retryLibrary}</Button></div>}
+          <div className="saved-team-save-actions">
+            {sourceTeamId ? (
+              <>
+                <Button type="button" variant="outline" disabled={libraryBusy || libraryStatus !== "ready" || !sourceIsVerified} title={!sourceIsVerified ? t.team.saveSourceUnavailable : undefined} onClick={onSaveTeam}>{t.team.saveChanges}</Button>
+                <Button type="button" variant="outline" disabled={libraryBusy || libraryStatus !== "ready"} onClick={onSaveCopy}>{t.team.saveCopy}</Button>
+              </>
+            ) : <Button type="button" disabled={libraryBusy || libraryStatus !== "ready"} onClick={onSaveTeam}>{t.team.saveButton}</Button>}
+          </div>
+          {sourceTeamId && !sourceIsVerified && libraryStatus === "ready" && <p className="field-help">{t.team.saveSourceUnavailable}</p>}
+        </div>
+      ) : (
+        <a className="text-link" href="/account">{t.team.signInOrCreate}</a>
+      )}
 
       {team.pokemon.map((set, index) => (
         <PokemonSetEditor

@@ -8,7 +8,7 @@
 
 The web app sends same-origin requests to `/api` through its [fetch wrapper](../apps/web/src/lib/api.ts), using JSON and browser credentials. Local Vite proxies those requests to Fastify; the deployed image serves web and API on the same origin behind Caddy. The public API is currently unversioned. Its implemented routes are registered in [app.ts](../apps/api/src/app.ts); this page should be updated when those routes or their contracts change.
 
-The browser does not need an API key for public utilities. Private team routes require a Better Auth session cookie. The server checks the session and scopes database operations to its user ID. Team create and delete also require an exact trusted `Origin`; missing, malformed, `null`, or untrusted values receive 403. Guest comparison teams stay in the browser and do not have API endpoints. The [security plan](security/security-plan.md) covers cookies, rate limits, proxy identity, and the selected Origin control.
+The browser does not need an API key for public utilities. Private team routes require a Better Auth session cookie. The server checks the session and scopes database operations to its user ID. Team create, update, and delete also require an exact trusted `Origin`; missing, malformed, `null`, or untrusted values receive 403. Guest comparison teams stay in the browser and do not have API endpoints. The [security plan](security/security-plan.md) covers cookies, rate limits, proxy identity, and the selected Origin control.
 
 | Method and path | Access | Request | Success and important outcomes |
 | --- | --- | --- | --- |
@@ -22,8 +22,9 @@ The browser does not need an API key for public utilities. Private team routes r
 | `POST /api/damage` | Public | [Damage request](../packages/contracts/src/index.ts) JSON | `200` damage range, conditional one-hit KO chance, and structured canonical matchup/no-effect fields; `400` for invalid shape or unknown catalog names. |
 | `GET /api/me/teams` | Session | None | `200` saved teams for this owner, newest updated first; `401` without a session. |
 | `POST /api/me/teams` | Session + trusted Origin | [Team input](../packages/contracts/src/index.ts) JSON | `201` created owner-scoped team; `400` for invalid shape or unknown set names; `401` without a session; `403` for missing/untrusted Origin. |
+| `PUT /api/me/teams/:id` | Session + trusted Origin | Team ID in path and [Team input](../packages/contracts/src/index.ts) JSON | `200` updated owner-scoped team; `400` for invalid shape or unknown set names; `401` without a session; `403` for missing/untrusted Origin; `404` if no team with that ID belongs to the caller. |
 | `DELETE /api/me/teams/:id` | Session + trusted Origin | Team ID in path | `204` with no body when deleted; `401` without a session; `403` for missing/untrusted Origin; `404` if no team with that ID belongs to the caller. |
-| `GET` or `POST /api/auth/*` | Varies by Better Auth operation | Delegated to Better Auth | The UI currently calls `GET /api/auth/get-session` and `POST` for email sign-up, sign-in, and sign-out. Exact auth payloads, responses, cookies, and other delegated operations are not described by the app's wildcard OpenAPI route. |
+| `GET` or `POST /api/auth/*` | Varies by Better Auth operation | Delegated to Better Auth | The UI calls `GET /api/auth/get-session` and `POST` for email registration, username-or-email sign-in, username claims, and sign-out. Registration requires a unique lowercase-normalized username (3–30 ASCII letters, digits, underscores, or periods); existing accounts can claim one in Account. Exact auth payloads, responses, cookies, and other delegated operations are not described by the app's wildcard OpenAPI route. |
 
 In development and private staging, `GET /api/ingress-debug` exposes raw peer, effective client IP, protocol, host, and selected forwarding headers for proxy verification. It is absent when `DEPLOY_ENV=production` and is an operational diagnostic, not a product API. The interactive OpenAPI UI is mounted at `/docs` in development and staging, with its JSON at `/docs/json`; it is not registered in production. The API should still be checked on the deployed paths because configuration and generated documents alone do not prove exposure or behavior.
 
@@ -61,7 +62,7 @@ The success result includes `generation`, `min`, `max`, `minPercent`, `maxPercen
 }
 ```
 
-The persistence adapter stores the parsed set data and returns database team records on create and list. The web client currently opens a saved team from the list; there is no separate `GET /api/me/teams/:id` or update route. The [requirements](requirements/requirements.md#req-006) leave the exact saved-team size policy open, so this document records current behavior rather than setting a new rule.
+The persistence adapter stores parsed set data and returns database team records on create, list, and update. `PUT` updates only a row matching both the requested ID and authenticated owner; a missing or foreign-owned ID returns the same `404 team-not-found` response. The browser keeps loaded team drafts independent and sends explicit snapshots when saving changes or a copy. The [requirements](requirements/requirements.md#req-006) leave the exact saved-team size policy open, so this document records current behavior rather than setting a new rule.
 
 ## Response and error boundaries
 

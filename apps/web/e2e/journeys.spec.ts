@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 test("guest can inspect chart, build a team, and calculate damage", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Type chart" }).click();
-  await expect(page.getByRole("group", { name: "Or choose one or two types" }).getByRole("button")).toHaveCount(18);
+  await page.getByRole("link", { name: "Type chart", exact: true }).click();
+  await expect(page.getByRole("group", { name: "Or choose up to two types" }).getByRole("button")).toHaveCount(18);
   await page.getByRole("button", { name: "Grass" }).click();
   await page.getByRole("button", { name: "Ground" }).click();
   const quadrupleDamage = page.getByRole("region", { name: "4×" });
@@ -15,13 +15,13 @@ test("guest can inspect chart, build a team, and calculate damage", async ({ pag
   await expect(page.getByRole("button", { name: "Ice" })).toBeDisabled();
   await page.getByRole("combobox", { name: "Or find a Pokémon" }).fill("Charizard");
   await expect(page.getByText("Charizard", { exact: true }).first()).toBeVisible();
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
   await page.getByRole("button", { name: "+ Add Pokémon" }).first().click();
   await expect(page.getByText("1/6").first()).toBeVisible();
   await page.getByRole("link", { name: "Damage", exact: true }).click();
   await expect(page.getByRole("combobox", { name: "Move", exact: true })).toHaveAttribute("aria-invalid", "false");
   await page.getByRole("button", { name: "Calculate damage" }).click();
-  await expect(page.getByText(/one-hit KO chance/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /one-hit KO chance/ })).toBeVisible();
 });
 
 test("damage calculator keeps blank spreads, applies EV/IV overrides, and resets them", async ({ page }) => {
@@ -60,12 +60,12 @@ test("damage calculator keeps blank spreads, applies EV/IV overrides, and resets
 
 test("guest drafts retain incomplete edits and move slots after a page reload", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
   await page.getByLabel("Team name").first().fill("Half-finished draft");
   await page.getByRole("button", { name: "+ Add Pokémon" }).first().click();
   await page.getByPlaceholder("Move 3").first().fill("Protect");
   await page.reload();
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
 
   await expect(page.getByLabel("Team name").first()).toHaveValue("Half-finished draft");
   await expect(page.getByPlaceholder("Move 2").first()).toHaveValue("");
@@ -74,7 +74,7 @@ test("guest drafts retain incomplete edits and move slots after a page reload", 
 
 test("guest can review a Showdown paste, edit the imported set, and reload the draft", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
   await page.getByRole("button", { name: "Import from Showdown" }).first().click();
   await page.getByLabel("Showdown paste").fill(`Pikachu @ Light Ball
 Ability: Static
@@ -99,7 +99,7 @@ IVs: 0 Atk
   await page.getByLabel("Team name").first().fill("Imported and edited");
   await page.getByPlaceholder("Move 2").first().fill("Protect");
   await page.reload();
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
 
   await expect(page.getByLabel("Team name").first()).toHaveValue("Imported and edited");
   await expect(page.getByLabel("Item").first()).toHaveValue("Light Ball");
@@ -109,7 +109,7 @@ IVs: 0 Atk
 test("the defensive chart stays readable on a narrow phone-sized viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await page.getByRole("link", { name: "Type chart" }).click();
+  await page.getByRole("link", { name: "Type chart", exact: true }).click();
   const grass = page.getByRole("button", { name: "Grass" });
   await grass.focus();
   await page.keyboard.press("Space");
@@ -123,25 +123,51 @@ test("the defensive chart stays readable on a narrow phone-sized viewport", asyn
 
 test("account can save a private team without exposing it to another account", async ({ page, browser }) => {
   const email = `e2e-${Date.now()}@example.invalid`;
+  const username = `trainer_${Date.now()}`;
   await page.goto("/");
   await page.getByRole("link", { name: "Account" }).click();
   await page.getByRole("button", { name: "Create account" }).click();
-  await page.getByLabel("Name").fill("E2E Trainer");
+  await page.getByLabel("Name", { exact: true }).fill("E2E Trainer");
+  await page.getByLabel("Username").fill(username);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill("e2e-secure-password-123");
   await page.getByRole("button", { name: "Create account", exact: true }).last().click();
-  await expect(page.getByText("Welcome, E2E Trainer")).toBeVisible();
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await expect(page.getByRole("heading", { name: "Trainer card" })).toBeVisible();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
   await page.getByRole("button", { name: "+ Add Pokémon" }).first().click();
   await page.getByLabel("Team name").first().fill("Private E2E team");
-  await page.getByRole("button", { name: "Save your team" }).click();
+  await page.getByRole("button", { name: "Save your team" }).first().click();
   await expect(page.getByText("Team saved privately.")).toBeVisible();
-  const teamId = await page.evaluate(async () => {
+  const originalTeamId = await page.evaluate(async () => {
     const response = await fetch("/api/me/teams");
     const teams = await response.json() as Array<{ id: string }>;
     return teams[0]?.id;
   });
-  expect(teamId).toBeTruthy();
+  expect(originalTeamId).toBeTruthy();
+
+  await page.getByLabel("Load saved team").nth(1).selectOption(originalTeamId!);
+  await expect(page.getByLabel("Team name").nth(1)).toHaveValue("Private E2E team");
+  await page.getByRole("button", { name: "Save a copy" }).first().click();
+  await expect(page.getByText("A copy was added to your private library.")).toBeVisible();
+  const copyTeamId = await page.evaluate(async (originalId) => {
+    const response = await fetch("/api/me/teams");
+    const teams = await response.json() as Array<{ id: string }>;
+    return teams.find((team) => team.id !== originalId)?.id;
+  }, originalTeamId);
+  expect(copyTeamId).toBeTruthy();
+  await page.getByLabel("Team name").nth(1).fill("Updated by B");
+  await page.getByRole("button", { name: "Save changes" }).nth(1).click();
+  await expect(page.getByText("Saved team updated.")).toBeVisible();
+  await expect(page.getByLabel("Team name").first()).toHaveValue("Private E2E team");
+  await expect(page.getByLabel("Team name").nth(1)).toHaveValue("Updated by B");
+  await page.getByLabel("Team name").nth(1).fill("Updated E2E team");
+  await page.getByRole("button", { name: "Save changes" }).nth(1).click();
+  await expect(page.getByText("Saved team updated.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel("Team name").first()).toHaveValue("Private E2E team");
+  await expect(page.getByLabel("Team name").nth(1)).toHaveValue("Updated E2E team");
+  await expect(page.getByRole("button", { name: "Save changes" }).first()).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Save changes" }).nth(1)).toBeEnabled();
 
   const secondContext = await browser.newContext();
   try {
@@ -149,31 +175,59 @@ test("account can save a private team without exposing it to another account", a
     await secondPage.goto(new URL("/", page.url()).href);
     await secondPage.getByRole("link", { name: "Account" }).click();
     await secondPage.getByRole("button", { name: "Create account" }).click();
-    await secondPage.getByLabel("Name").fill("Second Trainer");
+    await secondPage.getByLabel("Name", { exact: true }).fill("Second Trainer");
+    await secondPage.getByLabel("Username").fill(username.toUpperCase());
     await secondPage.getByLabel("Email").fill(`e2e-second-${Date.now()}@example.invalid`);
     await secondPage.getByLabel("Password").fill("e2e-secure-password-456");
     await secondPage.getByRole("button", { name: "Create account", exact: true }).last().click();
-    await expect(secondPage.getByText("Welcome, Second Trainer")).toBeVisible();
+    await expect(secondPage.getByText("An account already uses this username.")).toBeVisible();
+    await secondPage.getByLabel("Username").fill(`second_${Date.now()}`);
+    await secondPage.getByRole("button", { name: "Create account", exact: true }).last().click();
+    await expect(secondPage.getByRole("heading", { name: "Trainer card" })).toBeVisible();
     const isolation = await secondPage.evaluate(async (id) => {
       const listed = await fetch("/api/me/teams");
       const teams = await listed.json() as unknown[];
       const removed = await fetch(`/api/me/teams/${encodeURIComponent(id)}`, { method: "DELETE" });
-      return { count: teams.length, deleteStatus: removed.status };
-    }, teamId);
-    expect(isolation).toEqual({ count: 0, deleteStatus: 404 });
+      const updated = await fetch(`/api/me/teams/${encodeURIComponent(id)}`, {
+        method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "Foreign update", pokemon: [] })
+      });
+      return { count: teams.length, deleteStatus: removed.status, updateStatus: updated.status };
+    }, originalTeamId);
+    expect(isolation).toEqual({ count: 0, deleteStatus: 404, updateStatus: 404 });
   } finally {
     await secondContext.close();
   }
 
-  await page.getByRole("button", { name: "Private E2E team", exact: true }).click();
-  await expect(page.getByLabel("Team name").first()).toHaveValue("Private E2E team");
-  await page.getByRole("button", { name: "Delete Private E2E team" }).click();
-  await expect(page.getByRole("button", { name: "Private E2E team", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Save your team" }).click();
-  await expect(page.getByText("Team saved privately.")).toBeVisible();
+  await page.getByLabel("Load saved team").nth(1).selectOption(copyTeamId!);
+  await expect(page.getByLabel("Team name").nth(1)).toHaveValue("Private E2E team");
   await page.getByRole("link", { name: "Account" }).click();
+  const trainerCard = page.getByRole("region", { name: "Trainer card" });
+  await expect(trainerCard.getByText("2", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Private library" }).click();
+  const library = page.getByRole("table");
+  await expect(library.getByRole("columnheader")).toHaveCount(3);
+  await expect(library.getByRole("row", { name: /Updated E2E team Pikachu/ })).toBeVisible();
+  await expect(library.getByRole("row", { name: /Private E2E team Pikachu/ })).toBeVisible();
+  await library.getByRole("button", { name: "Delete Private E2E team" }).click();
+  await expect(library.getByRole("row", { name: /Private E2E team/ })).toHaveCount(0);
+  await page.getByRole("link", { name: "Account" }).click();
+  await expect(trainerCard.getByText("1", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Private library" }).click();
+  await page.getByRole("table").getByRole("button", { name: "Delete Updated E2E team" }).click();
+  await expect(page.getByRole("table").getByRole("row", { name: /Updated E2E team/ })).toHaveCount(0);
+  await page.getByRole("link", { name: "Account" }).click();
+  await expect(trainerCard.getByText("0", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click();
-  await page.getByRole("link", { name: "Team builder" }).click();
-  await expect(page.getByRole("button", { name: "Private E2E team", exact: true })).toHaveCount(0);
+  await expect(page.getByText("Guest mode")).toBeVisible();
+  await page.getByRole("link", { name: "Account" }).click();
+  await page.getByRole("button", { name: "Sign in", exact: true }).first().click();
+  await page.getByLabel("Username or email").fill(username.toUpperCase());
+  await page.getByLabel("Password").fill("e2e-secure-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).last().click();
+  await expect(page.getByRole("heading", { name: "Trainer card" })).toBeVisible();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
+  await expect(page.getByText("Private E2E team")).toHaveCount(0);
   await expect(page.getByLabel("Team name").first()).toHaveValue("Private E2E team");
+  await expect(page.getByLabel("Team name").nth(1)).toHaveValue("Private E2E team");
 });

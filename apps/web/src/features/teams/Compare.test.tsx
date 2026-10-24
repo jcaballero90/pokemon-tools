@@ -110,11 +110,11 @@ describe("team comparison interface", () => {
     expect(screen.queryByText("No uncovered weaknesses among the analyzed Pokémon.")).toBeNull();
 
     rerender(<Compare {...ready} left={left} right={right} chart={chart.slice(0, 1)} />);
-    expect(screen.getByRole("status").textContent).toContain("Comparison data is unavailable");
+    expect(screen.getByRole("status").textContent).toContain("We couldn't load the comparison data");
 
     rerender(<Compare {...ready} left={left} right={right} catalog={{ ...catalog, moveDetails: undefined }} />);
     openMatchup();
-    expect(screen.getByText("Move details are unavailable. Selected-move coverage cannot be calculated.")).toBeTruthy();
+    expect(screen.getByText("Move details aren't available, so selected-move coverage can't be calculated.")).toBeTruthy();
     expect(screen.getByRole("table", { name: "Unmodified Speed ranking" })).toBeTruthy();
     expect(screen.queryByRole("table", { name: "Best selected move type effectiveness" })).toBeNull();
   });

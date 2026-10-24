@@ -8,6 +8,13 @@ export class PrismaTeamStore implements TeamStore {
   create(ownerId: string, team: TeamInput) {
     return this.db.team.create({ data: { ownerId, name: team.name, notes: team.notes, format: team.format, pokemon: team.pokemon } });
   }
+  async update(ownerId: string, id: string, team: TeamInput) {
+    const result = await this.db.team.updateManyAndReturn({
+      where: { id, ownerId },
+      data: { name: team.name, notes: team.notes, format: team.format, pokemon: team.pokemon }
+    });
+    return result[0] ?? null;
+  }
   async remove(ownerId: string, id: string) {
     return (await this.db.team.deleteMany({ where: { id, ownerId } })).count > 0;
   }
