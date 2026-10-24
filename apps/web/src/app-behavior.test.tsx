@@ -219,27 +219,136 @@ describe("website interaction regressions", () => {
     expect(screen.getByText("Hidden ability")).toBeTruthy();
   });
 
-  it("removes a previously rendered private library as soon as the user signs out", async () => {
+  it("shows the private library in its own tab and disables it while signed out", async () => {
     let signedOut = false;
     apiMock.mockImplementation((path: string) => {
       if (path === "/catalog") return Promise.resolve(catalog);
       if (path === "/type-chart") return Promise.resolve([]);
-      if (path === "/auth/get-session") return Promise.resolve(signedOut ? {} : { user: { id: "owner-1", name: "Trainer", email: "trainer@example.test" } });
+      if (path === "/auth/get-session") return Promise.resolve(signedOut ? {} : { user: { id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" } });
       if (path === "/me/teams") return Promise.resolve([savedTeam]);
       if (path === "/auth/sign-out") { signedOut = true; return Promise.resolve(undefined); }
       return Promise.resolve(undefined);
     });
 
     render(<LocaleProvider><App /></LocaleProvider>);
-    await screen.findByText("Trainer");
+    await screen.findByText("trainer_1");
+    fireEvent.click(screen.getByRole("link", { name: "Account" }));
+    expect(await screen.findByText("Manage your username and account.")).toBeTruthy();
+    expect(screen.queryByRole("table")).toBeNull();
+
+    fireEvent.click(screen.getByRole("link", { name: "Private library" }));
+    const table = await screen.findByRole("table");
+    expect(within(table).getByRole("columnheader", { name: "Team name" })).toBeTruthy();
+    expect(within(table).getByRole("columnheader", { name: "Pokémon" })).toBeTruthy();
+    expect(within(table).getByRole("columnheader", { name: "Delete" })).toBeTruthy();
+    expect(within(table).getByRole("row", { name: /Saved team Pikachu/ })).toBeTruthy();
+    fireEvent.click(within(table).getByRole("button", { name: "Delete Saved team" }));
+    await waitFor(() => {
+      expect(apiMock.mock.calls.some(([path, options]) => path === "/me/teams/team-1" && options?.method === "DELETE")).toBe(true);
+      expect(screen.getByText("You haven't saved any teams yet.")).toBeTruthy();
+    });
     fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
-    expect(await screen.findByRole("button", { name: "Saved team" })).toBeTruthy();
+    expect(screen.getAllByLabelText("Load saved team")).toHaveLength(2);
+    expect(screen.queryByRole("option", { name: /Saved team — Pikachu/ })).toBeNull();
     fireEvent.click(screen.getByRole("link", { name: "Account" }));
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
     await screen.findByText("Guest mode");
-    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
+    const disabledLibrary = screen.getByRole("button", { name: "Private library" });
+    expect(disabledLibrary.getAttribute("aria-disabled")).toBe("true");
+    const tooltipId = disabledLibrary.getAttribute("aria-describedby");
+    expect(tooltipId).toBe("private-library-tooltip");
+    expect(document.getElementById(tooltipId ?? "")?.getAttribute("role")).toBe("tooltip");
+    expect(document.getElementById(tooltipId ?? "")?.textContent).toBe("Create an account to use the private library.");
+    fireEvent.click(disabledLibrary);
+    expect(window.location.pathname).toBe("/account");
+    expect(screen.queryByRole("table")).toBeNull();
 
-    expect(screen.queryByRole("button", { name: "Saved team" })).toBeNull();
+    fireEvent.click(screen.getByRole("link", { name: "Overview" }));
+    fireEvent.click(screen.getByRole("link", { name: /Save your teams/ }));
+    expect(screen.getByRole("heading", { level: 1, name: "Private library" })).toBeTruthy();
+    expect(screen.getAllByRole("heading", { name: "Private library" })).toHaveLength(1);
+    const privateLibraryPanel = screen.getByRole("region", { name: "Private library" });
+    expect(within(privateLibraryPanel).getByText("Create an account to use the private library.")).toBeTruthy();
+    expect(within(privateLibraryPanel).getByRole("link", { name: "Go to Account" })).toBeTruthy();
+  });
+
+  it("shows trainer details with localized account creation dates", async () => {
+    const user = {
+      id: "owner-1",
+      name: "Trainer",
+      email: "trainer@example.test",
+      username: "trainer_1",
+      createdAt: "2026-10-03T10:00:00.000Z"
+    };
+    const onDone = vi.fn(async () => user);
+    const account = () => (
+      <LocaleProvider>
+        <Account user={user} savedTeams={[savedTeam, { ...savedTeam, id: "team-2" }]} libraryStatus="ready" onDone={onDone} onSigningOut={() => undefined} onNotice={() => undefined} />
+      </LocaleProvider>
+    );
+    const { container, rerender } = render(account());
+
+    const card = screen.getByRole("region", { name: "Trainer card" });
+    const details = card.querySelector(".trainer-card-details");
+    const memberDate = container.querySelector<HTMLTimeElement>(".trainer-card-details time");
+    expect(within(card).getByText("trainer_1")).toBeTruthy();
+    expect(within(card).getByText("2", { exact: true })).toBeTruthy();
+    expect(memberDate?.dateTime).toBe("2026-10-03T10:00:00.000Z");
+    expect(memberDate?.textContent).toBe(new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(user.createdAt)));
+    expect(details?.querySelectorAll(":scope > div")).toHaveLength(3);
+    expect(card.textContent).not.toContain(user.email);
+
+    const englishDate = memberDate?.textContent;
+    await act(async () => { setLocale("es-ES"); });
+    rerender(account());
+    const spanishDate = container.querySelector<HTMLTimeElement>(".trainer-card-details time");
+    expect(spanishDate?.textContent).not.toBe(englishDate);
+    expect(spanishDate?.textContent).toBe(new Intl.DateTimeFormat("es-ES", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(user.createdAt)));
+  });
+
+  it("omits an invalid creation date and shows a real zero team count for an empty library", () => {
+    const user = { id: "owner-1", name: "Trainer", email: "trainer@example.test", createdAt: "not-a-date" };
+    const renderAccount = (accountUser: typeof user | { id: string; name: string; email: string }) => (
+      <LocaleProvider>
+        <Account user={accountUser} savedTeams={[]} libraryStatus="ready" onDone={async () => user} onSigningOut={() => undefined} onNotice={() => undefined} />
+      </LocaleProvider>
+    );
+    const { rerender } = render(renderAccount(user));
+
+    const card = screen.getByRole("region", { name: "Trainer card" });
+    const details = card.querySelector("dl");
+    expect(within(card).getByText("Not set yet")).toBeTruthy();
+    expect(within(card).getByText("0", { exact: true })).toBeTruthy();
+    expect(within(card).queryByText("Member since")).toBeNull();
+    expect(details?.querySelectorAll(":scope > div")).toHaveLength(2);
+    const usernameForm = card.querySelector(".trainer-card-username-form");
+    expect(usernameForm?.querySelector(".trainer-card-help")?.textContent).toContain("3–30");
+    expect(usernameForm?.querySelector("button")?.textContent).toBe("Set username");
+    expect(card.querySelector(".trainer-card-footer button")?.textContent).toBe("Sign out");
+
+    rerender(renderAccount({ id: user.id, name: user.name, email: user.email }));
+    expect(screen.getByRole("region", { name: "Trainer card" }).querySelector("time")).toBeNull();
+  });
+
+  it("shows a loading state and omits the team count when the library cannot be loaded", () => {
+    const user = { id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" };
+    const { rerender } = render(
+      <LocaleProvider>
+        <Account user={user} savedTeams={[]} libraryStatus="loading" onDone={async () => user} onSigningOut={() => undefined} onNotice={() => undefined} />
+      </LocaleProvider>
+    );
+
+    const card = screen.getByRole("region", { name: "Trainer card" });
+    expect(within(card).getByRole("status").textContent).toBe("Loading…");
+    expect(within(card).getByText("Saved teams")).toBeTruthy();
+    rerender(
+      <LocaleProvider>
+        <Account user={user} savedTeams={[]} libraryStatus="error" onDone={async () => user} onSigningOut={() => undefined} onNotice={() => undefined} />
+      </LocaleProvider>
+    );
+
+    expect(screen.getByRole("region", { name: "Trainer card" }).querySelector("dt")?.textContent).toBe("Username");
+    expect(screen.getByRole("region", { name: "Trainer card" }).textContent).not.toContain("Saved teams");
   });
 
   it("keeps a saved library hidden after logout and ignores a delayed old-session list", async () => {
@@ -248,37 +357,93 @@ describe("website interaction regressions", () => {
     apiMock.mockImplementation((path: string) => {
       if (path === "/catalog") return Promise.resolve(catalog);
       if (path === "/type-chart") return Promise.resolve([]);
-      if (path === "/auth/get-session") return Promise.resolve(++sessions === 1 ? { user: { id: "owner-1", name: "Trainer", email: "trainer@example.test" } } : {});
+      if (path === "/auth/get-session") return Promise.resolve(++sessions === 1 ? { user: { id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" } } : {});
       if (path === "/me/teams") return oldList.promise;
       return Promise.resolve(undefined);
     });
 
     render(<LocaleProvider><App /></LocaleProvider>);
-    await screen.findByText("Trainer");
+    await screen.findByText("trainer_1");
     fireEvent.click(screen.getByRole("link", { name: "Account" }));
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
     await screen.findByText("Guest mode");
     await act(async () => oldList.resolve([savedTeam]));
 
     fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
-    expect(screen.queryByRole("button", { name: "Saved team" })).toBeNull();
+    expect(screen.queryByRole("option", { name: /Saved team/ })).toBeNull();
+  });
+
+  it("loads saved sets independently into either editor, updates a saved snapshot, and can load it again", async () => {
+    apiMock.mockImplementation((path: string, options?: RequestInit) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({ user: { id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" } });
+      if (path === "/me/teams" && !options?.method) return Promise.resolve([savedTeam]);
+      if (path === "/me/teams/team-1" && options?.method === "PUT") {
+        return Promise.resolve({ ...savedTeam, ...JSON.parse(options.body as string), updatedAt: "2026-10-04T10:00:00.000Z" });
+      }
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+    await screen.findByText("trainer_1");
+    fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
+    await waitFor(() => expect((screen.getAllByLabelText("Load saved team")[0] as HTMLSelectElement).disabled).toBe(false));
+    const loaders = screen.getAllByLabelText("Load saved team") as HTMLSelectElement[];
+    fireEvent.change(loaders[0]!, { target: { value: "team-1" } });
+    fireEvent.change(loaders[1]!, { target: { value: "team-1" } });
+    expect((screen.getAllByLabelText("Team name")[0] as HTMLInputElement).value).toBe("Saved team");
+    expect((screen.getAllByLabelText("Team name")[1] as HTMLInputElement).value).toBe("Saved team");
+
+    fireEvent.change(screen.getAllByLabelText("Team name")[0]!, { target: { value: "Edited A" } });
+    expect((screen.getAllByLabelText("Team name")[1] as HTMLInputElement).value).toBe("Saved team");
+    fireEvent.click(screen.getAllByRole("button", { name: "Save changes" })[0]!);
+    await screen.findByText("Saved team updated.");
+    const updateCall = apiMock.mock.calls.find(([path, options]) => path === "/me/teams/team-1" && options?.method === "PUT");
+    expect(JSON.parse(updateCall?.[1]?.body as string).name).toBe("Edited A");
+    expect((screen.getAllByLabelText("Team name")[1] as HTMLInputElement).value).toBe("Saved team");
+
+    fireEvent.change(screen.getAllByLabelText("Load saved team")[0]!, { target: { value: "team-1" } });
+    expect((screen.getAllByLabelText("Team name")[0] as HTMLInputElement).value).toBe("Edited A");
+  });
+
+  it("keeps the signed-in user when private library loading fails and retries successfully", async () => {
+    let listRequests = 0;
+    apiMock.mockImplementation((path: string) => {
+      if (path === "/catalog") return Promise.resolve(catalog);
+      if (path === "/type-chart") return Promise.resolve([]);
+      if (path === "/auth/get-session") return Promise.resolve({ user: { id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" } });
+      if (path === "/me/teams" && ++listRequests === 1) return Promise.reject(new Error("offline"));
+      if (path === "/me/teams") return Promise.resolve([savedTeam]);
+      return Promise.resolve(undefined);
+    });
+
+    render(<LocaleProvider><App /></LocaleProvider>);
+    await screen.findByText("trainer_1");
+    fireEvent.click(screen.getByRole("link", { name: "Private library" }));
+    expect(await screen.findByText("Your saved teams could not be loaded. Your account is still signed in.")).toBeTruthy();
+    expect(screen.getByText("trainer_1")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(await screen.findByRole("table")).toBeTruthy();
+    expect(screen.getByText("trainer_1")).toBeTruthy();
   });
 
   it("blocks saving a team with a catalog name that does not exist", async () => {
     apiMock.mockImplementation((path: string) => {
       if (path === "/catalog") return Promise.resolve(catalog);
       if (path === "/type-chart") return Promise.resolve([]);
-      if (path === "/auth/get-session") return Promise.resolve({ user: { id: "owner-1", name: "Trainer", email: "trainer@example.test" } });
+      if (path === "/auth/get-session") return Promise.resolve({ user: { id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" } });
       if (path === "/me/teams") return Promise.resolve([]);
       return Promise.resolve(undefined);
     });
 
     render(<LocaleProvider><App /></LocaleProvider>);
-    await screen.findByText("Trainer");
+    await screen.findByText("trainer_1");
     fireEvent.click(screen.getByRole("link", { name: "Team builder" }));
+    await waitFor(() => expect((screen.getAllByRole("button", { name: "Save your team" })[0] as HTMLButtonElement).disabled).toBe(false));
     fireEvent.click(screen.getAllByRole("button", { name: "+ Add Pokémon" })[0]!);
     fireEvent.change(screen.getByLabelText("Species"), { target: { value: "Missingmon" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save your team" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Save your team" })[0]!);
 
     expect(screen.getAllByRole("alert").some((alert) => alert.textContent?.includes("Missingmon"))).toBe(true);
     expect(apiMock.mock.calls.some(([path, options]) => path === "/me/teams" && options?.method === "POST")).toBe(false);
@@ -376,7 +541,7 @@ describe("website interaction regressions", () => {
   it("preserves empty move positions rather than shifting the next move", () => {
     const source = teamInputSchema.parse({ name: "Draft", pokemon: [{ species: "Pikachu", moves: ["Thunderbolt", "Protect"] }] }) as TeamDraft;
     let updated = source;
-    render(<TeamEditor title="Your team" team={source} onChange={(next) => { updated = next; }} catalog={catalog} />);
+    render(<MemoryRouter><TeamEditor title="Your team" team={source} onChange={(next) => { updated = next; }} catalog={catalog} /></MemoryRouter>);
 
     fireEvent.change(screen.getByPlaceholderText("Move 3"), { target: { value: "U-turn" } });
 
@@ -392,7 +557,7 @@ describe("website interaction regressions", () => {
 
     function TeamEditorHarness() {
       const [team, setTeam] = useState(initialTeam);
-      return <TeamEditor title="Your team" team={team} onChange={setTeam} catalog={catalog} />;
+      return <MemoryRouter><TeamEditor title="Your team" team={team} onChange={setTeam} catalog={catalog} /></MemoryRouter>;
     }
 
     const { container } = render(<TeamEditorHarness />);
@@ -421,7 +586,7 @@ describe("website interaction regressions", () => {
 
     function TeamEditorHarness() {
       const [team, setTeam] = useState(initialTeam);
-      return <TeamEditor title="Your team" team={team} onChange={(next) => { updated = next; setTeam(next); }} catalog={catalog} />;
+      return <MemoryRouter><TeamEditor title="Your team" team={team} onChange={(next) => { updated = next; setTeam(next); }} catalog={catalog} /></MemoryRouter>;
     }
 
     render(<TeamEditorHarness />);
@@ -453,6 +618,7 @@ describe("website interaction regressions", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Trainer" } });
+    fireEvent.change(screen.getByLabelText("Username"), { target: { value: "Trainer_1" } });
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "trainer@example.test" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct horse battery" } });
     const form = container.querySelector("form");
@@ -462,6 +628,7 @@ describe("website interaction regressions", () => {
     expect(apiMock.mock.calls[0]?.[0]).toBe("/auth/sign-up/email");
     expect(JSON.parse(apiMock.mock.calls[0]?.[1]?.body as string)).toEqual({
       name: "Trainer",
+      username: "trainer_1",
       email: "trainer@example.test",
       password: "correct horse battery"
     });
@@ -470,7 +637,7 @@ describe("website interaction regressions", () => {
     expect(events).toEqual(["request:/auth/sign-up/email", "refresh", "notice"]);
   });
 
-  it("submits only email and password when signing in", async () => {
+  it("uses the email endpoint when the username-or-email field contains an email address", async () => {
     apiMock.mockResolvedValue(undefined);
     const onDone = vi.fn(async () => ({
       id: "owner-1",
@@ -486,7 +653,7 @@ describe("website interaction regressions", () => {
         onNotice={() => undefined}
       />
     );
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "trainer@example.test" } });
+    fireEvent.change(screen.getByLabelText("Username or email"), { target: { value: "trainer@example.test" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct horse battery" } });
     const form = container.querySelector("form");
     expect(form).not.toBeNull();
@@ -497,6 +664,35 @@ describe("website interaction regressions", () => {
       email: "trainer@example.test",
       password: "correct horse battery"
     });
+  });
+
+  it("uses the normalized username endpoint when signing in with a username", async () => {
+    apiMock.mockResolvedValue(undefined);
+    const onDone = vi.fn(async () => ({ id: "owner-1", name: "Trainer", email: "trainer@example.test", username: "trainer_1" }));
+    render(<Account user={null} onDone={onDone} onSigningOut={() => undefined} onNotice={() => undefined} />);
+    fireEvent.change(screen.getByLabelText("Username or email"), { target: { value: "Trainer_1" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct horse battery" } });
+    const form = screen.getByLabelText("Username or email").closest("form");
+    expect(form).not.toBeNull();
+    await act(async () => fireEvent.submit(form!));
+
+    expect(apiMock.mock.calls[0]?.[0]).toBe("/auth/sign-in/username");
+    expect(JSON.parse(apiMock.mock.calls[0]?.[1]?.body as string)).toEqual({ username: "trainer_1", password: "correct horse battery" });
+  });
+
+  it("lets an existing account claim a normalized username without changing its display name", async () => {
+    apiMock.mockResolvedValue(undefined);
+    const onDone = vi.fn(async () => ({ id: "owner-1", name: "Existing Display Name", email: "legacy@example.test", username: "legacy_1" }));
+    render(<Account user={{ id: "owner-1", name: "Existing Display Name", email: "legacy@example.test" }} onDone={onDone} onSigningOut={() => undefined} onNotice={() => undefined} />);
+    fireEvent.change(screen.getByLabelText("Choose a username"), { target: { value: "Legacy_1" } });
+    const form = screen.getByLabelText("Choose a username").closest("form");
+    expect(form).not.toBeNull();
+    await act(async () => fireEvent.submit(form!));
+
+    expect(apiMock.mock.calls[0]?.[0]).toBe("/auth/update-user");
+    expect(JSON.parse(apiMock.mock.calls[0]?.[1]?.body as string)).toEqual({ username: "legacy_1" });
+    expect(onDone).toHaveBeenCalledOnce();
+    expect(screen.getByRole("heading", { name: "Trainer card" })).toBeTruthy();
   });
 
   it("hides a calculator response when its inputs change before the response arrives", async () => {
@@ -510,7 +706,7 @@ describe("website interaction regressions", () => {
     await act(async () => response.resolve({ generation: 9, min: 90, max: 110, minPercent: 90, maxPercent: 110, koChanceOnHit: 1, defenderHp: 100, description: "old matchup" }));
 
     expect(screen.queryByText("90–110%")).toBeNull();
-    expect(screen.getByRole("status").textContent).toContain("Inputs changed");
+    expect(screen.getByRole("status").textContent).toContain("Your changes aren't reflected in this result");
   });
 
   it("uses optional per-side spreads, keeps team values in blank fields, and resets one side independently", async () => {

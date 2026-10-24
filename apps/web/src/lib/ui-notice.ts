@@ -8,6 +8,11 @@ export type UiNoticeId =
   | "teamStorageUnavailable"
   | "comparisonStorageUnavailable"
   | "teamSaved"
+  | "teamUpdated"
+  | "teamCopied"
+  | "teamNotFound"
+  | "usernameUpdated"
+  | "invalidUsername"
   | "accountCreated"
   | "accountSignedIn"
   | "accountSessionUnavailable";
@@ -23,6 +28,11 @@ export function formatUiNotice(notice: UiNotice, locale: Locale): string {
     teamStorageUnavailable: t.notices.teamStorageUnavailable,
     comparisonStorageUnavailable: t.notices.comparisonStorageUnavailable,
     teamSaved: t.notices.teamSaved,
+    teamUpdated: t.notices.teamUpdated,
+    teamCopied: t.notices.teamCopied,
+    teamNotFound: t.notices.teamNotFound,
+    usernameUpdated: t.notices.usernameUpdated,
+    invalidUsername: t.notices.invalidUsername,
     accountCreated: t.account.created,
     accountSignedIn: t.account.signedIn,
     accountSessionUnavailable: t.account.sessionUnavailable

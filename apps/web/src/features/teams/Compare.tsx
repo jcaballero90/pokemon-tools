@@ -43,7 +43,7 @@ export function Compare({
   const ready = catalogStatus === "ready" && chartStatus === "ready" && catalog && completeChart;
 
   return (
-    <section className="panel compare" aria-labelledby={titleId}>
+    <section id="team-comparison" className="panel compare" tabIndex={-1} aria-labelledby={titleId}>
       <div className="comparison-heading">
         <span className="eyebrow">{t.comparison.eyebrow}</span>
         <h3 id={titleId}>{t.comparison.title}</h3>

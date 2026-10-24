@@ -253,7 +253,8 @@ const draftPokemonSchema = z.object({
 export const teamDraftSchema = z.object({
   name: z.string(), notes: z.string(), format: z.literal("gen9"), pokemon: z.array(draftPokemonSchema).max(6)
 });
-export const versionedTeamDraftSchema = z.object({ version: z.literal(1), team: teamDraftSchema });
+export const teamDraftSourceSchema = z.object({ ownerId: z.string().min(1), teamId: z.string().min(1) });
+export const versionedTeamDraftSchema = z.object({ version: z.literal(1), team: teamDraftSchema, source: teamDraftSourceSchema.optional() });
 
 export type PokemonSet = z.infer<typeof pokemonSetSchema>;
 export type TeamInput = z.infer<typeof teamInputSchema>;
@@ -272,3 +273,4 @@ export type PokedexLearnedMove = z.infer<typeof pokedexLearnedMoveSchema>;
 export type PokedexMovesResponse = z.infer<typeof pokedexMovesResponseSchema>;
 export type SavedTeamResponse = z.infer<typeof savedTeamResponseSchema>;
 export type TeamDraft = z.infer<typeof teamDraftSchema>;
+export type TeamDraftSource = z.infer<typeof teamDraftSourceSchema>;

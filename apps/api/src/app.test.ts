@@ -106,14 +106,23 @@ describe("API composition", () => {
       expect(foreignSave.statusCode).toBe(403);
       const blockedDelete = await app.inject({ method: "DELETE", url: "/api/me/teams/team-id" });
       expect(blockedDelete.statusCode).toBe(403);
+      const blockedUpdate = await app.inject({ method: "PUT", url: "/api/me/teams/team-id", payload: { name: "Attack", pokemon: [] } });
+      expect(blockedUpdate.statusCode).toBe(403);
       const sameOriginSave = await app.inject({ method: "POST", url: "/api/me/teams", headers: { origin: "http://localhost:4000" }, payload: { name: "Safe", pokemon: [] } });
       expect(sameOriginSave.statusCode).toBe(401);
       const headers = await app.inject("/api/health");
       expect(headers.headers["content-security-policy"]).toContain("https://raw.githubusercontent.com/PokeAPI/sprites/");
       expect(headers.headers["content-security-policy"]).toContain("https://archives.bulbagarden.net");
+      expect(headers.headers["content-security-policy"]).toContain("https://assets.dittobase.com/");
       expect(headers.headers["content-security-policy"]).toContain("script-src 'self'");
       const session = await app.inject({ url: "/api/auth/get-session", headers: { host: "localhost:4000" } });
       expect(session.statusCode).toBe(200);
+      const missingSignupUsername = await app.inject({ method: "POST", url: "/api/auth/sign-up/email", payload: { name: "Legacy", email: "legacy@example.test", password: "valid-password-123" } });
+      expect(missingSignupUsername.statusCode).toBe(400);
+      expect(missingSignupUsername.json()).toMatchObject({ code: "INVALID_USERNAME" });
+      const malformedSignupUsername = await app.inject({ method: "POST", url: "/api/auth/sign-up/email", payload: { name: "Legacy", username: "bad name", email: "legacy@example.test", password: "valid-password-123" } });
+      expect(malformedSignupUsername.statusCode).toBe(400);
+      expect(malformedSignupUsername.json()).toMatchObject({ code: "INVALID_USERNAME" });
       const spec = app.swagger();
       expect(spec.paths?.["/api/damage"]?.post?.requestBody).toBeDefined();
       expect(spec.paths?.["/api/me/teams"]?.post?.requestBody).toBeDefined();
@@ -128,6 +137,8 @@ describe("API composition", () => {
       expect(spec.paths?.["/api/me/teams"]?.post?.responses?.["201"]).toBeDefined();
       expect(spec.paths?.["/api/me/teams/{id}"]?.delete?.responses?.["204"]).toBeDefined();
       expect(spec.paths?.["/api/me/teams/{id}"]?.delete?.security).toEqual([{ cookieAuth: [] }]);
+      expect(spec.paths?.["/api/me/teams/{id}"]?.put?.responses?.["200"]).toBeDefined();
+      expect(spec.paths?.["/api/me/teams/{id}"]?.put?.security).toEqual([{ cookieAuth: [] }]);
     } finally { await app.close(); await db.$disconnect(); }
   });
 

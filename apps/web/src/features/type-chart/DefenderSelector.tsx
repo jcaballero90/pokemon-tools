@@ -54,9 +54,6 @@ export function DefenderSelector({
         </span>
       </div>
 
-      <label className="species-finder-label" htmlFor="defender-species">
-        {t.chart.findPokemon}
-      </label>
       <CatalogInput
         id="defender-species"
         aria-label={t.chart.findPokemon}

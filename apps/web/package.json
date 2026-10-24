@@ -9,7 +9,7 @@
     "check": "node scripts/check-ui-literals.mjs && tsc --noEmit -p tsconfig.json",
     "check:ui-copy": "node scripts/check-ui-literals.mjs",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "node scripts/run-e2e.mjs"
   },
   "dependencies": {
     "@pokemon-tools/contracts": "workspace:*",

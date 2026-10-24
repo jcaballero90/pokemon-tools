@@ -67,8 +67,12 @@ export function formatApiFailure(status: number, body: unknown, locale?: string)
   // Better Auth owns its response format; use its stable codes, never its prose.
   const code = body && typeof body === "object" && "code" in body ? body.code : undefined;
   switch (code) {
-    case "INVALID_EMAIL_OR_PASSWORD": case "INVALID_PASSWORD": case "USER_NOT_FOUND": return t.errors.auth.invalidCredentials;
+    case "INVALID_EMAIL_OR_PASSWORD": case "INVALID_USERNAME_OR_PASSWORD": case "INVALID_PASSWORD": case "USER_NOT_FOUND": return t.errors.auth.invalidCredentials;
     case "USER_ALREADY_EXISTS": case "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": return t.errors.auth.emailInUse;
+    case "USERNAME_IS_ALREADY_TAKEN": return t.errors.auth.usernameInUse;
+    case "INVALID_USERNAME": return t.errors.auth.invalidUsername;
+    case "USERNAME_TOO_SHORT": return t.errors.auth.usernameTooShort;
+    case "USERNAME_TOO_LONG": return t.errors.auth.usernameTooLong;
     case "INVALID_EMAIL": return t.errors.auth.invalidEmail;
     case "PASSWORD_TOO_SHORT": return t.errors.auth.passwordTooShort;
     case "PASSWORD_TOO_LONG": return t.errors.auth.passwordTooLong;

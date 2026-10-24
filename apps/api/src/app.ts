@@ -11,13 +11,13 @@ import {
   evolutionResponseSchema, pokedexMovesResponseSchema, pokedexResponseSchema, savedTeamResponseSchema, savedTeamsResponseSchema,
   teamInputSchema, typeChartResponseSchema
 } from "@pokemon-tools/contracts";
-import { createAuth } from "./modules/auth/auth.js";
+import { createAuth, isValidUsername } from "./modules/auth/auth.js";
 import { catalog, typeChart } from "./modules/catalog/catalog.js";
 import { pokedex, pokedexEvolution } from "./modules/catalog/pokeapi-adapter.js";
 import { pokedexMoves } from "./modules/catalog/pokedex-moves.js";
 import { eligiblePokedexSlugs, pokedexIdentityBySlug } from "./modules/catalog/pokedex-identities.js";
 import { computeDamage } from "./modules/damage/damage.js";
-import { deleteTeam, listTeams, saveTeam, validateTeam, validateTeamIssues } from "./modules/teams/teams.js";
+import { deleteTeam, listTeams, saveTeam, updateTeam, validateTeam, validateTeamIssues } from "./modules/teams/teams.js";
 import { PrismaTeamStore } from "./modules/teams/prisma-adapter.js";
 import { inCidr } from "./ingress.js";
 import { apiError, fastifyValidationIssues, InputValidationError, zodValidationIssues } from "./http-errors.js";
@@ -37,8 +37,8 @@ export async function buildApp(config: Config, db: Database) {
     if (config.EDGE_CIDR && !inCidr(peer, config.EDGE_CIDR)) return reply.code(403).send(apiError("untrusted-ingress"));
     if (!config.EDGE_CIDR && config.NODE_ENV !== "development" && config.NODE_ENV !== "test") return reply.code(503).send(apiError("ingress-not-configured"));
   });
-  await app.register(helmet, { contentSecurityPolicy: { directives: { imgSrc: ["'self'", "data:", "https://raw.githubusercontent.com/PokeAPI/sprites/", "https://archives.bulbagarden.net"] } } });
-  await app.register(rateLimit, { max: 120, timeWindow: "1 minute" });
+  await app.register(helmet, { contentSecurityPolicy: { directives: { imgSrc: ["'self'", "data:", "https://raw.githubusercontent.com/PokeAPI/sprites/", "https://archives.bulbagarden.net", "https://assets.dittobase.com/"] } } });
+  await app.register(rateLimit, { max: config.NODE_ENV === "test" ? 1_000 : 120, timeWindow: "1 minute" });
   await app.register(swagger, { openapi: { info: { title: "Pokémon Tools API", version: "0.1.0" }, components: { securitySchemes: { cookieAuth: { type: "apiKey", in: "cookie", name: "better-auth.session_token" } } } } });
   if (config.DEPLOY_ENV !== "production") await app.register(swaggerUi, { routePrefix: "/docs" });
   app.setErrorHandler((error, request, reply) => {
@@ -67,6 +67,14 @@ export async function buildApp(config: Config, db: Database) {
   const trustedOrigins = trustedOriginSet(config.PUBLIC_BASE_URL, config.TRUSTED_ORIGINS);
   app.route({ method: ["GET", "POST"], url: "/api/auth/*", handler: async (request, reply) => {
     const url = new URL(request.url, `${request.protocol}://${request.hostname}`);
+    if (url.pathname === "/api/auth/sign-up/email") {
+      const username = request.body && typeof request.body === "object" && "username" in request.body
+        ? (request.body as { username?: unknown }).username
+        : undefined;
+      if (!isValidUsername(username)) {
+        return reply.code(400).send({ code: "INVALID_USERNAME", message: "Username must contain 3–30 letters, numbers, underscores or periods." });
+      }
+    }
     const headers = new Headers();
     for (const [key, value] of Object.entries(request.headers)) if (value !== undefined) headers.set(key, Array.isArray(value) ? value.join(", ") : value);
     const response = await auth.handler(new Request(url, {
@@ -140,6 +148,17 @@ export async function buildApp(config: Config, db: Database) {
     const errors = validateTeam(parsed.data);
     if (errors.length) return reply.code(400).send(apiError("validation-failed", errors, validateTeamIssues(parsed.data)));
     return reply.code(201).send(await saveTeam(teamStore, owner, parsed.data));
+  });
+  app.put<{ Params: { id: string } }>("/api/me/teams/:id", { schema: { tags: ["teams"], security: [{ cookieAuth: [] }], params: { type: "object", required: ["id"], properties: { id: { type: "string", minLength: 1 } } }, body: z.toJSONSchema(teamInputSchema, { target: "draft-7", io: "input" }), response: { 200: json(savedTeamResponseSchema), 400: errors, 401: errors, 403: errors, 404: errors, 500: errors } } }, async (request, reply) => {
+    if (!hasTrustedOrigin(request.headers.origin, trustedOrigins)) return reply.code(403).send(apiError("untrusted-origin"));
+    const owner = await userId(request);
+    if (!owner) return reply.code(401).send(apiError("sign-in-required"));
+    const parsed = teamInputSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send(apiError("validation-failed", parsed.error.flatten(), zodValidationIssues(parsed.error.issues)));
+    const errors = validateTeam(parsed.data);
+    if (errors.length) return reply.code(400).send(apiError("validation-failed", errors, validateTeamIssues(parsed.data)));
+    const updated = await updateTeam(teamStore, owner, request.params.id, parsed.data);
+    return updated ? reply.code(200).send(updated) : reply.code(404).send(apiError("team-not-found"));
   });
   app.delete<{ Params: { id: string } }>("/api/me/teams/:id", { schema: { tags: ["teams"], security: [{ cookieAuth: [] }], params: { type: "object", required: ["id"], properties: { id: { type: "string", minLength: 1 } } }, response: { 204: { type: "null" }, 401: errors, 403: errors, 404: errors, 500: errors } } }, async (request, reply) => {
     if (!hasTrustedOrigin(request.headers.origin, trustedOrigins)) return reply.code(403).send(apiError("untrusted-origin"));
