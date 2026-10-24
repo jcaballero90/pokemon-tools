@@ -13,7 +13,7 @@ test("guest can inspect chart, build a team, and calculate damage", async ({ pag
   await expect(page.getByRole("region", { name: "2×" }).getByText("Flying")).toBeVisible();
   await expect(page.getByRole("region", { name: "0×" }).getByText("Electric")).toBeVisible();
   await expect(page.getByRole("button", { name: "Ice" })).toBeDisabled();
-  await page.getByRole("combobox", { name: "Or find a Pokémon" }).fill("Charizard");
+  await page.getByRole("combobox", { name: "Find a Pokémon" }).fill("Charizard");
   await expect(page.getByText("Charizard", { exact: true }).first()).toBeVisible();
   await page.getByRole("link", { name: "Team builder", exact: true }).click();
   await page.getByRole("button", { name: "+ Add Pokémon" }).first().click();
