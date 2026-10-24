@@ -1,6 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { catalog, typeChart } from "./catalog.js";
 
+describe("move details from pinned Generation 9 battle data", () => {
+  it("retains every canonical move and its type and category", () => {
+    expect(Object.keys(catalog.moveDetails).sort()).toEqual(catalog.moves);
+    expect(catalog.moveDetails.Thunderbolt).toEqual({ type: "Electric", category: "Special" });
+    expect(catalog.moveDetails["Flying Press"]).toEqual({ type: "Fighting", category: "Physical" });
+    expect(catalog.moveDetails["Freeze-Dry"]).toEqual({ type: "Ice", category: "Special" });
+    expect(catalog.moveDetails.thunderbolt).toBeUndefined();
+  });
+
+  it("distinguishes status moves from damaging moves with zero base power", () => {
+    expect(catalog.moveDetails["Swords Dance"]).toEqual({ type: "Normal", category: "Status" });
+    expect(catalog.moveDetails["Night Shade"]).toEqual({ type: "Ghost", category: "Special" });
+    expect(catalog.moveDetails["Seismic Toss"]).toEqual({ type: "Fighting", category: "Physical" });
+  });
+});
+
 describe("type chart from pinned battle data", () => {
   it("keeps known Generation 9 matchups", () => {
     const fire = typeChart().find((row) => row.attack === "Fire");

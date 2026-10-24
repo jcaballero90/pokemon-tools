@@ -18,9 +18,44 @@ test("guest can inspect chart, build a team, and calculate damage", async ({ pag
   await page.getByRole("link", { name: "Team builder" }).click();
   await page.getByRole("button", { name: "+ Add Pokémon" }).first().click();
   await expect(page.getByText("1/6").first()).toBeVisible();
-  await page.getByRole("link", { name: "Damage" }).click();
+  await page.getByRole("link", { name: "Damage", exact: true }).click();
+  await expect(page.getByRole("combobox", { name: "Move", exact: true })).toHaveAttribute("aria-invalid", "false");
   await page.getByRole("button", { name: "Calculate damage" }).click();
   await expect(page.getByText(/one-hit KO chance/)).toBeVisible();
+});
+
+test("damage calculator keeps blank spreads, applies EV/IV overrides, and resets them", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Damage", exact: true }).click();
+  await page.getByRole("button", { name: "Calculate damage" }).click();
+  const result = page.locator(".result-card h2");
+  await expect(result).toBeVisible();
+  const baseline = await result.textContent();
+
+  await page.getByText("EVs and IVs (optional)").click();
+  await page.getByLabel("Attacker Special Attack EVs").fill("252");
+  await page.getByLabel("Attacker Special Attack IVs").fill("0");
+  await page.getByLabel("Defender Hit Points EVs").fill("252");
+  await page.getByRole("button", { name: "Calculate damage" }).click();
+  await expect(result).not.toHaveText(baseline ?? "");
+
+  await page.locator(".result-card details summary").click();
+  await expect(page.getByText(/Attacker EVs: .*SpA 252/)).toBeVisible();
+  await expect(page.getByText(/Attacker IVs: .*SpA 0/)).toBeVisible();
+  await expect(page.getByText(/Defender EVs: .*HP 252/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Reset overrides" }).first().click();
+  await page.getByRole("button", { name: "Reset overrides" }).last().click();
+  await page.getByRole("button", { name: "Calculate damage" }).click();
+  await expect(result).toHaveText(baseline ?? "");
+
+  await page.getByRole("switch", { name: "Dark theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("switch", { name: "Change language to Spain Spanish" }).click();
+  await expect(page.getByText("EV e IV (opcionales)")).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(pageWidth).toBeLessThanOrEqual(390);
 });
 
 test("guest drafts retain incomplete edits and move slots after a page reload", async ({ page }) => {
@@ -35,6 +70,40 @@ test("guest drafts retain incomplete edits and move slots after a page reload", 
   await expect(page.getByLabel("Team name").first()).toHaveValue("Half-finished draft");
   await expect(page.getByPlaceholder("Move 2").first()).toHaveValue("");
   await expect(page.getByPlaceholder("Move 3").first()).toHaveValue("Protect");
+});
+
+test("guest can review a Showdown paste, edit the imported set, and reload the draft", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("button", { name: "Import from Showdown" }).first().click();
+  await page.getByLabel("Showdown paste").fill(`Pikachu @ Light Ball
+Ability: Static
+Level: 42
+Tera Type: Water
+Timid Nature
+EVs: 252 SpA / 4 SpD / 252 Spe
+IVs: 0 Atk
+- Thunderbolt`);
+  await page.getByRole("button", { name: "Review paste" }).click();
+  await expect(page.getByText("1 Pokémon ready to import.")).toBeVisible();
+  await page.getByRole("button", { name: "Import team" }).click();
+
+  await expect(page.getByText("1/6").first()).toBeVisible();
+  await expect(page.getByLabel("Item").first()).toHaveValue("Light Ball");
+  await page.getByRole("button", { name: "Export to Showdown" }).first().click();
+  const exportedPaste = page.getByLabel("Showdown export");
+  await expect.poll(() => exportedPaste.inputValue()).toContain("Pikachu @ Light Ball");
+  await expect.poll(() => exportedPaste.inputValue()).toContain("IVs: 0 Atk");
+  await expect.poll(() => exportedPaste.inputValue()).toContain("- Thunderbolt");
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.getByLabel("Team name").first().fill("Imported and edited");
+  await page.getByPlaceholder("Move 2").first().fill("Protect");
+  await page.reload();
+  await page.getByRole("link", { name: "Team builder" }).click();
+
+  await expect(page.getByLabel("Team name").first()).toHaveValue("Imported and edited");
+  await expect(page.getByLabel("Item").first()).toHaveValue("Light Ball");
+  await expect(page.getByPlaceholder("Move 2").first()).toHaveValue("Protect");
 });
 
 test("the defensive chart stays readable on a narrow phone-sized viewport", async ({ page }) => {
@@ -77,7 +146,7 @@ test("account can save a private team without exposing it to another account", a
   const secondContext = await browser.newContext();
   try {
     const secondPage = await secondContext.newPage();
-    await secondPage.goto("http://127.0.0.1:5173/");
+    await secondPage.goto(new URL("/", page.url()).href);
     await secondPage.getByRole("link", { name: "Account" }).click();
     await secondPage.getByRole("button", { name: "Create account" }).click();
     await secondPage.getByLabel("Name").fill("Second Trainer");
