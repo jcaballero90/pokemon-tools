@@ -19,6 +19,12 @@ export const catalog = {
     };
   }).sort((a, b) => a.name.localeCompare(b.name)),
   moves: [...gen.moves].map((m) => m.name).sort(),
+  moveDetails: Object.fromEntries([...gen.moves].map((move) => {
+    if (!move.category) {
+      throw new Error(`Missing Generation 9 move category: ${move.name}`);
+    }
+    return [move.name, { type: move.type, category: move.category }];
+  })),
   abilities: [...gen.abilities].map((a) => a.name).sort(),
   items: [...gen.items].map((i) => i.name).sort(),
   types: [...gen.types].map((t) => t.name).filter((name) => name !== "???").sort(),

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { PokedexResponse } from "@pokemon-tools/contracts";
 import { t } from "../../i18n/presentation";
 
@@ -26,8 +26,9 @@ export function PokemonArtwork({ name, detail, shiny, onShinyChange, gender, onG
     if (shiny) return detail.artwork?.shiny ?? [];
     return detail.artwork?.normal.length ? detail.artwork.normal : detail.sprite ? [detail.sprite] : [];
   }, [activeGender, activeGenderArtwork, detail, shiny]);
-  const [failedCandidates, setFailedCandidates] = useState(0);
-  useEffect(() => setFailedCandidates(0), [name, activeGender, shiny, candidates]);
+  const candidateKey = `${name}\u0000${activeGender}\u0000${shiny}\u0000${candidates.join("\u0000")}`;
+  const [candidateFailure, setCandidateFailure] = useState<{ key: string; index: number } | null>(null);
+  const failedCandidates = candidateFailure?.key === candidateKey ? candidateFailure.index : 0;
 
   const src = candidates[failedCandidates];
   const hasShiny = activeGenderArtwork
@@ -36,7 +37,6 @@ export function PokemonArtwork({ name, detail, shiny, onShinyChange, gender, onG
   function selectGender(next: PokemonGender) {
     if (next === activeGender || (next === "male" ? !maleAvailable : !femaleAvailable)) return;
     if (shiny && !genderVariants?.[next].shiny.length) onShinyChange(false);
-    setFailedCandidates(0);
     onGenderChange(next);
   }
 
@@ -50,7 +50,10 @@ export function PokemonArtwork({ name, detail, shiny, onShinyChange, gender, onG
             alt={name}
             width="360"
             height="360"
-            onError={() => setFailedCandidates((index) => Math.min(index + 1, candidates.length))}
+            onError={() => setCandidateFailure((current) => {
+              const currentIndex = current?.key === candidateKey ? current.index : 0;
+              return { key: candidateKey, index: Math.min(currentIndex + 1, candidates.length) };
+            })}
           />
         ) : (
           <div className="artwork-placeholder" role="img" aria-label={t.pokedex.artworkUnavailable}>
@@ -86,7 +89,7 @@ export function PokemonArtwork({ name, detail, shiny, onShinyChange, gender, onG
             className="shiny-toggle"
             aria-pressed={shiny}
             disabled={!hasShiny}
-            onClick={() => { setFailedCandidates(0); onShinyChange(!shiny); }}
+            onClick={() => onShinyChange(!shiny)}
           >
             <span className="shiny-sparkle" aria-hidden="true">✦</span>
             {t.pokedex.shinyArtwork}

@@ -32,7 +32,7 @@ const catalog: CatalogResponse = {
     { name: "Pikachu", types: ["Electric"], baseStats: { hp: 35, atk: 55, def: 40, spa: 50, spd: 50, spe: 90 } },
     { name: "Charizard", types: ["Fire", "Flying"], baseStats: { hp: 78, atk: 84, def: 78, spa: 109, spd: 85, spe: 100 } }
   ],
-  moves: ["Thunderbolt", "Protect"], abilities: [], items: [], types: ["Electric", "Fire", "Flying"], natures: ["Serious", "Timid"]
+  moves: ["Thunderbolt", "Protect", "Flamethrower"], abilities: [], items: [], types: ["Electric", "Fire", "Flying"], natures: ["Serious", "Timid"]
 };
 
 beforeEach(() => apiMock.mockReset());
