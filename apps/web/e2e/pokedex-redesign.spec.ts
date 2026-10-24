@@ -32,7 +32,7 @@ test("Pokédex details, evolution family, and moves fit desktop and phone layout
   await page.route("**/api/catalog", (route) => route.fulfill({ json: catalog }));
   await page.route("**/api/type-chart", (route) => route.fulfill({ json: [] }));
   await page.route("**/api/auth/get-session", (route) => route.fulfill({ json: {} }));
-  await page.route("**/api/site-config", (route) => route.fulfill({ json: { publicBaseUrl: "http://127.0.0.1:5173", deployEnv: "development" } }));
+  await page.route("**/api/site-config", (route) => route.fulfill({ json: { publicBaseUrl: new URL(route.request().url()).origin, deployEnv: "development" } }));
   await page.route("**/api/pokedex/Corvisquire/evolution", (route) => route.fulfill({ json: family }));
   await page.route("**/api/pokedex/Corvisquire/moves", (route) => route.fulfill({ json: {
     source: {
@@ -75,7 +75,7 @@ test("Pokédex details, evolution family, and moves fit desktop and phone layout
   await expect(page.locator(".species-list .species-name").nth(2)).toHaveText("Corviknight");
   await page.getByRole("link", { name: /Corvisquire/ }).click();
   await expect(page).toHaveURL(/\/pokedex\/corvisquire$/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "http://127.0.0.1:5173/pokedex/corvisquire");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new URL("/pokedex/corvisquire", page.url()).href);
   await page.goBack();
   await expect(page).toHaveURL(/\/pokedex$/);
   await page.goForward();

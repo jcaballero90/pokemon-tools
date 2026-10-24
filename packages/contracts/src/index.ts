@@ -83,7 +83,12 @@ export const catalogResponseSchema = z.object({
     pokedexSlug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
     pokedexIsBaseForm: z.boolean().optional()
   })),
-  moves: z.array(z.string()), abilities: z.array(z.string()), items: z.array(z.string()),
+  moves: z.array(z.string()),
+  moveDetails: z.record(z.string(), z.object({
+    type: z.string().trim().min(1),
+    category: z.enum(["Physical", "Special", "Status"])
+  })).optional(),
+  abilities: z.array(z.string()), items: z.array(z.string()),
   types: z.array(z.string()), natures: z.array(z.string()),
   translations: z.object({
     species: z.record(z.string(), z.string()),
