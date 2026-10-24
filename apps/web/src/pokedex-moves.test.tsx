@@ -132,7 +132,7 @@ describe("Pokédex move panel", () => {
     apiMock.mockResolvedValue(unavailable);
     render(<LocaleProvider><PokemonMoves species="Abra" catalog={catalog} /></LocaleProvider>);
 
-    expect(await screen.findByText("No hay datos de movimientos registrados para este Pokémon en Escarlata/Púrpura.")).toBeTruthy();
+    expect(await screen.findByText("No hay datos de movimientos de Escarlata y Púrpura para este Pokémon.")).toBeTruthy();
     expect(screen.queryByText("No hay movimientos que coincidan con la búsqueda.")).toBeNull();
   });
 
@@ -144,7 +144,7 @@ describe("Pokédex move panel", () => {
     const view = render(<LocaleProvider><PokemonMoves species="Pikachu" catalog={catalog} /></LocaleProvider>);
 
     view.rerender(<LocaleProvider><PokemonMoves species="Abra" catalog={catalog} /></LocaleProvider>);
-    expect(await screen.findByText("No Scarlet/Violet move data is recorded for this Pokémon.")).toBeTruthy();
+    expect(await screen.findByText("Scarlet/Violet move data isn't available for this Pokémon.")).toBeTruthy();
     resolvePikachu?.(response);
     await Promise.resolve();
     expect(screen.queryByText("Impactrueno")).toBeNull();

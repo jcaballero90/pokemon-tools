@@ -87,6 +87,15 @@ async function importTeam(editor: Locator, paste: string, count = 2) {
 }
 
 async function stubData(page: Page) {
+  await page.route("https://assets.dittobase.com/**", (route) => route.fulfill({
+    status: 200,
+    contentType: "image/png",
+    body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jmk0AAAAASUVORK5CYII=", "base64")
+  }));
+  await page.route("**/api/site-config", (route) => route.fulfill({ json: {
+    publicBaseUrl: "http://127.0.0.1:5175",
+    deployEnv: "development"
+  } }));
   await page.route("**/api/catalog", (route) => route.fulfill({ json: catalog }));
   await page.route("**/api/type-chart", (route) => route.fulfill({ json: typeChart }));
   await page.route("**/api/auth/get-session", (route) => route.fulfill({ json: {} }));
@@ -196,7 +205,7 @@ test("equal editors support independent expansion and live selected-move coverag
   await expect(page.getByLabel("Attacker Attack EVs").locator("..")).toContainText("Inherited: 0");
   await expect(page.getByLabel("Attacker Attack IVs")).toHaveAttribute("placeholder", "0–31");
   await expect(page.getByLabel("Attacker Attack IVs").locator("..")).toContainText("Inherited: 31");
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
   await a.locator(".set-card").first().locator("summary").click();
   await expect(page.locator(".team-editor").first().locator(".set-card").first().getByLabel("Species")).toHaveValue("Pikachu");
   await expect(a.locator(".set-card").first().getByRole("spinbutton", { name: "Level" })).toHaveValue("100");
@@ -211,7 +220,7 @@ test("equal editors support independent expansion and live selected-move coverag
   await expect(page.locator(".damage-transfer-summary")).toContainText("Charizard");
   await expect(page.locator(".damage-transfer-summary")).toContainText("Blastoise");
   await expect(page.locator(".damage-transfer-summary")).toContainText("Spe 0");
-  await page.getByRole("link", { name: "Team builder" }).click();
+  await page.getByRole("link", { name: "Team builder", exact: true }).click();
 
   await a.getByRole("button", { name: "Export to Showdown" }).click();
   await expect(a.getByLabel("Showdown export")).toHaveValue(/- Flamethrower/);

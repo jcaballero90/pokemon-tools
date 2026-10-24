@@ -67,7 +67,7 @@ test("Pokédex details, evolution family, and moves fit desktop and phone layout
 
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
-  await page.getByRole("link", { name: "Pokédex" }).click();
+  await page.getByRole("link", { name: "Pokédex", exact: true }).click();
   await expect(page.getByRole("link", { name: /Ababo/ })).toHaveCount(0);
   await expect(page.locator(".species-list .species-name").nth(0)).toHaveText("Rookidee");
   await expect(page.locator(".species-list .species-national-number").nth(0)).toHaveText("#0821");

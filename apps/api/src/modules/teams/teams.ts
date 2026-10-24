@@ -5,6 +5,7 @@ import { errorText } from "../../resources/errors.js";
 export interface TeamStore {
   list(ownerId: string): Promise<unknown[]>;
   create(ownerId: string, team: TeamInput): Promise<unknown>;
+  update(ownerId: string, id: string, team: TeamInput): Promise<unknown | null>;
   remove(ownerId: string, id: string): Promise<boolean>;
 }
 
@@ -18,4 +19,5 @@ export function validateTeamIssues(team: TeamInput) {
 
 export function listTeams(store: TeamStore, ownerId: string) { return store.list(ownerId); }
 export function saveTeam(store: TeamStore, ownerId: string, team: TeamInput) { return store.create(ownerId, team); }
+export function updateTeam(store: TeamStore, ownerId: string, id: string, team: TeamInput) { return store.update(ownerId, id, team); }
 export function deleteTeam(store: TeamStore, ownerId: string, id: string) { return store.remove(ownerId, id); }

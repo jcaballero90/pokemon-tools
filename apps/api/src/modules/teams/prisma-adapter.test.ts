@@ -25,4 +25,18 @@ describe("Prisma team ownership filters", () => {
 
     expect(create).toHaveBeenCalledWith({ data: expect.objectContaining({ ownerId: "session-owner", name: "Practice" }) });
   });
+
+  it("updates a team atomically inside the owner's scope and returns null for foreign or missing ids", async () => {
+    const updateManyAndReturn = vi.fn().mockResolvedValue([]);
+    const db = { team: { updateManyAndReturn } } as unknown as Database;
+    const store = new PrismaTeamStore(db);
+
+    const result = await store.update("owner-a", "team-b", { name: "Practice", notes: "", format: "gen9", pokemon: [] });
+
+    expect(result).toBeNull();
+    expect(updateManyAndReturn).toHaveBeenCalledWith({
+      where: { id: "team-b", ownerId: "owner-a" },
+      data: expect.objectContaining({ name: "Practice", pokemon: [] })
+    });
+  });
 });

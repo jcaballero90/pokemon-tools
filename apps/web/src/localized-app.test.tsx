@@ -109,7 +109,7 @@ describe("localized website values", () => {
       <TypeChart chart={chart} catalog={catalog} chartStatus="ready" catalogStatus="ready" />
     );
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Or find a Pokémon" }), {
+    fireEvent.change(screen.getByRole("combobox", { name: "Find a Pokémon" }), {
       target: { value: "Translated Charizard" }
     });
 

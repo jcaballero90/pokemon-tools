@@ -1,8 +1,13 @@
 import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import nodemailer from "nodemailer";
 import type { Config } from "../../config.js";
 import type { Database } from "../../db.js";
+
+export function isValidUsername(value: unknown): value is string {
+  return typeof value === "string" && /^[a-zA-Z0-9_.]{3,30}$/.test(value);
+}
 
 export function createAuth(db: Database, config: Config) {
   const transport = config.SMTP_URL && config.EMAIL_FROM ? nodemailer.createTransport(config.SMTP_URL) : null;
@@ -18,6 +23,12 @@ export function createAuth(db: Database, config: Config) {
         await transport.sendMail({ from: config.EMAIL_FROM, to: user.email, subject: "Reset your Pokémon Tools password", text: `Reset your password: ${url}` });
       } : undefined
     },
+    plugins: [username({
+      displayUsername: false,
+      minUsernameLength: 3,
+      maxUsernameLength: 30,
+      usernameValidator: isValidUsername
+    })],
     emailVerification: transport ? {
       sendOnSignUp: true,
       sendVerificationEmail: async ({ user, url }) => {

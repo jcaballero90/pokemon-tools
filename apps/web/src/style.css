@@ -8,7 +8,6 @@
 .defender-heading-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .defender-heading-row h2, .results-heading h2 { margin: 6px 0 0; font-size: 1.48rem; letter-spacing: -.045em; }
 .selection-count { flex: none; padding: 8px 12px; border: 1px solid #e1eae6; border-radius: 999px; background: #f1f6f4; color: #465d4e; font-size: .78rem; font-weight: 750; }
-.species-finder-label { display: block; margin-bottom: 7px; color: #314739; font-size: .84rem; font-weight: 750; }
 .species-finder { max-width: 520px; margin-top: 0; }
 .finder-help { min-height: 21px; margin: 7px 0 22px; color: #647469; font-size: .78rem; line-height: 1.45; }
 .type-selection-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }

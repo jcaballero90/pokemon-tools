@@ -72,7 +72,7 @@ describe("Pokédex species list", () => {
 
     fireEvent.change(screen.getByLabelText("Buscar un Pokémon"), { target: { value: "missing-pokemon" } });
 
-    expect(screen.getByRole("status").textContent).toBe("No hay ningún Pokémon que coincida con la búsqueda.");
+    expect(screen.getByRole("status").textContent).toBe("No hay ningún Pokémon que coincida. Prueba con el nombre de una especie o forma.");
     expect(screen.queryByRole("button", { name: "Cargar más Pokémon" })).toBeNull();
   });
 });

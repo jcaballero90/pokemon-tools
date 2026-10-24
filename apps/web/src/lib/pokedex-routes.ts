@@ -1,6 +1,6 @@
 import type { CatalogResponse } from "@pokemon-tools/contracts";
 
-export type SiteTab = "overview" | "typeChart" | "pokedex" | "teamBuilder" | "damage" | "account";
+export type SiteTab = "overview" | "typeChart" | "pokedex" | "teamBuilder" | "damage" | "privateLibrary" | "account";
 type SpeciesEntry = CatalogResponse["species"][number];
 
 export const siteTabPaths: Record<SiteTab, string> = {
@@ -9,6 +9,7 @@ export const siteTabPaths: Record<SiteTab, string> = {
   pokedex: "/pokedex",
   teamBuilder: "/team-builder",
   damage: "/damage",
+  privateLibrary: "/private-library",
   account: "/account"
 };
 
