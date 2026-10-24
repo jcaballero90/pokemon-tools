@@ -77,7 +77,7 @@ afterEach(() => {
 describe("defensive type chart", () => {
   it("groups all Grass/Ground attack types by combined effectiveness", () => {
     renderChart();
-    const defendingTypes = within(screen.getByRole("group", { name: "Or choose one or two types" }));
+    const defendingTypes = within(screen.getByRole("group", { name: "Or choose up to two types" }));
     expect(defendingTypes.getAllByRole("button").length).toBe(18);
     const grassIcon = screen.getByRole("button", { name: "Grass" }).querySelector("img");
     expect(grassIcon?.getAttribute("src")).toBe(
@@ -152,7 +152,7 @@ describe("defensive type chart", () => {
     });
     renderChart();
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Or find a Pokémon" }), {
+    fireEvent.change(screen.getByRole("combobox", { name: "Find a Pokémon" }), {
       target: { value: "Charizard" }
     });
     expect(screen.getByRole("button", { name: "Fire" }).getAttribute("aria-pressed")).toBe("true");
@@ -161,7 +161,7 @@ describe("defensive type chart", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Flying" }));
     expect(screen.queryByLabelText("Selected Pokémon")).toBeNull();
-    expect((screen.getByRole("combobox", { name: "Or find a Pokémon" }) as HTMLInputElement).value).toBe("");
+    expect((screen.getByRole("combobox", { name: "Find a Pokémon" }) as HTMLInputElement).value).toBe("");
     expect(screen.getByRole("button", { name: "Fire" }).getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByRole("button", { name: "Flying" }).getAttribute("aria-pressed")).toBe("false");
   });
@@ -169,7 +169,7 @@ describe("defensive type chart", () => {
   it("keeps existing types while a finder query is incomplete", () => {
     renderChart();
     fireEvent.click(screen.getByRole("button", { name: "Fire" }));
-    fireEvent.change(screen.getByRole("combobox", { name: "Or find a Pokémon" }), {
+    fireEvent.change(screen.getByRole("combobox", { name: "Find a Pokémon" }), {
       target: { value: "Char" }
     });
 
@@ -183,23 +183,23 @@ describe("defensive type chart", () => {
       sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png"
     });
     renderChart();
-    fireEvent.change(screen.getByRole("combobox", { name: "Or find a Pokémon" }), {
+    fireEvent.change(screen.getByRole("combobox", { name: "Find a Pokémon" }), {
       target: { value: "Charizard" }
     });
     expect(await screen.findByAltText("Charizard")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Clear selection" }));
 
-    expect((screen.getByRole("combobox", { name: "Or find a Pokémon" }) as HTMLInputElement).value).toBe("");
+    expect((screen.getByRole("combobox", { name: "Find a Pokémon" }) as HTMLInputElement).value).toBe("");
     expect(screen.queryByLabelText("Selected Pokémon")).toBeNull();
     expect(screen.queryByRole("region", { name: "2×" })).toBeNull();
-    expect(screen.getByRole("status").textContent).toContain("Choose one or two defending types");
+    expect(screen.getByRole("status").textContent).toContain("Choose a Pokémon or one or two types");
   });
 
   it("keeps the matchup available when a Pokémon sprite cannot be loaded", async () => {
     apiMock.mockRejectedValue(new Error("Sprite unavailable"));
     renderChart();
-    fireEvent.change(screen.getByRole("combobox", { name: "Or find a Pokémon" }), {
+    fireEvent.change(screen.getByRole("combobox", { name: "Find a Pokémon" }), {
       target: { value: "Pikachu" }
     });
 
@@ -212,7 +212,7 @@ describe("defensive type chart", () => {
     const second = deferred<{ source: "PokéAPI"; pokedexId: number; sprite: string }>();
     apiMock.mockImplementation((path: string) => path.endsWith("Charizard") ? first.promise : second.promise);
     renderChart();
-    const finder = screen.getByRole("combobox", { name: "Or find a Pokémon" });
+    const finder = screen.getByRole("combobox", { name: "Find a Pokémon" });
 
     fireEvent.change(finder, { target: { value: "Charizard" } });
     fireEvent.change(finder, { target: { value: "Bulbasaur" } });
@@ -235,7 +235,7 @@ describe("defensive type chart", () => {
   it("does not display an empty matrix or calculated results while type data is loading", () => {
     render(<TypeChart chart={null} catalog={catalog} chartStatus="loading" catalogStatus="ready" />);
 
-    expect(screen.getByRole("status").textContent).toContain("Loading Generation 9 type data");
+    expect(screen.getByRole("status").textContent).toContain("Loading the Generation 9 type chart");
     expect(screen.queryByRole("button", { name: "Fire" })).toBeNull();
     expect(screen.queryByRole("region", { name: "0×" })).toBeNull();
   });
@@ -243,6 +243,6 @@ describe("defensive type chart", () => {
   it("reports unavailable chart data", () => {
     render(<TypeChart chart={[]} catalog={catalog} chartStatus="unavailable" catalogStatus="ready" />);
 
-    expect(screen.getByRole("alert").textContent).toContain("Type effectiveness data is unavailable");
+    expect(screen.getByRole("alert").textContent).toContain("We couldn't load the type chart");
   });
 });

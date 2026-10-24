@@ -10,12 +10,13 @@ import {
   type CatalogResponse,
   type SavedTeamResponse,
   type TeamDraft,
+  type TeamDraftSource,
   type TeamInput,
   type TypeChartResponse,
   typeChartResponseSchema
 } from "@pokemon-tools/contracts";
-import { Button } from "./components/ui/button";
 import { Account, type AccountUser } from "./features/account/Account";
+import { PrivateLibrary } from "./features/account/PrivateLibrary";
 import { Compare } from "./features/teams/Compare";
 import { TeamEditor } from "./features/teams/TeamEditor";
 import { Damage } from "./features/damage/Damage";
@@ -28,7 +29,7 @@ import { setApiCatalogTranslations } from "./i18n";
 import { formatUiNotice, type UiNotice } from "./lib/ui-notice";
 import { api } from "./lib/api";
 import { resolveSiteRoute, siteTabPaths, type SiteTab } from "./lib/pokedex-routes";
-import { loadTeamDraft, saveTeamDraft } from "./lib/team-drafts";
+import { loadStoredTeamDraft, saveTeamDraft } from "./lib/team-drafts";
 import { copyPokemonSet, submittedTeam, type DamageTransfer } from "./features/teams/team-model";
 import { validateTeamDraft } from "./features/teams/set-validation";
 import { CatalogDatalists } from "./components/catalog-datalists";
@@ -37,7 +38,7 @@ import "./style.css";
 import "./theme.css";
 
 type SavedTeam = SavedTeamResponse;
-const tabs: SiteTab[] = ["overview", "typeChart", "pokedex", "teamBuilder", "damage", "account"];
+const tabs: SiteTab[] = ["overview", "typeChart", "pokedex", "teamBuilder", "damage", "privateLibrary", "account"];
 const emptyTeam = (): TeamInput => teamInputSchema.parse({ name: t.team.defaultName, pokemon: [] });
 type PublicSiteConfig = { publicBaseUrl: string; deployEnv: "development" | "staging" | "production" };
 
@@ -87,21 +88,41 @@ function AppContent() {
   const [catalogStatus, setCatalogStatus] = useState<"loading" | "ready" | "unavailable">("loading");
   const [user, setUser] = useState<AccountUser | null>(null);
   const [saved, setSaved] = useState<SavedTeam[]>([]);
+  const [libraryStatus, setLibraryStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [libraryPendingCount, setLibraryPendingCount] = useState(0);
   const [notice, setNotice] = useState<UiNotice | null>(null);
   const [siteConfig, setSiteConfig] = useState<PublicSiteConfig | null>(null);
-  const [team, setTeam] = useState<TeamDraft>(() => loadTeamDraft("team", emptyTeam()));
-  const [comparison, setComparison] = useState<TeamDraft>(() => loadTeamDraft("comparison", emptyTeam()));
+  const [initialTeamDraft] = useState(() => loadStoredTeamDraft("team", emptyTeam()));
+  const [initialComparisonDraft] = useState(() => loadStoredTeamDraft("comparison", emptyTeam()));
+  const [team, setTeam] = useState<TeamDraft>(initialTeamDraft.team);
+  const [comparison, setComparison] = useState<TeamDraft>(initialComparisonDraft.team);
+  const [draftSourceA, setDraftSourceA] = useState<TeamDraftSource | null>(initialTeamDraft.source);
+  const [draftSourceB, setDraftSourceB] = useState<TeamDraftSource | null>(initialComparisonDraft.source);
+  const [teamEditorRevisionA, setTeamEditorRevisionA] = useState(0);
+  const [teamEditorRevisionB, setTeamEditorRevisionB] = useState(0);
   const [invalidNumericSetsA, setInvalidNumericSetsA] = useState<ReadonlySet<number>>(() => new Set());
   const [invalidNumericSetsB, setInvalidNumericSetsB] = useState<ReadonlySet<number>>(() => new Set());
-  const [showTeamValidationErrors, setShowTeamValidationErrors] = useState(false);
+  const [showTeamValidationErrorsA, setShowTeamValidationErrorsA] = useState(false);
+  const [showTeamValidationErrorsB, setShowTeamValidationErrorsB] = useState(false);
   const [damageTransfer, setDamageTransfer] = useState<DamageTransfer | undefined>();
   const sessionGeneration = useRef(0);
   const damageTransferSequence = useRef(0);
+  const authenticatedUserId = useRef<string | null>(null);
+  const libraryQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const libraryBusy = libraryPendingCount > 0;
+
+  function serializeLibraryOperation<T>(operation: () => Promise<T>): Promise<T> {
+    setLibraryPendingCount((count) => count + 1);
+    const result = libraryQueue.current.then(operation, operation);
+    libraryQueue.current = result.then(() => undefined, () => undefined);
+    return result.finally(() => setLibraryPendingCount((count) => Math.max(0, count - 1)));
+  }
 
   const route = resolveSiteRoute(location.pathname, catalog);
   const tab = route.kind === "page" ? route.tab : null;
   const tabLabels: Record<SiteTab, string> = t.tabs;
   const descriptions: Record<SiteTab, string> = t.descriptions;
+  const pageTabDescription = tab === "account" && user ? t.account.signedInDescription : descriptions[tab ?? "overview"];
   const entryName = route.kind === "page" && route.species ? label("species", route.species.name) : undefined;
   let pageTitle: string;
   let pageDescription: string;
@@ -114,7 +135,7 @@ function AppContent() {
   } else {
     const pageTab = tab ?? "overview";
     pageTitle = pageTab === "overview" ? t.app.title : `${tabLabels[pageTab]} | ${t.app.title}`;
-    pageDescription = descriptions[pageTab];
+    pageDescription = pageTabDescription;
   }
 
   useEffect(() => {
@@ -145,28 +166,62 @@ function AppContent() {
     if (route.kind === "page" && location.pathname !== route.canonicalPath) navigate(route.canonicalPath, { replace: true });
   }, [location.pathname, navigate, route]);
 
+  useEffect(() => {
+    if (location.hash !== "#team-comparison" || tab !== "teamBuilder") return;
+    const comparisonSection = document.getElementById("team-comparison");
+    if (!comparisonSection) return;
+    comparisonSection.focus({ preventScroll: true });
+    comparisonSection.scrollIntoView?.({ block: "start" });
+  }, [location.hash, location.pathname, tab]);
+
   const refreshSession = useCallback(async (): Promise<AccountUser | null> => {
     const generation = ++sessionGeneration.current;
-    setSaved([]);
-
+    let currentUser: AccountUser | null;
     try {
       const result = await api<{ user?: AccountUser }>("/auth/get-session");
       if (generation !== sessionGeneration.current) return null;
-
-      const currentUser = result?.user ?? null;
-      setUser(currentUser);
-      if (!currentUser) return null;
-
-      const teams = await api<SavedTeam[]>("/me/teams", undefined, savedTeamsResponseSchema);
-      if (generation === sessionGeneration.current) setSaved(teams);
-      return currentUser;
+      currentUser = result?.user ?? null;
     } catch {
       if (generation === sessionGeneration.current) {
+        authenticatedUserId.current = null;
         setUser(null);
         setSaved([]);
+        setDraftSourceA(null);
+        setDraftSourceB(null);
+        setLibraryStatus("ready");
       }
       return null;
     }
+
+    const previousOwnerId = authenticatedUserId.current;
+    if (previousOwnerId !== null && previousOwnerId !== (currentUser?.id ?? null)) {
+      setSaved([]);
+      setDraftSourceA(null);
+      setDraftSourceB(null);
+    }
+    authenticatedUserId.current = currentUser?.id ?? null;
+    setUser(currentUser);
+    if (!currentUser) {
+      setSaved([]);
+      setDraftSourceA(null);
+      setDraftSourceB(null);
+      setLibraryStatus("ready");
+      return null;
+    }
+
+    setLibraryStatus("loading");
+    try {
+      const teams = await serializeLibraryOperation(() => api<SavedTeam[]>("/me/teams", undefined, savedTeamsResponseSchema));
+      if (generation === sessionGeneration.current) {
+        setSaved(teams);
+        setLibraryStatus("ready");
+        setDraftSourceA((source) => source?.ownerId === currentUser.id && teams.some((entry) => entry.id === source.teamId) ? source : null);
+        setDraftSourceB((source) => source?.ownerId === currentUser.id && teams.some((entry) => entry.id === source.teamId) ? source : null);
+      }
+    } catch {
+      if (generation === sessionGeneration.current) setLibraryStatus("error");
+    }
+    return currentUser;
   }, []);
 
   useEffect(() => {
@@ -194,42 +249,117 @@ function AppContent() {
   }, [refreshSession]);
 
   useEffect(() => {
-    if (!saveTeamDraft("team", team)) setNotice({ kind: "message", id: "teamStorageUnavailable" });
-  }, [team]);
+    if (!saveTeamDraft("team", team, draftSourceA)) setNotice({ kind: "message", id: "teamStorageUnavailable" });
+  }, [team, draftSourceA]);
 
   useEffect(() => {
-    if (!saveTeamDraft("comparison", comparison)) {
+    if (!saveTeamDraft("comparison", comparison, draftSourceB)) {
       setNotice({ kind: "message", id: "comparisonStorageUnavailable" });
     }
-  }, [comparison]);
+  }, [comparison, draftSourceB]);
 
   function clearPrivateLibrary() {
     sessionGeneration.current++;
+    authenticatedUserId.current = null;
     setUser(null);
     setSaved([]);
+    setDraftSourceA(null);
+    setDraftSourceB(null);
+    setLibraryStatus("ready");
   }
 
-  async function saveTeam() {
+  async function retryPrivateLibrary() {
     const owner = user;
     const generation = sessionGeneration.current;
     if (!owner) return;
-
-    setShowTeamValidationErrors(true);
-    if (validateTeamDraft(team, catalog).length > 0 || invalidNumericSetsA.size > 0) return;
-
+    setLibraryStatus("loading");
     try {
-      const created = await api<SavedTeam>(
-        "/me/teams",
-        { method: "POST", body: JSON.stringify(submittedTeam(team)) },
-        savedTeamResponseSchema
-      );
+      const teams = await serializeLibraryOperation(() => api<SavedTeam[]>("/me/teams", undefined, savedTeamsResponseSchema));
+      if (generation !== sessionGeneration.current || authenticatedUserId.current !== owner.id) return;
+      setSaved(teams);
+      setLibraryStatus("ready");
+      setDraftSourceA((source) => source?.ownerId === owner.id && teams.some((entry) => entry.id === source.teamId) ? source : null);
+      setDraftSourceB((source) => source?.ownerId === owner.id && teams.some((entry) => entry.id === source.teamId) ? source : null);
+    } catch {
+      if (generation === sessionGeneration.current) setLibraryStatus("error");
+    }
+  }
 
-      if (generation === sessionGeneration.current && user?.id === owner.id) {
-        setSaved((current) => [created, ...current.filter((entry) => entry.id !== created.id)]);
-        setNotice({ kind: "message", id: "teamSaved" });
-      }
+  function setDraftForSide(side: "a" | "b", next: TeamDraft) {
+    if (side === "a") setTeam(next);
+    else setComparison(next);
+  }
+
+  function setSourceForSide(side: "a" | "b", source: TeamDraftSource | null) {
+    if (side === "a") setDraftSourceA(source);
+    else setDraftSourceB(source);
+  }
+
+  function setShowErrorsForSide(side: "a" | "b", show: boolean) {
+    if (side === "a") setShowTeamValidationErrorsA(show);
+    else setShowTeamValidationErrorsB(show);
+  }
+
+  function clearEditorTransientState(side: "a" | "b") {
+    if (side === "a") {
+      setInvalidNumericSetsA(new Set());
+      setShowTeamValidationErrorsA(false);
+      setTeamEditorRevisionA((revision) => revision + 1);
+    } else {
+      setInvalidNumericSetsB(new Set());
+      setShowTeamValidationErrorsB(false);
+      setTeamEditorRevisionB((revision) => revision + 1);
+    }
+  }
+
+  function loadSavedTeamIntoSide(side: "a" | "b", id: string) {
+    if (!user || libraryBusy || libraryStatus !== "ready") return;
+    const savedTeam = saved.find((entry) => entry.id === id);
+    if (!savedTeam) return;
+    const copiedTeam = teamInputSchema.parse(savedTeam);
+    setDraftForSide(side, { ...copiedTeam, pokemon: copiedTeam.pokemon.map(copyPokemonSet) });
+    setSourceForSide(side, { ownerId: user.id, teamId: savedTeam.id });
+    clearEditorTransientState(side);
+  }
+
+  async function saveDraft(side: "a" | "b", asCopy = false) {
+    const owner = user;
+    const generation = sessionGeneration.current;
+    if (!owner || libraryStatus !== "ready" || libraryBusy) return;
+    const draft = side === "a" ? team : comparison;
+    const invalidNumericIndexes = side === "a" ? invalidNumericSetsA : invalidNumericSetsB;
+    const source = side === "a" ? draftSourceA : draftSourceB;
+    setShowErrorsForSide(side, true);
+    if (validateTeamDraft(draft, catalog).length > 0 || invalidNumericIndexes.size > 0) return;
+
+    const linkedTeamId = !asCopy && source?.ownerId === owner.id && saved.some((entry) => entry.id === source.teamId)
+      ? source.teamId
+      : null;
+    if (!asCopy && source && !linkedTeamId) {
+      setSourceForSide(side, null);
+      setNotice({ kind: "message", id: "teamNotFound" });
+      return;
+    }
+
+    const snapshot = submittedTeam(draft);
+    try {
+      const savedTeam = await serializeLibraryOperation(async () => {
+        if (generation !== sessionGeneration.current || authenticatedUserId.current !== owner.id) return null;
+        return api<SavedTeam>(linkedTeamId ? `/me/teams/${linkedTeamId}` : "/me/teams", {
+          method: linkedTeamId ? "PUT" : "POST",
+          body: JSON.stringify(snapshot)
+        }, savedTeamResponseSchema);
+      });
+      if (!savedTeam || generation !== sessionGeneration.current || authenticatedUserId.current !== owner.id) return;
+      setSaved((current) => [savedTeam, ...current.filter((entry) => entry.id !== savedTeam.id)]);
+      setSourceForSide(side, { ownerId: owner.id, teamId: savedTeam.id });
+      setNotice({ kind: "message", id: linkedTeamId ? "teamUpdated" : source && asCopy ? "teamCopied" : "teamSaved" });
     } catch (error) {
-      if (generation === sessionGeneration.current) setNotice({ kind: "error", error });
+      if (generation !== sessionGeneration.current) return;
+      if (linkedTeamId && typeof error === "object" && error !== null && "status" in error && error.status === 404) {
+        setSourceForSide(side, null);
+        setNotice({ kind: "message", id: "teamNotFound" });
+      } else setNotice({ kind: "error", error });
     }
   }
 
@@ -239,22 +369,28 @@ function AppContent() {
     if (!owner) return;
 
     try {
-      await api(`/me/teams/${id}`, { method: "DELETE" });
+      await serializeLibraryOperation(async () => {
+        if (generation !== sessionGeneration.current || authenticatedUserId.current !== owner.id) return;
+        await api(`/me/teams/${id}`, { method: "DELETE" });
+      });
       if (generation === sessionGeneration.current && user?.id === owner.id) {
         setSaved((current) => current.filter((entry) => entry.id !== id));
+        setDraftSourceA((source) => source?.teamId === id ? null : source);
+        setDraftSourceB((source) => source?.teamId === id ? null : source);
       }
     } catch (error) {
       if (generation === sessionGeneration.current) setNotice({ kind: "error", error });
     }
   }
 
-  function handleSavedTeamOpen(savedTeam: SavedTeam) {
-    setTeam(teamInputSchema.parse(savedTeam));
-  }
-
   function handleTeamChange(nextTeam: TeamDraft) {
     setTeam(nextTeam);
-    setShowTeamValidationErrors(false);
+    setShowTeamValidationErrorsA(false);
+  }
+
+  function handleComparisonChange(nextTeam: TeamDraft) {
+    setComparison(nextTeam);
+    setShowTeamValidationErrorsB(false);
   }
 
   function handleDamageTransfer(pair: Omit<DamageTransfer, "id">) {
@@ -288,14 +424,15 @@ function AppContent() {
       />
 
       <main>
-        <div className="page-heading">
-          <span className="eyebrow">{t.app.competitiveWorkspace}</span>
-          <h1>{route.kind === "notFound" ? t.seo.notFoundHeading : tabLabels[tab ?? "overview"]}</h1>
-          <p>{route.kind === "notFound" ? pageDescription : descriptions[tab ?? "overview"]}</p>
-        </div>
+        {(route.kind === "notFound" || tab !== "overview") && (
+          <div className="page-heading">
+            <h1>{route.kind === "notFound" ? t.seo.notFoundHeading : tabLabels[tab ?? "overview"]}</h1>
+            <p>{route.kind === "notFound" ? pageDescription : pageTabDescription}</p>
+          </div>
+        )}
 
         {notice && (
-          <div className="notice" role="status">
+          <div className={`notice${notice.kind === "error" ? " notice-error" : ""}`} role={notice.kind === "error" ? "alert" : "status"}>
             {formatUiNotice(notice, locale)}
             <button onClick={handleNoticeDismiss} aria-label={t.app.dismissNotice}>×</button>
           </div>
@@ -320,21 +457,44 @@ function AppContent() {
         {route.kind === "page" && tab === "teamBuilder" && (
           <div className="builder-layout">
             <TeamEditor
+              key={`team-a-${teamEditorRevisionA}`}
               title={t.team.yourTeam}
               team={team}
               onChange={handleTeamChange}
               catalog={catalog}
-              showValidationErrors={showTeamValidationErrors}
+              showValidationErrors={showTeamValidationErrorsA}
+              userSignedIn={Boolean(user)}
+              savedTeams={saved}
+              libraryStatus={libraryStatus}
+              libraryBusy={libraryBusy}
+              sourceTeamId={draftSourceA?.teamId ?? null}
+              sourceIsVerified={Boolean(user && draftSourceA?.ownerId === user.id && libraryStatus === "ready" && saved.some((entry) => entry.id === draftSourceA.teamId))}
+              onLoadSavedTeam={(id) => loadSavedTeamIntoSide("a", id)}
+              onSaveTeam={() => void saveDraft("a")}
+              onSaveCopy={() => void saveDraft("a", true)}
+              onRetryLibrary={() => void retryPrivateLibrary()}
               onNumericSetValidityChange={(index, valid) => {
                 setInvalidNumericSetsA((current) => updateInvalidIndexes(current, index, valid));
               }}
             />
             <TeamEditor
+              key={`team-b-${teamEditorRevisionB}`}
               title={t.team.comparisonTeam}
               team={comparison}
-              onChange={setComparison}
+              onChange={handleComparisonChange}
               catalog={catalog}
               side="b"
+              showValidationErrors={showTeamValidationErrorsB}
+              userSignedIn={Boolean(user)}
+              savedTeams={saved}
+              libraryStatus={libraryStatus}
+              libraryBusy={libraryBusy}
+              sourceTeamId={draftSourceB?.teamId ?? null}
+              sourceIsVerified={Boolean(user && draftSourceB?.ownerId === user.id && libraryStatus === "ready" && saved.some((entry) => entry.id === draftSourceB.teamId))}
+              onLoadSavedTeam={(id) => loadSavedTeamIntoSide("b", id)}
+              onSaveTeam={() => void saveDraft("b")}
+              onSaveCopy={() => void saveDraft("b", true)}
+              onRetryLibrary={() => void retryPrivateLibrary()}
               onNumericSetValidityChange={(index, valid) => {
                 setInvalidNumericSetsB((current) => updateInvalidIndexes(current, index, valid));
               }}
@@ -349,13 +509,6 @@ function AppContent() {
               invalidSetIndexesA={getInvalidSetIndexes(team, catalog, invalidNumericSetsA)}
               invalidSetIndexesB={getInvalidSetIndexes(comparison, catalog, invalidNumericSetsB)}
               onOpenDamage={handleDamageTransfer}
-            />
-            <PrivateTeamLibrary
-              user={user}
-              savedTeams={saved}
-              onSave={saveTeam}
-              onOpen={handleSavedTeamOpen}
-              onRemove={removeSavedTeam}
             />
           </div>
         )}
@@ -373,9 +526,21 @@ function AppContent() {
         {route.kind === "page" && tab === "account" && (
           <Account
             user={user}
+            savedTeams={saved}
+            libraryStatus={libraryStatus}
             onDone={refreshSession}
             onSigningOut={clearPrivateLibrary}
             onNotice={setNotice}
+          />
+        )}
+        {route.kind === "page" && tab === "privateLibrary" && (
+          <PrivateLibrary
+            signedIn={Boolean(user)}
+            savedTeams={saved}
+            status={libraryStatus}
+            busy={libraryBusy}
+            onRetry={() => void retryPrivateLibrary()}
+            onDeleteTeam={removeSavedTeam}
           />
         )}
       </main>
@@ -402,26 +567,41 @@ function SiteHeader({ tab, user, theme, onToggleTheme, locale, onToggleLocale }:
   return (
     <header className="site-header">
       <div className="brand">
-        <span className="brand-mark">✦</span>
-        <div>
+        <Link className="brand-home" to={siteTabPaths.overview} aria-label={t.app.title}>
+          <img className="brand-mark" src="https://assets.dittobase.com/items/scarlet-violet/quick-ball.png" alt="" />
           <strong>{t.app.title}</strong>
-          <small>{t.app.brandSubtitle}</small>
-        </div>
+        </Link>
       </div>
       <nav aria-label={t.app.mainNavigation}>
         {tabs.map((item) => (
-          <Link
-            key={item}
-            to={siteTabPaths[item]}
-            className={tab === item ? "nav-active" : ""}
-            aria-current={tab === item ? "page" : undefined}
-          >
-            {tabLabels[item]}
-          </Link>
+          item === "privateLibrary" && !user ? (
+            <span key={item} className="private-library-nav-item">
+              <button
+                type="button"
+                className="nav-disabled"
+                aria-disabled="true"
+                aria-describedby="private-library-tooltip"
+              >
+                {tabLabels[item]}
+              </button>
+              <span id="private-library-tooltip" className="pokedex-ability-tooltip private-library-nav-tooltip" role="tooltip">
+                {t.account.libraryRequiresAccount}
+              </span>
+            </span>
+          ) : (
+            <Link
+              key={item}
+              to={siteTabPaths[item]}
+              className={tab === item ? "nav-active" : ""}
+              aria-current={tab === item ? "page" : undefined}
+            >
+              {tabLabels[item]}
+            </Link>
+          )
         ))}
       </nav>
       <div className="header-actions">
-        <div className="header-user" title={user?.name}>{user ? user.name : t.app.guestMode}</div>
+        <div className="header-user" title={user?.username ?? t.account.usernameNotSet}>{user ? user.username || t.account.usernameNotSet : t.app.guestMode}</div>
         <button
           className="theme-toggle"
           type="button"
@@ -451,40 +631,6 @@ function SiteHeader({ tab, user, theme, onToggleTheme, locale, onToggleLocale }:
         </button>
       </div>
     </header>
-  );
-}
-
-type PrivateTeamLibraryProps = {
-  user: AccountUser | null;
-  savedTeams: SavedTeam[];
-  onSave: () => Promise<void>;
-  onOpen: (team: SavedTeam) => void;
-  onRemove: (id: string) => Promise<void>;
-};
-
-function PrivateTeamLibrary({ user, savedTeams, onSave, onOpen, onRemove }: PrivateTeamLibraryProps) {
-  return (
-    <div className="panel save-panel">
-      <h3>{t.team.privateLibrary}</h3>
-      <p>{t.team.saveDescription}</p>
-      <Button disabled={!user} onClick={onSave}>{t.team.saveButton}</Button>
-      {!user && (
-        <Link className="text-link" to={siteTabPaths.account}>
-          {t.team.signInOrCreate}
-        </Link>
-      )}
-      {user && savedTeams.map((savedTeam) => (
-        <div className="saved-row" key={savedTeam.id}>
-          <button onClick={() => onOpen(savedTeam)}>{savedTeam.name}</button>
-          <button
-            aria-label={formatMessage(t.team.deleteTeam, { name: savedTeam.name })}
-            onClick={() => void onRemove(savedTeam.id)}
-          >
-            ×
-          </button>
-        </div>
-      ))}
-    </div>
   );
 }
 

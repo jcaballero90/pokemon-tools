@@ -11,8 +11,8 @@ const webUrl = `http://127.0.0.1:${webPort}`;
 export default defineConfig({
   testDir: "./e2e",
   use: { baseURL: webUrl, ...devices["Desktop Chrome"], channel: process.env.PLAYWRIGHT_CHANNEL === "msedge" ? "msedge" : undefined },
-  webServer: [
-    { command: "node --env-file-if-exists=.env --import tsx src/main.ts", cwd: apiDirectory, url: `${apiUrl}/api/health`, env: { PORT: String(apiPort), PUBLIC_BASE_URL: webUrl, TRUSTED_ORIGINS: webUrl }, reuseExistingServer: !process.env.CI, timeout: 60_000 },
+  webServer: process.env.E2E_EXTERNAL_SERVERS === "1" ? [] : [
+    { command: "node --env-file-if-exists=.env --import tsx src/main.ts", cwd: apiDirectory, url: `${apiUrl}/api/health`, env: { NODE_ENV: "test", PORT: String(apiPort), PUBLIC_BASE_URL: webUrl, TRUSTED_ORIGINS: webUrl }, reuseExistingServer: !process.env.CI, timeout: 60_000 },
     { command: `node node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${webPort} --strictPort`, cwd: webDirectory, url: webUrl, env: { API_PORT: String(apiPort) }, reuseExistingServer: !process.env.CI, timeout: 60_000 }
   ],
   retries: process.env.CI ? 1 : 0

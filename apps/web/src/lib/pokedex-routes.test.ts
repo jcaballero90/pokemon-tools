@@ -34,6 +34,7 @@ describe("Pokédex routes", () => {
   it("maps every top-level page and builds exceptional slugs", () => {
     expect(resolveSiteRoute("/type-chart", catalog)).toMatchObject({ kind: "page", tab: "typeChart" });
     expect(resolveSiteRoute("/team-builder", catalog)).toMatchObject({ kind: "page", tab: "teamBuilder" });
+    expect(resolveSiteRoute("/private-library", catalog)).toMatchObject({ kind: "page", tab: "privateLibrary" });
     expect(speciesPath(catalog.species[4]!)).toBe("/pokedex/charizard-mega-x");
     expect(speciesSlug("Mr. Mime")).toBe("mr-mime");
     expect(resolveSiteRoute("/missing", catalog)).toEqual({ kind: "notFound" });
