@@ -41,7 +41,7 @@ La API es un monolito modular con límites prácticos; el [mapa de arquitectura]
 
 ## Ejecución local
 
-Requisitos previos: Node.js 24, pnpm 11 (el workspace fija `pnpm@11.19.0`) y Docker Desktop para el contenedor local de PostgreSQL, o un servidor PostgreSQL 18 existente. Ejecuta los siguientes comandos desde la raíz del repositorio.
+Requisitos previos: Node.js 24.21.0 o posterior dentro de la rama 24.x, pnpm 11.19.0 (versión fijada por el workspace; compruébala con `pnpm --version`) y Docker Desktop para el contenedor local de PostgreSQL, o un servidor PostgreSQL 18 existente. Ejecuta los siguientes comandos desde la raíz del repositorio.
 
 1. Instala las dependencias y genera el cliente de Prisma:
 
@@ -99,7 +99,8 @@ La ruta de publicación utiliza las comprobaciones satisfactorias de `staging` p
 | --- | --- |
 | URL del repositorio GitHub | [github.com/jcaballero90/pokemon-tools](https://github.com/jcaballero90/pokemon-tools) |
 | URL pública de la aplicación | `https://jcrserver.duckdns.org` (el propietario informa de que la publicación de producción y la página funcionan). |
-| Presentación y vídeo explicativo | Pendientes; se añadirán los enlaces cuando estén creados. |
-| Acceso de revisor | `<user>` / `<password>` son solo marcadores. El propietario preparará credenciales de prueba para la entrega final sin incluir contraseñas reales en el repositorio. |
+| Presentación | https://canva.link/4wyyj6ig7gd08u1 |
+| Vídeo explicativo | https://youtu.be/i4BER2PJHYs |
+| Acceso de revisor | Indicado en el formulario de entrega |
 
 Otros documentos del proyecto: [plan de seguridad](docs/security/security-plan.es.md), [metodología del TFM y evidencia de workflows](docs/tfm/ai-methodology/README.es.md), y el [workflow de evolución del producto](docs/tfm/ai-methodology/workflows/007-post-rollout-product-evolution.es.md). Antes de entregar el TFM, revisa la URL real de GitHub, la aplicación publicada, los materiales de entrega y el acceso del revisor.
