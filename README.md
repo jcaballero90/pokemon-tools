@@ -41,7 +41,7 @@ The API is a modular monolith with pragmatic boundaries; the [architecture map](
 
 ## Run locally
 
-Prerequisites: Node.js 24, pnpm 11 (the workspace pins `pnpm@11.19.0`), and Docker Desktop for the local PostgreSQL container, or an existing local PostgreSQL 18 server. The following commands run from the repository root.
+Prerequisites: Node.js 24.21.0 or newer within the 24.x line, pnpm 11.19.0 (pinned by the workspace; check with `pnpm --version`), and Docker Desktop for the local PostgreSQL container, or an existing local PostgreSQL 18 server. The following commands run from the repository root.
 
 1. Install dependencies and generate the Prisma client:
 
@@ -99,7 +99,8 @@ The release path uses successful Checks on `staging` to build one image, deploy 
 | --- | --- |
 | GitHub repository URL | [github.com/jcaballero90/pokemon-tools](https://github.com/jcaballero90/pokemon-tools) |
 | Public application URL | `https://jcrserver.duckdns.org` (production deployment and page reported working by the owner). |
-| Slides and explanatory video | Pending; links will be added when created. |
-| Reviewer login | `<user>` / `<password>` are placeholders only. The owner will arrange usable test access for final delivery without committing real credentials. |
+| Slides | https://canva.link/4wyyj6ig7gd08u1 |
+| Explanatory video | https://youtu.be/i4BER2PJHYs |
+| Reviewer login | Indicated in the submission form  |
 
 Further project records: [security plan](docs/security/security-plan.md), [AI methodology and workflow evidence](docs/tfm/ai-methodology/README.md), and the [latest product-evolution workflow](docs/tfm/ai-methodology/workflows/007-post-rollout-product-evolution.md). Review the GitHub URL, live app, delivery materials, and reviewer access before TFM submission.
